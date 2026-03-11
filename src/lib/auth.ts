@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const db = getDb();
+        const db = await getDb();
         const user = await db.query.users.findFirst({
           where: eq(users.email, credentials.email),
         });
