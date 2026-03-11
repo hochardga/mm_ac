@@ -40,12 +40,28 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const analyticsEvents = pgTable("analytics_events", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  playerId: text("player_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  sessionId: text("session_id").notNull(),
+  caseDefinitionId: text("case_definition_id").references(() => caseDefinitions.id, {
+    onDelete: "cascade",
+  }),
+  caseRevision: text("case_revision"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const usersRelations = relations(users, ({ many }) => ({
   playerCases: many(playerCases),
+  analyticsEvents: many(analyticsEvents),
 }));
 
 export const caseDefinitionsRelations = relations(caseDefinitions, ({ many }) => ({
   playerCases: many(playerCases),
+  analyticsEvents: many(analyticsEvents),
 }));
 
 export const playerCasesRelations = relations(playerCases, ({ one, many }) => ({
@@ -64,5 +80,16 @@ export const notesRelations = relations(notes, ({ one }) => ({
   playerCase: one(playerCases, {
     fields: [notes.playerCaseId],
     references: [playerCases.id],
+  }),
+}));
+
+export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => ({
+  player: one(users, {
+    fields: [analyticsEvents.playerId],
+    references: [users.id],
+  }),
+  caseDefinition: one(caseDefinitions, {
+    fields: [analyticsEvents.caseDefinitionId],
+    references: [caseDefinitions.id],
   }),
 }));

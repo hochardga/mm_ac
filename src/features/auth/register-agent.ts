@@ -15,15 +15,17 @@ export type RegisterAgentInput = {
 export async function registerAgent(input: RegisterAgentInput) {
   const db = await getDb();
   const passwordHash = await hashPassword(input.password);
+  const userId = randomUUID();
 
   await db.insert(users).values({
-    id: randomUUID(),
+    id: userId,
     email: input.email,
     passwordHash,
     alias: input.alias,
   });
 
   return {
+    userId,
     redirectTo: "/vault",
   };
 }

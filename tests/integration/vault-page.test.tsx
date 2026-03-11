@@ -6,9 +6,16 @@ import { afterEach, expect, test, vi } from "vitest";
 const { cookiesMock } = vi.hoisted(() => ({
   cookiesMock: vi.fn(),
 }));
+const { getServerSessionMock } = vi.hoisted(() => ({
+  getServerSessionMock: vi.fn(),
+}));
 
 vi.mock("next/headers", () => ({
   cookies: cookiesMock,
+}));
+
+vi.mock("next-auth", () => ({
+  getServerSession: getServerSessionMock,
 }));
 
 import VaultPage from "@/app/(app)/vault/page";
@@ -17,6 +24,7 @@ import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
   cookiesMock.mockReset();
+  getServerSessionMock.mockReset();
   await closeDb();
 });
 
@@ -27,6 +35,7 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   const redHarborId = randomUUID();
   const briarLedgerId = randomUUID();
 
+  getServerSessionMock.mockResolvedValue(null);
   cookiesMock.mockResolvedValue({
     get: (name: string) =>
       name === "ashfall-agent-id" ? { value: agentId } : undefined,

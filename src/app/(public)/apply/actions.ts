@@ -34,6 +34,11 @@ export async function registerAgentAction(
     sameSite: "lax",
     path: "/",
   });
+  cookieStore.set("ashfall-agent-id", result.userId, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+  });
 
   return {
     status: "success",

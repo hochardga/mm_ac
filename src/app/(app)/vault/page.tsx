@@ -1,12 +1,19 @@
+import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { listAvailableCases } from "@/features/cases/list-available-cases";
+import { authOptions } from "@/lib/auth";
 
 export default async function VaultPage() {
-  const cookieStore = await cookies();
+  const [session, cookieStore] = await Promise.all([
+    getServerSession(authOptions),
+    cookies(),
+  ]);
+  const sessionUserId =
+    session?.user && "id" in session.user ? String(session.user.id) : undefined;
   const dossiers = await listAvailableCases({
-    userId: cookieStore.get("ashfall-agent-id")?.value,
+    userId: sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value,
   });
 
   return (
