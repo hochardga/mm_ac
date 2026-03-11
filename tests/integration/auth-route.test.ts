@@ -1,4 +1,4 @@
-import { isProtectedPath } from "@/lib/auth";
+import { isProtectedPath } from "@/lib/route-protection";
 
 test("treats vault and case routes as protected", () => {
   expect(isProtectedPath("/vault")).toBe(true);

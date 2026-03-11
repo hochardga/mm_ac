@@ -4,17 +4,14 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import { users } from "@/db/schema";
 import { comparePassword } from "@/features/auth/password";
+import { resolveAuthSecret } from "@/lib/auth-config";
 import { getDb } from "@/lib/db";
-
-export function isProtectedPath(pathname: string) {
-  return pathname === "/vault" || pathname.startsWith("/cases/");
-}
 
 export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET ?? "test-secret",
+  secret: resolveAuthSecret(process.env),
   pages: {
     signIn: "/signin",
   },

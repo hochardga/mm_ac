@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "validate:cases": "tsx scripts/validate-cases.ts"
+    "validate:cases": "tsx scripts/validate-cases.ts",
+    "playwright": "playwright test"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.16",
@@ -23,6 +24,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
