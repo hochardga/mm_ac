@@ -1,11 +1,15 @@
 export function getCaseAvailability(input: {
-  currentPublishedRevision: string;
-  hasStartedCase: boolean;
+  published: boolean;
+  broken: boolean;
+  hasPlayerCase: boolean;
 }) {
-  const published = input.currentPublishedRevision.length > 0;
+  if (!input.published) {
+    return input.hasPlayerCase ? "Available" : "Hidden";
+  }
 
-  return {
-    published,
-    visible: published || input.hasStartedCase,
-  };
+  if (input.broken && !input.hasPlayerCase) {
+    return "Maintenance";
+  }
+
+  return "Available";
 }

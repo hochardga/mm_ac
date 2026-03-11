@@ -39,27 +39,41 @@ export default async function VaultPage() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.25em] text-stone-500">
-                  {dossier.displayStatus}
+                  {dossier.availability === "Available"
+                    ? dossier.displayStatus
+                    : dossier.availability}
                 </p>
                 <h2 className="mt-3 text-2xl font-semibold text-stone-950">
                   {dossier.title}
                 </h2>
               </div>
-              <div className="rounded-full border border-stone-300 px-3 py-1 text-xs uppercase tracking-[0.2em] text-stone-600">
-                {dossier.estimatedMinutes} min
-              </div>
+              {dossier.availability === "Available" ? (
+                <div className="rounded-full border border-stone-300 px-3 py-1 text-xs uppercase tracking-[0.2em] text-stone-600">
+                  {dossier.estimatedMinutes} min
+                </div>
+              ) : null}
             </div>
 
             <p className="mt-4 flex-1 text-base leading-7 text-stone-700">
               {dossier.summary}
             </p>
 
-            <Link
-              className="mt-6 inline-flex w-fit rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
-              href={`/cases/${dossier.slug}`}
-            >
-              Open Case File
-            </Link>
+            {dossier.availability === "Available" ? (
+              <Link
+                className="mt-6 inline-flex w-fit rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
+                href={`/cases/${dossier.slug}`}
+              >
+                Open Case File
+              </Link>
+            ) : (
+              <button
+                className="mt-6 inline-flex w-fit cursor-not-allowed rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-500"
+                disabled
+                type="button"
+              >
+                Unavailable
+              </button>
+            )}
           </article>
         ))}
       </section>

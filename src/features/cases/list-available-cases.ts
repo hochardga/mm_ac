@@ -2,7 +2,6 @@ import "server-only";
 
 import {
   getDisplayStatus,
-  getVaultAvailability,
   isPlayerCaseStatus,
   type PlayerCaseStatus,
 } from "@/features/cases/case-status";
@@ -18,13 +17,18 @@ export type VaultCaseRecord = {
   estimatedMinutes: number;
   status: PlayerCaseStatus;
   displayStatus: string;
-  availability: "Available" | "Hidden";
+  availability: "Available" | "Maintenance" | "Hidden";
 };
 
 export async function listAvailableCases(input: { userId?: string }) {
   const db = await getDb();
 
-  await syncCaseDefinitions(db);
+  try {
+    await syncCaseDefinitions(db);
+  } catch {
+    // Published rows already in the database should still render even if the
+    // latest authored manifest is temporarily broken.
+  }
 
   const definitions = await db.query.caseDefinitions.findMany();
   const existingPlayerCases = input.userId
@@ -42,30 +46,40 @@ export async function listAvailableCases(input: { userId?: string }) {
   const dossiers = await Promise.all(
     definitions.map(async (definition) => {
       const playerCase = playerCaseByDefinitionId.get(definition.id);
+      const published = definition.currentPublishedRevision.length > 0;
+      let broken = false;
+      let manifest: Awaited<ReturnType<typeof loadCaseManifest>> | null = null;
+
+      try {
+        manifest = await loadCaseManifest(definition.slug);
+      } catch {
+        broken = true;
+      }
+
       const availability = getCaseAvailability({
-        currentPublishedRevision: definition.currentPublishedRevision,
-        hasStartedCase: Boolean(playerCase),
+        published,
+        broken,
+        hasPlayerCase: Boolean(playerCase),
       });
 
-      if (!availability.visible) {
+      if (availability === "Hidden") {
         return null;
       }
 
-      const manifest = await loadCaseManifest(definition.slug);
       const status = isPlayerCaseStatus(playerCase?.status ?? "")
         ? playerCase.status
         : "new";
 
       return {
         slug: definition.slug,
-        title: manifest.title,
-        summary: manifest.summary,
-        estimatedMinutes: manifest.estimatedMinutes,
+        title: manifest?.title ?? definition.title,
+        summary:
+          manifest?.summary ??
+          "This dossier is under maintenance while Ashfall repairs the published file.",
+        estimatedMinutes: manifest?.estimatedMinutes ?? 0,
         status,
         displayStatus: getDisplayStatus(status),
-        availability: getVaultAvailability({
-          published: availability.published,
-        }),
+        availability,
       } satisfies VaultCaseRecord;
     }),
   );
