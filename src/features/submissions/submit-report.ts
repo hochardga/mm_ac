@@ -27,6 +27,17 @@ export async function submitReport(input: SubmitReportInput) {
     });
 
     if (existingSubmission) {
+      const samePayload =
+        existingSubmission.suspectId === input.answers.suspectId &&
+        existingSubmission.motiveId === input.answers.motiveId &&
+        existingSubmission.methodId === input.answers.methodId;
+
+      if (!samePayload) {
+        throw new Error(
+          "Submission token is already bound to a different payload",
+        );
+      }
+
       return {
         id: existingSubmission.id,
         attemptNumber: existingSubmission.attemptNumber,
@@ -41,6 +52,10 @@ export async function submitReport(input: SubmitReportInput) {
 
     if (!playerCase) {
       throw new Error("Player case not found");
+    }
+
+    if (playerCase.status !== "in_progress") {
+      throw new Error("Case no longer accepts submissions");
     }
 
     const caseDefinition = await tx.query.caseDefinitions.findFirst({

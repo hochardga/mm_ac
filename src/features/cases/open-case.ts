@@ -4,10 +4,44 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
 
-import { analyticsEvents, playerCases } from "@/db/schema";
+import { analyticsEvents, notes, playerCases, reportDrafts } from "@/db/schema";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb } from "@/lib/db";
+
+async function buildResumeTarget(
+  tx: Parameters<Awaited<ReturnType<typeof getDb>>["transaction"]>[0] extends (
+    executor: (transaction: infer T) => Promise<unknown>,
+  ) => Promise<unknown>
+    ? T
+    : never,
+  playerCase: typeof playerCases.$inferSelect,
+  caseSlug: string,
+) {
+  const [savedNote, savedDraft] = await Promise.all([
+    tx.query.notes.findFirst({
+      where: eq(notes.playerCaseId, playerCase.id),
+    }),
+    tx.query.reportDrafts.findFirst({
+      where: eq(reportDrafts.playerCaseId, playerCase.id),
+    }),
+  ]);
+
+  return {
+    caseSlug,
+    section: savedDraft ? "report" : savedNote ? "notes" : "evidence",
+    noteBody: savedNote?.body ?? "",
+    draft: savedDraft
+      ? {
+          suspectId: savedDraft.suspectId,
+          motiveId: savedDraft.motiveId,
+          methodId: savedDraft.methodId,
+        }
+      : null,
+    lastActivityAt:
+      savedDraft?.updatedAt ?? savedNote?.updatedAt ?? playerCase.updatedAt,
+  };
+}
 
 export async function openCase(input: { userId: string; caseSlug: string }) {
   const db = await getDb();
@@ -38,9 +72,15 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
           ),
         )
         .limit(1);
+      const resumeTarget = await buildResumeTarget(
+        tx,
+        existingPlayerCase,
+        input.caseSlug,
+      );
 
       return {
         playerCase: existingPlayerCase,
+        resumeTarget,
         analyticsEvent:
           existingEvent ??
           (await writeAnalyticsEvent(tx, {
@@ -71,9 +111,15 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
       caseDefinitionId: definition.id,
       caseRevision: definition.currentPublishedRevision,
     });
+    const resumeTarget = await buildResumeTarget(
+      tx,
+      createdPlayerCase,
+      input.caseSlug,
+    );
 
     return {
       playerCase: createdPlayerCase,
+      resumeTarget,
       analyticsEvent,
     };
   });
