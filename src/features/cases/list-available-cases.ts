@@ -7,6 +7,7 @@ import {
   type PlayerCaseStatus,
 } from "@/features/cases/case-status";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
+import { syncCaseDefinitions } from "@/features/cases/sync-case-definitions";
 import { getCaseAvailability } from "@/features/maintenance/get-case-availability";
 import { getDb } from "@/lib/db";
 
@@ -22,6 +23,9 @@ export type VaultCaseRecord = {
 
 export async function listAvailableCases(input: { userId?: string }) {
   const db = await getDb();
+
+  await syncCaseDefinitions(db);
+
   const definitions = await db.query.caseDefinitions.findMany();
   const existingPlayerCases = input.userId
     ? await db.query.playerCases.findMany({

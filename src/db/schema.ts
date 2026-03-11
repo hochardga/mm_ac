@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -40,6 +40,19 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const reportDrafts = pgTable("report_drafts", {
+  id: text("id").primaryKey(),
+  playerCaseId: text("player_case_id")
+    .notNull()
+    .unique()
+    .references(() => playerCases.id, { onDelete: "cascade" }),
+  suspectId: text("suspect_id").notNull(),
+  motiveId: text("motive_id").notNull(),
+  methodId: text("method_id").notNull(),
+  attemptCount: integer("attempt_count").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const analyticsEvents = pgTable("analytics_events", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -74,11 +87,19 @@ export const playerCasesRelations = relations(playerCases, ({ one, many }) => ({
     references: [caseDefinitions.id],
   }),
   notes: many(notes),
+  reportDrafts: many(reportDrafts),
 }));
 
 export const notesRelations = relations(notes, ({ one }) => ({
   playerCase: one(playerCases, {
     fields: [notes.playerCaseId],
+    references: [playerCases.id],
+  }),
+}));
+
+export const reportDraftsRelations = relations(reportDrafts, ({ one }) => ({
+  playerCase: one(playerCases, {
+    fields: [reportDrafts.playerCaseId],
     references: [playerCases.id],
   }),
 }));

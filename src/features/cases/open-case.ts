@@ -4,7 +4,8 @@ import { randomUUID } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
 
-import { analyticsEvents, caseDefinitions, playerCases } from "@/db/schema";
+import { analyticsEvents, playerCases } from "@/db/schema";
+import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb } from "@/lib/db";
 
@@ -12,9 +13,7 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
   const db = await getDb();
 
   return db.transaction(async (tx) => {
-    const definition = await tx.query.caseDefinitions.findFirst({
-      where: eq(caseDefinitions.slug, input.caseSlug),
-    });
+    const definition = await ensureCaseDefinition(tx, input.caseSlug);
 
     if (!definition || !definition.currentPublishedRevision) {
       throw new Error("Case is not currently available");
