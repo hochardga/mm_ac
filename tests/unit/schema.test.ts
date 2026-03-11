@@ -8,6 +8,7 @@ test("exports the expected baseline tables", () => {
       "playerCases",
       "notes",
       "reportDrafts",
+      "reportSubmissions",
       "analyticsEvents",
     ]),
   );

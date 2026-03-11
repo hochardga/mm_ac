@@ -27,6 +27,8 @@ export const playerCases = pgTable("player_cases", {
     .references(() => caseDefinitions.id, { onDelete: "cascade" }),
   caseRevision: text("case_revision").notNull(),
   status: text("status").notNull(),
+  terminalDebriefTitle: text("terminal_debrief_title"),
+  terminalDebriefSummary: text("terminal_debrief_summary"),
   startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -51,6 +53,21 @@ export const reportDrafts = pgTable("report_drafts", {
   methodId: text("method_id").notNull(),
   attemptCount: integer("attempt_count").notNull().default(0),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const reportSubmissions = pgTable("report_submissions", {
+  id: text("id").primaryKey(),
+  playerCaseId: text("player_case_id")
+    .notNull()
+    .references(() => playerCases.id, { onDelete: "cascade" }),
+  submissionToken: text("submission_token").notNull().unique(),
+  suspectId: text("suspect_id").notNull(),
+  motiveId: text("motive_id").notNull(),
+  methodId: text("method_id").notNull(),
+  attemptNumber: integer("attempt_number").notNull(),
+  nextStatus: text("next_status").notNull(),
+  feedback: text("feedback").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const analyticsEvents = pgTable("analytics_events", {
@@ -88,6 +105,7 @@ export const playerCasesRelations = relations(playerCases, ({ one, many }) => ({
   }),
   notes: many(notes),
   reportDrafts: many(reportDrafts),
+  reportSubmissions: many(reportSubmissions),
 }));
 
 export const notesRelations = relations(notes, ({ one }) => ({
@@ -103,6 +121,16 @@ export const reportDraftsRelations = relations(reportDrafts, ({ one }) => ({
     references: [playerCases.id],
   }),
 }));
+
+export const reportSubmissionsRelations = relations(
+  reportSubmissions,
+  ({ one }) => ({
+    playerCase: one(playerCases, {
+      fields: [reportSubmissions.playerCaseId],
+      references: [playerCases.id],
+    }),
+  }),
+);
 
 export const analyticsEventsRelations = relations(analyticsEvents, ({ one }) => ({
   player: one(users, {
