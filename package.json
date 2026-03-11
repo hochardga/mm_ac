@@ -11,8 +11,10 @@
     "validate:cases": "tsx scripts/validate-cases.ts"
   },
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "drizzle-orm": "^0.45.1",
     "next": "16.1.6",
+    "next-auth": "^4.24.13",
     "pg": "^8.20.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
