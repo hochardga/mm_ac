@@ -2,7 +2,10 @@
 
 import { cookies } from "next/headers";
 
-import { registerAgent } from "@/features/auth/register-agent";
+import {
+  AgentEmailAlreadyActiveError,
+  registerAgent,
+} from "@/features/auth/register-agent";
 
 export type ApplyActionState = {
   status: "idle" | "success" | "error";
@@ -26,7 +29,21 @@ export async function registerAgentAction(
     };
   }
 
-  const result = await registerAgent({ email, password, alias });
+  let result;
+
+  try {
+    result = await registerAgent({ email, password, alias });
+  } catch (error) {
+    if (error instanceof AgentEmailAlreadyActiveError) {
+      return {
+        status: "error",
+        message: "That agency email is already active. Sign in instead.",
+      };
+    }
+
+    throw error;
+  }
+
   const cookieStore = await cookies();
 
   cookieStore.set("ashfall-onboarding", "active", {

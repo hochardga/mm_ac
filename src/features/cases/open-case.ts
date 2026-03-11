@@ -9,12 +9,16 @@ import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb } from "@/lib/db";
 
+type DbClient = Awaited<ReturnType<typeof getDb>>;
+type TransactionClient = Parameters<DbClient["transaction"]>[0] extends (
+  tx: infer T,
+  ...args: never[]
+) => Promise<unknown>
+  ? T
+  : never;
+
 async function buildResumeTarget(
-  tx: Parameters<Awaited<ReturnType<typeof getDb>>["transaction"]>[0] extends (
-    executor: (transaction: infer T) => Promise<unknown>,
-  ) => Promise<unknown>
-    ? T
-    : never,
+  tx: TransactionClient,
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {

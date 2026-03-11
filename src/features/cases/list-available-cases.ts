@@ -20,7 +20,9 @@ export type VaultCaseRecord = {
   availability: "Available" | "Maintenance" | "Hidden";
 };
 
-export async function listAvailableCases(input: { userId?: string }) {
+export async function listAvailableCases(
+  input: { userId?: string },
+): Promise<VaultCaseRecord[]> {
   const db = await getDb();
 
   try {
@@ -66,8 +68,9 @@ export async function listAvailableCases(input: { userId?: string }) {
         return null;
       }
 
-      const status = isPlayerCaseStatus(playerCase?.status ?? "")
-        ? playerCase.status
+      const playerStatus = playerCase?.status ?? "";
+      const status = isPlayerCaseStatus(playerStatus)
+        ? playerStatus
         : "new";
 
       return {
@@ -84,7 +87,18 @@ export async function listAvailableCases(input: { userId?: string }) {
     }),
   );
 
-  return dossiers
-    .filter((dossier): dossier is VaultCaseRecord => dossier !== null)
-    .sort((left, right) => left.title.localeCompare(right.title));
+  const availableDossiers = dossiers.reduce<VaultCaseRecord[]>(
+    (records, dossier) => {
+      if (dossier) {
+        records.push(dossier);
+      }
+
+      return records;
+    },
+    [],
+  );
+
+  availableDossiers.sort((left, right) => left.title.localeCompare(right.title));
+
+  return availableDossiers;
 }

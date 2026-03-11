@@ -16,16 +16,14 @@ export async function saveNoteAction(formData: FormData) {
     throw new Error("playerCaseId is required");
   }
 
-  const note = await saveNote({
+  await saveNote({
     playerCaseId,
     body,
   });
 
   if (caseSlug) {
-    redirect(`/cases/${caseSlug}`);
+    revalidatePath(`/cases/${caseSlug}`);
   }
-
-  return note;
 }
 
 export async function saveReportDraftAction(formData: FormData) {
@@ -39,7 +37,7 @@ export async function saveReportDraftAction(formData: FormData) {
     throw new Error("Every draft field is required");
   }
 
-  const draft = await saveReportDraft({
+  await saveReportDraft({
     playerCaseId,
     suspectId,
     motiveId,
@@ -49,8 +47,6 @@ export async function saveReportDraftAction(formData: FormData) {
   if (caseSlug) {
     redirect(`/cases/${caseSlug}`);
   }
-
-  return draft;
 }
 
 export async function submitReportAction(formData: FormData) {

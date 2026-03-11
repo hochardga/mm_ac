@@ -26,3 +26,28 @@ test("creates a new user and returns the vault redirect", async () => {
 
   expect(result.redirectTo).toBe("/vault");
 });
+
+test("rejects duplicate agency email addresses", async () => {
+  const db = await getDb();
+
+  await db.insert(caseDefinitions).values({
+    id: randomUUID(),
+    slug: "hollow-bishop",
+    title: "The Hollow Bishop",
+    currentPublishedRevision: "rev-1",
+  });
+
+  await registerAgent({
+    email: "agent@example.com",
+    password: "CaseFile123!",
+    alias: "Agent Ash",
+  });
+
+  await expect(
+    registerAgent({
+      email: "agent@example.com",
+      password: "CaseFile123!",
+      alias: "Agent Ember",
+    }),
+  ).rejects.toThrow("Agency email is already active");
+});
