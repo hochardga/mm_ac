@@ -1,0 +1,27 @@
+{
+  "slug": "hollow-bishop",
+  "revision": "rev-1",
+  "canonicalAnswers": {
+    "suspect": "bookkeeper",
+    "motive": "embezzlement",
+    "method": "poisoned-wine"
+  },
+  "grading": {
+    "maxAttempts": 3
+  },
+  "feedbackTemplates": {
+    "incorrect_attempt_remaining": "Your report is incomplete. Keep digging before you accuse the wrong operative.",
+    "final_incorrect_closure": "The director is closing the file. Your conclusion does not hold.",
+    "solved": "Your report is accepted. The director is authorizing a full debrief."
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: The Hollow Bishop",
+      "summary": "Quinn poisoned the wine to silence the bishop before the missing funds surfaced."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: The Hollow Bishop",
+      "summary": "The file closed without a confirmed arrest. The missing parish funds remain unresolved."
+    }
+  }
+}

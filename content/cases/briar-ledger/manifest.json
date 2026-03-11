@@ -1,0 +1,36 @@
+{
+  "slug": "briar-ledger",
+  "revision": "rev-1",
+  "title": "The Briar Ledger",
+  "summary": "A dead archivist leaves behind a coded debt ledger and three missing names.",
+  "estimatedMinutes": 80,
+  "reportOptions": {
+    "suspect": [
+      { "id": "archivist-aide", "label": "Archivist Aide Nessa Cole" },
+      { "id": "treasurer", "label": "Treasurer Dorian Wren" },
+      { "id": "judge", "label": "Judge Imogen Thorne" }
+    ],
+    "motive": [
+      { "id": "debt-erasure", "label": "Debt record erasure" },
+      { "id": "political-blackmail", "label": "Political blackmail" },
+      { "id": "inheritance", "label": "Inheritance dispute" }
+    ],
+    "method": [
+      { "id": "letter-opener", "label": "Letter opener stabbing" },
+      { "id": "archive-fire", "label": "Archive fire cover-up" },
+      { "id": "sedative", "label": "Sedative overdose" }
+    ]
+  },
+  "handlerPrompts": [
+    "The coded ledger matters more than the broken cabinet lock.",
+    "Find who profits if three names disappear from the book."
+  ],
+  "evidence": [
+    {
+      "id": "coded-ledger",
+      "title": "Coded Ledger Copy",
+      "kind": "document",
+      "content": "Three entries are scratched out beside initials matching city officials."
+    }
+  ]
+}

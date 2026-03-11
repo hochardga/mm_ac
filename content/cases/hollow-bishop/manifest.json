@@ -1,0 +1,42 @@
+{
+  "slug": "hollow-bishop",
+  "revision": "rev-1",
+  "title": "The Hollow Bishop",
+  "summary": "A ritual-looking homicide in a locked church office.",
+  "estimatedMinutes": 90,
+  "reportOptions": {
+    "suspect": [
+      { "id": "bishop", "label": "Bishop Elias Vale" },
+      { "id": "groundskeeper", "label": "Groundskeeper Bram Yates" },
+      { "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }
+    ],
+    "motive": [
+      { "id": "blackmail", "label": "Blackmail exposure" },
+      { "id": "embezzlement", "label": "Embezzlement cover-up" },
+      { "id": "revenge", "label": "Personal revenge" }
+    ],
+    "method": [
+      { "id": "poisoned-wine", "label": "Poisoned sacramental wine" },
+      { "id": "candlestick", "label": "Blunt-force candlestick attack" },
+      { "id": "staged-fall", "label": "Staged staircase fall" }
+    ]
+  },
+  "handlerPrompts": [
+    "Review the vestry ledger before filing an accusation.",
+    "The church finances are dirtier than the crime scene."
+  ],
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Parish Ledger Extract",
+      "kind": "document",
+      "content": "A torn ledger page shows an off-books transfer approved by Bishop Vale."
+    },
+    {
+      "id": "photo",
+      "title": "Scene Photograph",
+      "kind": "photo",
+      "content": "A silver chalice lies beside the victim's desk."
+    }
+  ]
+}
