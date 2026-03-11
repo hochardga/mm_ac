@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
@@ -7,6 +9,7 @@ import { notes, reportDrafts } from "@/db/schema";
 import {
   saveNoteAction,
   saveReportDraftAction,
+  submitReportAction,
 } from "@/app/(app)/cases/[caseSlug]/actions";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
@@ -47,6 +50,7 @@ export default async function CasePage({ params }: CasePageProps) {
         where: eq(reportDrafts.playerCaseId, lifecycle.playerCase.id),
       }),
     ]);
+    const submissionToken = randomUUID();
 
     return (
       <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
@@ -129,6 +133,11 @@ export default async function CasePage({ params }: CasePageProps) {
                     type="hidden"
                     value={lifecycle.playerCase.id}
                   />
+                  <input
+                    name="submissionToken"
+                    type="hidden"
+                    value={submissionToken}
+                  />
 
                   <label className="grid gap-2">
                     <span className="text-sm uppercase tracking-[0.2em] text-stone-400">
@@ -184,12 +193,21 @@ export default async function CasePage({ params }: CasePageProps) {
                     </select>
                   </label>
 
-                  <button
-                    className="w-fit rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-950"
-                    type="submit"
-                  >
-                    Save Draft
-                  </button>
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      className="w-fit rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-950"
+                      type="submit"
+                    >
+                      Save Draft
+                    </button>
+                    <button
+                      className="w-fit rounded-full border border-white/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
+                      formAction={submitReportAction}
+                      type="submit"
+                    >
+                      Submit Report
+                    </button>
+                  </div>
                 </form>
               </section>
             </div>

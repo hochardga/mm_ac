@@ -1,7 +1,9 @@
+import { randomUUID } from "node:crypto";
+
 import { expect, test } from "@playwright/test";
 
 test("new recruit can apply and reach the vault", async ({ page }) => {
-  const email = `agent-${Date.now()}@example.com`;
+  const email = `agent-${randomUUID()}@example.com`;
 
   await page.goto("/apply");
   await page.getByLabel("Operative Alias").fill("Agent Ash");

@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { saveReportDraft } from "@/features/drafts/save-report-draft";
 import { saveNote } from "@/features/notes/save-note";
+import { submitReport } from "@/features/submissions/submit-report";
 
 export async function saveNoteAction(formData: FormData) {
   const caseSlug = String(formData.get("caseSlug") ?? "");
@@ -20,7 +22,7 @@ export async function saveNoteAction(formData: FormData) {
   });
 
   if (caseSlug) {
-    revalidatePath(`/cases/${caseSlug}`);
+    redirect(`/cases/${caseSlug}`);
   }
 
   return note;
@@ -45,8 +47,41 @@ export async function saveReportDraftAction(formData: FormData) {
   });
 
   if (caseSlug) {
-    revalidatePath(`/cases/${caseSlug}`);
+    redirect(`/cases/${caseSlug}`);
   }
 
   return draft;
+}
+
+export async function submitReportAction(formData: FormData) {
+  const caseSlug = String(formData.get("caseSlug") ?? "");
+  const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const submissionToken = String(formData.get("submissionToken") ?? "");
+  const suspectId = String(formData.get("suspectId") ?? "");
+  const motiveId = String(formData.get("motiveId") ?? "");
+  const methodId = String(formData.get("methodId") ?? "");
+
+  if (!caseSlug || !playerCaseId || !submissionToken) {
+    throw new Error("Submission context is incomplete");
+  }
+
+  if (!suspectId || !motiveId || !methodId) {
+    throw new Error("Every report field is required");
+  }
+
+  const result = await submitReport({
+    playerCaseId,
+    submissionToken,
+    answers: {
+      suspectId,
+      motiveId,
+      methodId,
+    },
+  });
+
+  if (result.nextStatus === "completed" || result.nextStatus === "closed_unsolved") {
+    redirect(`/cases/${caseSlug}/debrief`);
+  }
+
+  revalidatePath(`/cases/${caseSlug}`);
 }

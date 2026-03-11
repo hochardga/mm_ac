@@ -81,6 +81,7 @@ export const analyticsEvents = pgTable("analytics_events", {
     onDelete: "cascade",
   }),
   caseRevision: text("case_revision"),
+  submissionToken: text("submission_token"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
