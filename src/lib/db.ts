@@ -1,10 +1,12 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { PGlite } from "@electric-sql/pglite";
 import { drizzle } from "drizzle-orm/pglite";
 
 import * as schema from "@/db/schema";
+import { createPGliteClient } from "@/lib/pglite-client";
+import { resolveRuntimeStorage } from "@/lib/runtime-storage";
 
 type AppDb = ReturnType<typeof drizzle<typeof schema>>;
 
@@ -12,22 +14,10 @@ let client: PGlite | undefined;
 let db: AppDb | undefined;
 let initialization: Promise<AppDb> | undefined;
 
-function resolveDataDir() {
-  if (process.env.NODE_ENV === "test") {
-    return undefined;
-  }
-
-  return path.join(process.cwd(), ".data", "pglite");
-}
-
 async function initializeDb() {
-  const dataDir = resolveDataDir();
+  const storage = resolveRuntimeStorage(process.env);
 
-  if (dataDir) {
-    await mkdir(dataDir, { recursive: true });
-  }
-
-  client = dataDir ? new PGlite(dataDir) : new PGlite();
+  client = await createPGliteClient(storage);
   await client.waitReady;
 
   await applyMigrations(client);

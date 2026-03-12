@@ -20,4 +20,5 @@ test("initializes a local embedded postgres database for tests", async () => {
   const records = await db.select().from(users);
 
   expect(records).toHaveLength(1);
+  expect(records[0]?.email).toBe("agent@example.com");
 });
