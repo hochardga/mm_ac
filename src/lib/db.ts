@@ -28,36 +28,85 @@ export type AppTransaction = PgliteTransaction | PostgresTransaction;
 let db: AppDb | undefined;
 let initialization: Promise<AppDb> | undefined;
 let closeHandle: (() => Promise<unknown>) | undefined;
+const MIGRATION_LOCK_ID = 13_279_001;
 
 async function initializeDb() {
   const runtime = resolveDatabaseRuntime(process.env);
 
   if (runtime.driver === "postgres") {
     const client = createPostgresClient(runtime.connectionString);
+    try {
+      const migrationConnection = await client.pool.connect();
 
-    await applyMigrations({
-      exec: async (sql) => {
-        await client.pool.query(sql);
-      },
-      query: (sql, params) => client.pool.query(sql, params),
-    });
+      try {
+        const migrationExec = async (sql: string) => {
+          await migrationConnection.query(sql);
+        };
+        const migrationQuery = (sql: string, params?: unknown[]) =>
+          migrationConnection.query(sql, params);
 
-    closeHandle = () => client.close();
-    db = drizzleNodePg(client.pool, { schema });
-    return db;
+        await applyMigrations({
+          exec: migrationExec,
+          query: migrationQuery,
+          transaction: async (run) => {
+            await migrationQuery("begin");
+
+            try {
+              const result = await run({
+                exec: migrationExec,
+                query: migrationQuery,
+              });
+
+              await migrationQuery("commit");
+              return result;
+            } catch (error) {
+              await migrationQuery("rollback");
+              throw error;
+            }
+          },
+          withLock: async (run) => {
+            await migrationQuery("select pg_advisory_lock($1)", [
+              MIGRATION_LOCK_ID,
+            ]);
+
+            try {
+              return await run();
+            } finally {
+              await migrationQuery("select pg_advisory_unlock($1)", [
+                MIGRATION_LOCK_ID,
+              ]);
+            }
+          },
+        });
+      } finally {
+        migrationConnection.release();
+      }
+
+      closeHandle = () => client.close();
+      db = drizzleNodePg(client.pool, { schema });
+      return db;
+    } catch (error) {
+      await client.close();
+      throw error;
+    }
   }
 
   const client = await createPGliteClient(runtime.storage);
-  await client.waitReady;
+  try {
+    await client.waitReady;
 
-  await applyMigrations({
-    exec: (sql) => client.exec(sql),
-    query: (sql, params) => client.query(sql, params),
-  });
+    await applyMigrations({
+      exec: (sql) => client.exec(sql),
+      query: (sql, params) => client.query(sql, params),
+    });
 
-  closeHandle = () => client.close();
-  db = drizzlePglite(client, { schema });
-  return db;
+    closeHandle = () => client.close();
+    db = drizzlePglite(client, { schema });
+    return db;
+  } catch (error) {
+    await client.close();
+    throw error;
+  }
 }
 
 export async function getDb() {
@@ -69,8 +118,15 @@ export async function getDb() {
     initialization = initializeDb();
   }
 
-  db = await initialization;
-  return db;
+  try {
+    db = await initialization;
+    return db;
+  } catch (error) {
+    db = undefined;
+    initialization = undefined;
+    closeHandle = undefined;
+    throw error;
+  }
 }
 
 export async function closeDb() {
