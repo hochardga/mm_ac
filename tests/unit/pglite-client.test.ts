@@ -28,4 +28,31 @@ describe("createPGliteClient", () => {
     expect(warn).toHaveBeenCalledOnce();
     expect(client).toEqual({ kind: "memory-client" });
   });
+
+  test("rethrows errors when non-ephemeral storage initialization fails", async () => {
+    const mkdir = vi.fn().mockRejectedValue(new Error("EACCES"));
+    const openFileClient = vi.fn();
+    const openMemoryClient = vi.fn();
+    const warn = vi.fn();
+
+    await expect(
+      createPGliteClient(
+        {
+          kind: "filesystem",
+          dataDir: "/var/lib/ashfall-collective-pglite",
+          isEphemeral: false,
+        },
+        {
+          mkdir,
+          openFileClient,
+          openMemoryClient,
+          warn,
+        },
+      ),
+    ).rejects.toThrow("EACCES");
+
+    expect(openFileClient).not.toHaveBeenCalled();
+    expect(openMemoryClient).not.toHaveBeenCalled();
+    expect(warn).not.toHaveBeenCalled();
+  });
 });
