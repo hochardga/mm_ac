@@ -26,14 +26,6 @@ export function resolveRuntimeStorage(
     };
   }
 
-  if (isEphemeralDemoDeployment(input)) {
-    return {
-      kind: "filesystem",
-      dataDir: path.join("/tmp", "ashfall-collective-pglite"),
-      isEphemeral: true,
-    };
-  }
-
   return {
     kind: "filesystem",
     dataDir: path.join(cwd, ".data", "pglite"),

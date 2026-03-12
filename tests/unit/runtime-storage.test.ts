@@ -21,22 +21,11 @@ describe("resolveRuntimeStorage", () => {
       isEphemeral: false,
     });
   });
-
-  test("uses an ephemeral /tmp directory on vercel", () => {
-    expect(resolveRuntimeStorage({ VERCEL: "1" }, "/repo")).toEqual({
-      kind: "filesystem",
-      dataDir: path.join("/tmp", "ashfall-collective-pglite"),
-      isEphemeral: true,
-    });
-  });
 });
 
 describe("isEphemeralDemoDeployment", () => {
-  test("returns true for vercel-hosted demo deployments", () => {
+  test("still identifies vercel during the transition away from the demo banner", () => {
     expect(isEphemeralDemoDeployment({ VERCEL: "1" })).toBe(true);
-  });
-
-  test("returns false for non-vercel environments", () => {
     expect(isEphemeralDemoDeployment({} as NodeJS.ProcessEnv)).toBe(false);
   });
 });
