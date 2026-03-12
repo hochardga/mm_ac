@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 type MigrationClient = {
-  exec: (sql: string) => Promise<void>;
+  exec: (sql: string) => Promise<unknown>;
   query: (
     sql: string,
     params?: unknown[],

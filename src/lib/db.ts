@@ -9,7 +9,21 @@ import { createPostgresClient } from "@/lib/postgres-client";
 
 type PgliteDb = ReturnType<typeof drizzlePglite<typeof schema>>;
 type PostgresDb = ReturnType<typeof drizzleNodePg<typeof schema>>;
-type AppDb = PgliteDb | PostgresDb;
+type PgliteTransaction = Parameters<PgliteDb["transaction"]>[0] extends (
+  tx: infer T,
+  ...args: never[]
+) => Promise<unknown>
+  ? T
+  : never;
+type PostgresTransaction = Parameters<PostgresDb["transaction"]>[0] extends (
+  tx: infer T,
+  ...args: never[]
+) => Promise<unknown>
+  ? T
+  : never;
+
+export type AppDb = PgliteDb | PostgresDb;
+export type AppTransaction = PgliteTransaction | PostgresTransaction;
 
 let db: AppDb | undefined;
 let initialization: Promise<AppDb> | undefined;

@@ -6,17 +6,9 @@ import { eq } from "drizzle-orm";
 
 import { caseDefinitions } from "@/db/schema";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
-import { getDb } from "@/lib/db";
+import { getDb, type AppDb, type AppTransaction } from "@/lib/db";
 
-type DbClient = Awaited<ReturnType<typeof getDb>>;
-type TransactionClient = Parameters<DbClient["transaction"]>[0] extends (
-  tx: infer T,
-  ...args: never[]
-) => Promise<unknown>
-  ? T
-  : never;
-
-type CaseDefinitionWriter = DbClient | TransactionClient;
+type CaseDefinitionWriter = AppDb | AppTransaction;
 
 async function listAuthoredCaseSlugs() {
   const authoredCasesRoot = path.join(process.cwd(), "content", "cases");
@@ -70,7 +62,7 @@ export async function ensureCaseDefinition(
   return createdDefinition;
 }
 
-export async function syncCaseDefinitions(db: DbClient) {
+export async function syncCaseDefinitions(db: AppDb) {
   const authoredSlugs = await listAuthoredCaseSlugs();
 
   await Promise.all(
