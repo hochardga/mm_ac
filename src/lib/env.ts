@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const localEnvSchema = z.object({
-  DATABASE_DRIVER: z.literal("pglite").default("pglite"),
+  DATABASE_DRIVER: z.literal("pglite"),
   DATABASE_URL: z.string().url().optional(),
 });
 

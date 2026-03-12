@@ -1,6 +1,8 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import { z } from "zod";
+
 type MigrationExecutor = {
   exec: (sql: string) => Promise<unknown>;
   query: (
@@ -28,6 +30,45 @@ type MigrationJournal = {
     tag: string;
   }>;
 };
+
+const migrationJournalSchema = z.object({
+  entries: z.array(
+    z.object({
+      idx: z.number().int(),
+      tag: z.string().min(1),
+    }),
+  ),
+});
+
+function parseMigrationJournal(journalRaw: string, journalPath: string) {
+  try {
+    const parsed = JSON.parse(journalRaw) as unknown;
+    const result = migrationJournalSchema.safeParse(parsed);
+
+    if (!result.success) {
+      const issues = result.error.issues
+        .map((issue) => `${issue.path.join(".") || "root"}: ${issue.message}`)
+        .join("; ");
+
+      throw new Error(`Invalid migration journal at ${journalPath}: ${issues}`);
+    }
+
+    return result.data as MigrationJournal;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message.startsWith("Invalid migration journal")
+    ) {
+      throw error;
+    }
+
+    throw new Error(
+      `Invalid migration journal at ${journalPath}: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+  }
+}
 
 async function applyMigrationEntry(
   client: MigrationExecutor,
@@ -75,11 +116,9 @@ export async function applyMigrations(
     );
   `);
 
-  const journalRaw = await deps.readFile(
-    path.join(migrationsRoot, "meta", "_journal.json"),
-    "utf8",
-  );
-  const journal = JSON.parse(journalRaw) as MigrationJournal;
+  const journalPath = path.join(migrationsRoot, "meta", "_journal.json");
+  const journalRaw = await deps.readFile(journalPath, "utf8");
+  const journal = parseMigrationJournal(journalRaw, journalPath);
   const applyEntries = async () => {
     for (const entry of journal.entries.sort((left, right) => left.idx - right.idx)) {
       if (client.transaction) {

@@ -16,7 +16,14 @@ export type DatabaseRuntime =
       connectionString: string;
     };
 
-const postgresUrlSchema = z.string().url();
+const postgresUrlSchema = z
+  .string()
+  .url()
+  .refine((value) => {
+    const protocol = new URL(value).protocol.replace(/:$/, "");
+
+    return protocol === "postgres" || protocol === "postgresql";
+  }, "DATABASE_URL must use postgres:// or postgresql://");
 
 export function resolveDatabaseRuntime(
   input: NodeJS.ProcessEnv,

@@ -59,6 +59,15 @@ Post-deploy smoke test:
 PLAYWRIGHT_BASE_URL=https://<your-project>.vercel.app pnpm playwright test tests/e2e/apply.spec.ts tests/e2e/workspace.spec.ts tests/e2e/retention-loop.spec.ts tests/e2e/signin.spec.ts
 ```
 
+Local Playwright runs use an isolated PGlite database under
+`$TMPDIR/ashfall-playwright-*` unless `PGLITE_DATA_DIR` is set explicitly.
+Those temp dirs are left in place for post-failure inspection and can be removed
+with:
+
+```bash
+rm -rf "${TMPDIR:-/tmp}"/ashfall-playwright-*
+```
+
 ## Verification
 
 Run the full automated suite before handing off or merging:

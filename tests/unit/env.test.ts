@@ -21,11 +21,11 @@ describe("parseEnv", () => {
     expect(
       parseEnv({
         DATABASE_DRIVER: " postgres ",
-        DATABASE_URL: " https://db.example.com/app ",
+        DATABASE_URL: " postgres://demo:demo@db.example.com:5432/app ",
       } as NodeJS.ProcessEnv),
     ).toEqual({
       DATABASE_DRIVER: "postgres",
-      DATABASE_URL: "https://db.example.com/app",
+      DATABASE_URL: "postgres://demo:demo@db.example.com:5432/app",
     });
   });
 });

@@ -43,4 +43,17 @@ describe("resolveDatabaseRuntime", () => {
       connectionString: "postgres://demo:demo@db.example.com:5432/ashfall",
     });
   });
+
+  test("rejects non-postgres connection string schemes for postgres runtime", () => {
+    expect(() =>
+      resolveDatabaseRuntime(
+        {
+          VERCEL: "1",
+          DATABASE_DRIVER: "postgres",
+          DATABASE_URL: "https://db.example.com/ashfall",
+        },
+        "/repo",
+      ),
+    ).toThrow(/postgres/i);
+  });
 });

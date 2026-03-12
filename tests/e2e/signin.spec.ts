@@ -33,4 +33,5 @@ test("newly created agents can sign back in from a fresh browser context", async
   await expect(
     signinPage.getByRole("heading", { name: /dossier vault/i }),
   ).toBeVisible();
+  await signinContext.close();
 });

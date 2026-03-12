@@ -109,4 +109,27 @@ describe("applyMigrations", () => {
       ["0000_short_jetstream"],
     );
   });
+
+  test("fails fast when the migration journal is malformed", async () => {
+    const exec = vi.fn().mockResolvedValue(undefined);
+    const query = vi.fn().mockResolvedValue({ rows: [] });
+
+    await expect(
+      applyMigrations(
+        { exec, query },
+        {
+          readFile: async (filePath) => {
+            if (String(filePath).endsWith("_journal.json")) {
+              return JSON.stringify({
+                entries: [{ idx: 0 }],
+              });
+            }
+
+            return "create table demo(id text);";
+          },
+        },
+        "/repo/src/db/migrations",
+      ),
+    ).rejects.toThrow(/_journal\.json/i);
+  });
 });
