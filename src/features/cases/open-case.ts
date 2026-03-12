@@ -7,18 +7,10 @@ import { and, eq } from "drizzle-orm";
 import { analyticsEvents, notes, playerCases, reportDrafts } from "@/db/schema";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
-import { getDb } from "@/lib/db";
-
-type DbClient = Awaited<ReturnType<typeof getDb>>;
-type TransactionClient = Parameters<DbClient["transaction"]>[0] extends (
-  tx: infer T,
-  ...args: never[]
-) => Promise<unknown>
-  ? T
-  : never;
+import { getDb, type AppTransaction } from "@/lib/db";
 
 async function buildResumeTarget(
-  tx: TransactionClient,
+  tx: AppTransaction,
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {

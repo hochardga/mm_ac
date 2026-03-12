@@ -19,17 +19,19 @@ export function resolveRuntimeStorage(
   input: NodeJS.ProcessEnv,
   cwd = process.cwd(),
 ): RuntimeStorage {
-  if (input.NODE_ENV === "test") {
+  const explicitDataDir = input.PGLITE_DATA_DIR?.trim();
+
+  if (explicitDataDir) {
     return {
-      kind: "memory",
-      isEphemeral: true,
+      kind: "filesystem",
+      dataDir: explicitDataDir,
+      isEphemeral: false,
     };
   }
 
-  if (isEphemeralDemoDeployment(input)) {
+  if (input.NODE_ENV === "test") {
     return {
-      kind: "filesystem",
-      dataDir: path.join("/tmp", "ashfall-collective-pglite"),
+      kind: "memory",
       isEphemeral: true,
     };
   }

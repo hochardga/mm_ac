@@ -3,17 +3,9 @@ import { randomUUID } from "node:crypto";
 import { z } from "zod";
 
 import { analyticsEvents } from "@/db/schema";
-import { getDb } from "@/lib/db";
+import { type AppDb, type AppTransaction } from "@/lib/db";
 
-type DbClient = Awaited<ReturnType<typeof getDb>>;
-type TransactionClient = Parameters<DbClient["transaction"]>[0] extends (
-  tx: infer T,
-  ...args: never[]
-) => Promise<unknown>
-  ? T
-  : never;
-
-type AnalyticsWriter = DbClient | TransactionClient;
+type AnalyticsWriter = AppDb | AppTransaction;
 
 const analyticsEventSchema = z
   .object({

@@ -1,18 +1,32 @@
 import { z } from "zod";
 
-const envSchema = z.object({
+const localEnvSchema = z.object({
+  DATABASE_DRIVER: z.literal("pglite"),
+  DATABASE_URL: z.string().url().optional(),
+});
+
+const hostedEnvSchema = z.object({
+  DATABASE_DRIVER: z.literal("postgres"),
   DATABASE_URL: z.string().url(),
-  NEXTAUTH_SECRET: z.string().min(1),
 });
 
 export function parseEnv(input: NodeJS.ProcessEnv) {
-  if (!input.DATABASE_URL) {
-    throw new Error("DATABASE_URL must be a valid database URL");
+  const normalizedInput = {
+    ...input,
+    DATABASE_DRIVER: input.DATABASE_DRIVER?.trim(),
+    DATABASE_URL: input.DATABASE_URL?.trim() || undefined,
+  };
+  const driver = normalizedInput.DATABASE_DRIVER || "pglite";
+
+  if (driver === "postgres") {
+    return hostedEnvSchema.parse({
+      ...normalizedInput,
+      DATABASE_DRIVER: "postgres",
+    });
   }
 
-  if (!input.NEXTAUTH_SECRET) {
-    throw new Error("NEXTAUTH_SECRET is required");
-  }
-
-  return envSchema.parse(input);
+  return localEnvSchema.parse({
+    ...normalizedInput,
+    DATABASE_DRIVER: "pglite",
+  });
 }
