@@ -13,8 +13,8 @@
 ### Task 1: Runtime storage policy helper
 
 **Files:**
-- Create: `/Users/gregoryhochard/Development/mm_ac/.worktrees/codex/vercel-demo-hosting/src/lib/runtime-storage.ts`
-- Create: `/Users/gregoryhochard/Development/mm_ac/.worktrees/codex/vercel-demo-hosting/tests/unit/runtime-storage.test.ts`
+- Create: `src/lib/runtime-storage.ts`
+- Create: `tests/unit/runtime-storage.test.ts`
 
 - [ ] **Step 1: Write the failing test**
 

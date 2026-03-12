@@ -35,4 +35,13 @@ describe("resolveAuthSecret", () => {
       } as NodeJS.ProcessEnv),
     ).toThrow("NEXTAUTH_SECRET");
   });
+
+  test("rejects the example placeholder secret on Vercel", () => {
+    expect(() =>
+      resolveAuthSecret({
+        VERCEL: "1",
+        NEXTAUTH_SECRET: "replace-me",
+      } as NodeJS.ProcessEnv),
+    ).toThrow("NEXTAUTH_SECRET");
+  });
 });

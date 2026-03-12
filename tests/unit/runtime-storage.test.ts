@@ -35,4 +35,8 @@ describe("isEphemeralDemoDeployment", () => {
   test("returns true for vercel-hosted demo deployments", () => {
     expect(isEphemeralDemoDeployment({ VERCEL: "1" })).toBe(true);
   });
+
+  test("returns false for non-vercel environments", () => {
+    expect(isEphemeralDemoDeployment({} as NodeJS.ProcessEnv)).toBe(false);
+  });
 });

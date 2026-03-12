@@ -395,7 +395,10 @@ Use comments that make the split explicit:
 ```dotenv
 # Vercel Hobby demo deploys still use embedded PGlite.
 # Keep DATABASE_URL as a valid URL because env parsing expects it.
+# No Postgres service is required for this demo deployment because embedded PGlite handles storage.
 DATABASE_URL=postgres://postgres:postgres@localhost:5432/ashfall_collective
+# REQUIRED: Generate a secure secret (for example: openssl rand -base64 32).
+# Do not deploy with placeholder values like "replace-me".
 NEXTAUTH_SECRET=replace-me
 # Local: http://127.0.0.1:3000
 # Hosted demo: https://<your-project>.vercel.app
@@ -416,6 +419,8 @@ Required environment variables:
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL=https://<your-project>.vercel.app`
 - `DATABASE_URL=postgres://postgres:postgres@localhost:5432/ashfall_collective`
+
+You do not need to provision Postgres for a Vercel demo deployment. `DATABASE_URL` is only a placeholder to satisfy env parsing while embedded `PGlite` handles storage.
 
 Notes:
 
