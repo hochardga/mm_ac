@@ -16,4 +16,16 @@ describe("parseEnv", () => {
       } as NodeJS.ProcessEnv),
     ).toThrow(/DATABASE_URL/i);
   });
+
+  test("trims hosted postgres environment values before validation", () => {
+    expect(
+      parseEnv({
+        DATABASE_DRIVER: " postgres ",
+        DATABASE_URL: " https://db.example.com/app ",
+      } as NodeJS.ProcessEnv),
+    ).toEqual({
+      DATABASE_DRIVER: "postgres",
+      DATABASE_URL: "https://db.example.com/app",
+    });
+  });
 });
