@@ -12,7 +12,7 @@ pnpm install
 
 2. Create a local env file from `.env.example`.
 3. Set `NEXTAUTH_SECRET` to any non-empty local secret.
-   No local Postgres server is required; `DATABASE_URL` only exists to satisfy env parsing while the embedded `PGlite` instance handles storage.
+   No local Postgres server is required; local development defaults to embedded `PGlite` with `DATABASE_DRIVER=pglite`.
 4. Seed the three authored case definitions into the embedded local database:
 
 ```bash
@@ -33,23 +33,31 @@ The app runs at [http://127.0.0.1:3000](http://127.0.0.1:3000).
 - Case content lives in `content/cases/*` and is synced into `case_definitions` by the seed runner and the runtime manifest sync path.
 - Returning-agent auth uses NextAuth credentials. Signup also sets the local Ashfall agent cookie so the MVP flow works before a full session-management pass.
 
-## Vercel Demo Deployment
+## Vercel Deployment
 
-This app can be deployed on Vercel Hobby as a demo-grade environment.
+Hosted Vercel deployments must use a shared Postgres database. Embedded
+`PGlite` remains the default only for local development and tests.
 
 Required environment variables:
 
-- `NEXTAUTH_SECRET`
-- `NEXTAUTH_URL=https://<your-project>.vercel.app` (must match your deployed Vercel hostname so auth callbacks succeed)
-- `DATABASE_URL=postgres://postgres:postgres@localhost:5432/ashfall_collective` (kept to satisfy env parsing even though PGlite handles storage)
+- `DATABASE_DRIVER=postgres`
+- `DATABASE_URL=<managed postgres url>`
+- `NEXTAUTH_SECRET=<secure secret>`
+- `NEXTAUTH_URL=https://<your-project>.vercel.app`
 
 Notes:
 
-- Player data is temporary and may reset after deploys or runtime recycling.
+- Local development still uses `DATABASE_DRIVER=pglite` and does not require a Postgres server.
 - Case content still comes from `content/cases/*`, and migrations resolve from `process.cwd()/src/db/migrations`, so the repo files must remain available in the deployment bundle.
 - `NEXTAUTH_URL` has to remain pointed at the hosted Vercel URL; local values break return redirects in production.
-- `DATABASE_URL` is only present to satisfy the existing env parsing, and the Vercel deployment still runs on embedded `PGlite`.
-- If file-backed `PGlite` cannot initialize on Vercel, the app should fall back to in-memory demo storage.
+- Hosted Vercel should fail fast if it is still configured for embedded `PGlite`.
+- The deployed host should be smoke-tested after every release.
+
+Post-deploy smoke test:
+
+```bash
+PLAYWRIGHT_BASE_URL=https://<your-project>.vercel.app pnpm playwright test tests/e2e/apply.spec.ts tests/e2e/workspace.spec.ts tests/e2e/retention-loop.spec.ts tests/e2e/signin.spec.ts
+```
 
 ## Verification
 
