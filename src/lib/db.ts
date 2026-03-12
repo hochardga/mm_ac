@@ -1,76 +1,49 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
-import { PGlite } from "@electric-sql/pglite";
-import { drizzle } from "drizzle-orm/pglite";
+import { drizzle as drizzleNodePg } from "drizzle-orm/node-postgres";
+import { drizzle as drizzlePglite } from "drizzle-orm/pglite";
 
 import * as schema from "@/db/schema";
+import { resolveDatabaseRuntime } from "@/lib/database-runtime";
+import { applyMigrations } from "@/lib/migration-runner";
 import { createPGliteClient } from "@/lib/pglite-client";
-import { resolveRuntimeStorage } from "@/lib/runtime-storage";
+import { createPostgresClient } from "@/lib/postgres-client";
 
-type AppDb = ReturnType<typeof drizzle<typeof schema>>;
+type PgliteDb = ReturnType<typeof drizzlePglite<typeof schema>>;
+type PostgresDb = ReturnType<typeof drizzleNodePg<typeof schema>>;
+type AppDb = PgliteDb | PostgresDb;
 
-let client: PGlite | undefined;
 let db: AppDb | undefined;
 let initialization: Promise<AppDb> | undefined;
+let closeHandle: (() => Promise<unknown>) | undefined;
 
 async function initializeDb() {
-  const storage = resolveRuntimeStorage(process.env);
+  const runtime = resolveDatabaseRuntime(process.env);
 
-  client = await createPGliteClient(storage);
+  if (runtime.driver === "postgres") {
+    const client = createPostgresClient(runtime.connectionString);
+
+    await applyMigrations({
+      exec: async (sql) => {
+        await client.pool.query(sql);
+      },
+      query: (sql, params) => client.pool.query(sql, params),
+    });
+
+    closeHandle = () => client.close();
+    db = drizzleNodePg(client.pool, { schema });
+    return db;
+  }
+
+  const client = await createPGliteClient(runtime.storage);
   await client.waitReady;
 
-  await applyMigrations(client);
+  await applyMigrations({
+    exec: (sql) => client.exec(sql),
+    query: (sql, params) => client.query(sql, params),
+  });
 
-  db = drizzle(client, { schema });
-
+  closeHandle = () => client.close();
+  db = drizzlePglite(client, { schema });
   return db;
-}
-
-type MigrationJournal = {
-  entries: Array<{
-    idx: number;
-    tag: string;
-  }>;
-};
-
-async function applyMigrations(dbClient: PGlite) {
-  await dbClient.exec(`
-    create table if not exists app_migrations (
-      tag text primary key,
-      applied_at timestamptz not null default now()
-    );
-  `);
-
-  const migrationsRoot = path.join(process.cwd(), "src", "db", "migrations");
-  const journalRaw = await readFile(
-    path.join(migrationsRoot, "meta", "_journal.json"),
-    "utf8",
-  );
-  const journal = JSON.parse(journalRaw) as MigrationJournal;
-
-  for (const entry of journal.entries.sort((left, right) => left.idx - right.idx)) {
-    const existing = await dbClient.query(
-      "select tag from app_migrations where tag = $1",
-      [entry.tag],
-    );
-
-    if (existing.rows.length > 0) {
-      continue;
-    }
-
-    const sql = await readFile(path.join(migrationsRoot, `${entry.tag}.sql`), "utf8");
-    const statements = sql
-      .split("--> statement-breakpoint")
-      .map((statement) => statement.trim())
-      .filter(Boolean);
-
-    for (const statement of statements) {
-      await dbClient.exec(statement);
-    }
-
-    await dbClient.query("insert into app_migrations (tag) values ($1)", [entry.tag]);
-  }
 }
 
 export async function getDb() {
@@ -87,8 +60,8 @@ export async function getDb() {
 }
 
 export async function closeDb() {
-  await client?.close();
+  await closeHandle?.();
   db = undefined;
-  client = undefined;
   initialization = undefined;
+  closeHandle = undefined;
 }

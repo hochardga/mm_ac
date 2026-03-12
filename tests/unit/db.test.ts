@@ -5,9 +5,12 @@ import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
   await closeDb();
+  delete process.env.DATABASE_DRIVER;
+  delete process.env.DATABASE_URL;
+  delete process.env.VERCEL;
 });
 
-test("initializes a local embedded postgres database for tests", async () => {
+test("initializes a local embedded pglite database for tests", async () => {
   const db = await getDb();
 
   await db.insert(users).values({
