@@ -1,0 +1,27 @@
+{
+  "slug": "briar-ledger",
+  "revision": "rev-1",
+  "canonicalAnswers": {
+    "suspect": "treasurer",
+    "motive": "debt-erasure",
+    "method": "sedative"
+  },
+  "grading": {
+    "maxAttempts": 3
+  },
+  "feedbackTemplates": {
+    "incorrect_attempt_remaining": "The ledger still has holes. Refine your theory before filing again.",
+    "final_incorrect_closure": "The Briar Ledger closes unresolved. The missing names stay buried.",
+    "solved": "Your report is sound. The treasurer's cleanup operation is over."
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: The Briar Ledger",
+      "summary": "Wren sedated the archivist and erased the debt records to protect his laundering scheme."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: The Briar Ledger",
+      "summary": "Ashfall closed the file without proving who altered the debt book."
+    }
+  }
+}

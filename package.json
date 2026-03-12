@@ -1,0 +1,46 @@
+{
+  "name": "ashfall-collective-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "vitest",
+    "db:seed": "tsx src/db/seed.ts",
+    "validate:cases": "tsx scripts/validate-cases.ts",
+    "playwright": "playwright test"
+  },
+  "dependencies": {
+    "@electric-sql/pglite": "^0.3.16",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.1",
+    "next": "16.1.6",
+    "next-auth": "^4.24.13",
+    "pg": "^8.20.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "server-only": "^0.0.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/node": "^20",
+    "@types/pg": "^8.18.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^4.0.18",
+    "drizzle-kit": "^0.31.9",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "jsdom": "^28.1.0",
+    "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "typescript": "^5",
+    "vitest": "^4.0.18"
+  }
+}

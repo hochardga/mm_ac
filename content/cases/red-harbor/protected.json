@@ -1,0 +1,27 @@
+{
+  "slug": "red-harbor",
+  "revision": "rev-1",
+  "canonicalAnswers": {
+    "suspect": "radio-chief",
+    "motive": "smuggling",
+    "method": "signal-room"
+  },
+  "grading": {
+    "maxAttempts": 3
+  },
+  "feedbackTemplates": {
+    "incorrect_attempt_remaining": "The harbor file remains open. Reconstruct the signal chain again.",
+    "final_incorrect_closure": "Red Harbor is closed without a prosecutable case.",
+    "solved": "Your reconstruction holds. The harbor network is exposed."
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: Signal at Red Harbor",
+      "summary": "Pike staged the dead frequency and electrocuted the officer to shield the smuggling route."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: Signal at Red Harbor",
+      "summary": "The smuggling ring fractured before Ashfall could secure a conviction."
+    }
+  }
+}
