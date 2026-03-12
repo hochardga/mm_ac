@@ -19,6 +19,16 @@ export function resolveRuntimeStorage(
   input: NodeJS.ProcessEnv,
   cwd = process.cwd(),
 ): RuntimeStorage {
+  const explicitDataDir = input.PGLITE_DATA_DIR?.trim();
+
+  if (explicitDataDir) {
+    return {
+      kind: "filesystem",
+      dataDir: explicitDataDir,
+      isEphemeral: false,
+    };
+  }
+
   if (input.NODE_ENV === "test") {
     return {
       kind: "memory",

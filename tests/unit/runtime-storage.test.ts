@@ -21,6 +21,21 @@ describe("resolveRuntimeStorage", () => {
       isEphemeral: false,
     });
   });
+
+  test("uses an explicit pglite data directory when provided", () => {
+    expect(
+      resolveRuntimeStorage(
+        {
+          PGLITE_DATA_DIR: "/tmp/ashfall-playwright-db",
+        },
+        "/repo",
+      ),
+    ).toEqual({
+      kind: "filesystem",
+      dataDir: "/tmp/ashfall-playwright-db",
+      isEphemeral: false,
+    });
+  });
 });
 
 describe("isEphemeralDemoDeployment", () => {

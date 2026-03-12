@@ -1,7 +1,15 @@
+import { mkdtempSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+
 import { defineConfig } from "@playwright/test";
 
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? "http://127.0.0.1:3000";
+const localBaseURL = "http://127.0.0.1:3100";
 const useHostedTarget = Boolean(process.env.PLAYWRIGHT_BASE_URL);
+const localPgliteDataDir =
+  process.env.PGLITE_DATA_DIR ??
+  mkdtempSync(path.join(tmpdir(), "ashfall-playwright-"));
+const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? localBaseURL;
 
 const config = defineConfig({
   testDir: "./tests/e2e",
@@ -17,10 +25,12 @@ const config = defineConfig({
         command: "pnpm dev",
         env: {
           ...process.env,
-          NEXTAUTH_URL: "http://127.0.0.1:3000",
+          NEXTAUTH_URL: localBaseURL,
+          PGLITE_DATA_DIR: localPgliteDataDir,
+          PORT: "3100",
         },
-        url: "http://127.0.0.1:3000",
-        reuseExistingServer: true,
+        url: localBaseURL,
+        reuseExistingServer: false,
       },
 });
 
