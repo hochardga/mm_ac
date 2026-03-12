@@ -12,6 +12,9 @@ test("keeps the local dev server by default", async () => {
   expect(config.webServer).toMatchObject({
     command: "pnpm dev",
     url: "http://127.0.0.1:3000",
+    env: expect.objectContaining({
+      NEXTAUTH_URL: "http://127.0.0.1:3000",
+    }),
   });
 });
 
