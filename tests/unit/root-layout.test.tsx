@@ -10,10 +10,12 @@ import RootLayout from "@/app/layout";
 
 afterEach(() => {
   delete process.env.VERCEL;
+  delete process.env.DATABASE_DRIVER;
 });
 
-test("shows the demo reset notice on vercel deployments", () => {
+test("does not show the reset-warning banner for hosted postgres deployments", () => {
   process.env.VERCEL = "1";
+  process.env.DATABASE_DRIVER = "postgres";
 
   render(
     <RootLayout>
@@ -22,8 +24,8 @@ test("shows the demo reset notice on vercel deployments", () => {
   );
 
   expect(
-    screen.getByText(/demo environment: progress may reset occasionally/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/demo environment: progress may reset occasionally/i),
+  ).not.toBeInTheDocument();
 });
 
 test("does not show the demo reset notice on non-vercel environments", () => {
