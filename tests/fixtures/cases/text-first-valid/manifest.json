@@ -1,0 +1,47 @@
+{
+  "slug": "text-first-valid",
+  "revision": "rev-1",
+  "title": "Fixture Case",
+  "summary": "Fixture case for text-first evidence.",
+  "estimatedMinutes": 45,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Start with the ledger."
+  ],
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Ledger Extract",
+      "family": "document",
+      "subtype": "legal_doc",
+      "summary": "A damaged parish ledger.",
+      "source": "evidence/ledger.md"
+    },
+    {
+      "id": "access-log",
+      "title": "Access Log",
+      "family": "record",
+      "subtype": "badge_swipes",
+      "summary": "Swipe activity near the vestry.",
+      "source": "evidence/access-log.json"
+    },
+    {
+      "id": "interview",
+      "title": "Interview Transcript",
+      "family": "thread",
+      "subtype": "interview_transcript",
+      "summary": "Transcript from the vestry interview.",
+      "source": "evidence/interview.json"
+    }
+  ]
+}

@@ -40,3 +40,41 @@ test("agent can review evidence and save notes plus a draft report", async ({
   await expect(page.getByLabel("Motive")).toHaveValue("embezzlement");
   await expect(page.getByLabel("Method")).toHaveValue("poisoned-wine");
 });
+
+test("agent can switch evidence types and keep the notebook visible", async ({
+  page,
+}) => {
+  const email = `agent-${randomUUID()}@example.com`;
+
+  await page.goto("/apply");
+  await page.getByLabel("Operative Alias").fill("Agent Harbor");
+  await page.getByLabel("Agency Email").fill(email);
+  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
+  await page.getByRole("button", { name: /submit application/i }).click();
+  await page.waitForURL("**/vault");
+
+  await page.goto("/cases/red-harbor?evidence=dispatch-log");
+
+  await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+
+  await Promise.all([
+    page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread"),
+    page.getByRole("link", { name: /night watch exchange/i }).click(),
+  ]);
+
+  await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+  await expect(
+    page.getByText(/active evidence: night watch exchange/i),
+  ).toBeVisible();
+
+  await page.getByLabel("Suspect").selectOption("dispatcher");
+  await page.getByLabel("Motive").selectOption("smuggling");
+  await page.getByLabel("Method").selectOption("signal-room");
+
+  await page.getByRole("button", { name: /save draft/i }).click();
+  await page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread");
+
+  await expect(page.getByLabel("Suspect")).toHaveValue("dispatcher");
+  await expect(page.getByLabel("Motive")).toHaveValue("smuggling");
+  await expect(page.getByLabel("Method")).toHaveValue("signal-room");
+});

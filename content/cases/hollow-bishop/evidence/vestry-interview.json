@@ -1,0 +1,28 @@
+{
+  "subtype": "interview_transcript",
+  "thread": {
+    "subject": "Vestry interview",
+    "channel": "Interview room",
+    "participants": ["Handler Rowan", "Groundskeeper Bram Yates"]
+  },
+  "messages": [
+    {
+      "id": "bishop-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-12T07:42:00Z",
+      "body": "Walk me through what you saw when you opened the office."
+    },
+    {
+      "id": "bishop-2",
+      "sender": "Groundskeeper Bram Yates",
+      "timestamp": "2026-03-12T07:43:00Z",
+      "body": "The silver chalice was on the floor beside the desk, polished clean except for wax along the stem."
+    },
+    {
+      "id": "bishop-3",
+      "sender": "Groundskeeper Bram Yates",
+      "timestamp": "2026-03-12T07:44:00Z",
+      "body": "The office looked staged. Whoever moved the chalice wanted our eyes off the books."
+    }
+  ]
+}

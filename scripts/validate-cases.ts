@@ -1,25 +1,21 @@
-import { readFile, readdir } from "node:fs/promises";
+import { readdir } from "node:fs/promises";
 import path from "node:path";
 
-import {
-  caseManifestSchema,
-  protectedCaseSchema,
-} from "@/features/cases/case-schema";
+import { validateCasePackage } from "@/features/cases/validate-case-package";
 
 async function main() {
   const casesRoot = path.join(process.cwd(), "content", "cases");
-  const slugs = await readdir(casesRoot);
+  const slugs = (
+    await readdir(casesRoot, {
+      withFileTypes: true,
+    })
+  )
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
 
   await Promise.all(
     slugs.map(async (slug) => {
-      const manifestPath = path.join(casesRoot, slug, "manifest.json");
-      const protectedPath = path.join(casesRoot, slug, "protected.json");
-
-      const manifestRaw = await readFile(manifestPath, "utf8");
-      const protectedRaw = await readFile(protectedPath, "utf8");
-
-      caseManifestSchema.parse(JSON.parse(manifestRaw));
-      protectedCaseSchema.parse(JSON.parse(protectedRaw));
+      await validateCasePackage(slug, { casesRoot });
     }),
   );
 

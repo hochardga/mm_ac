@@ -11,12 +11,16 @@ const hostedEnvSchema = z.object({
 });
 
 export function parseEnv(input: NodeJS.ProcessEnv) {
+  const normalizedDatabaseUrl =
+    input.DATABASE_URL?.trim() || input.POSTGRES_URL?.trim() || undefined;
   const normalizedInput = {
     ...input,
     DATABASE_DRIVER: input.DATABASE_DRIVER?.trim(),
-    DATABASE_URL: input.DATABASE_URL?.trim() || undefined,
+    DATABASE_URL: normalizedDatabaseUrl,
   };
-  const driver = normalizedInput.DATABASE_DRIVER || "pglite";
+  const driver =
+    normalizedInput.DATABASE_DRIVER ||
+    (input.VERCEL === "1" && normalizedDatabaseUrl ? "postgres" : "pglite");
 
   if (driver === "postgres") {
     return hostedEnvSchema.parse({

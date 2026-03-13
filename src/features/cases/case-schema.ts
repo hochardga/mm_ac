@@ -1,18 +1,13 @@
 import { z } from "zod";
 
+import { evidenceIndexEntrySchema } from "@/features/cases/evidence/schema";
+
 const reportOptionSchema = z.object({
   id: z.string(),
   label: z.string(),
 });
 
-const evidenceSchema = z.object({
-  id: z.string(),
-  title: z.string(),
-  kind: z.enum(["document", "photo", "audio"]),
-  content: z.string(),
-});
-
-export const caseManifestSchema = z.object({
+export const caseManifestSourceSchema = z.object({
   slug: z.string(),
   revision: z.string(),
   title: z.string(),
@@ -24,8 +19,18 @@ export const caseManifestSchema = z.object({
     method: z.array(reportOptionSchema).min(1),
   }),
   handlerPrompts: z.array(z.string()),
-  evidence: z.array(evidenceSchema),
+  evidence: z
+    .array(evidenceIndexEntrySchema)
+    .min(1)
+    .refine(
+      (entries) => new Set(entries.map((entry) => entry.id)).size === entries.length,
+      {
+        message: "evidence ids must be unique",
+      },
+    ),
 });
+
+export const caseManifestSchema = caseManifestSourceSchema;
 
 export const protectedCaseSchema = z.object({
   slug: z.string(),
@@ -55,5 +60,6 @@ export const protectedCaseSchema = z.object({
   }),
 });
 
+export type CaseManifestSource = z.infer<typeof caseManifestSourceSchema>;
 export type CaseManifest = z.infer<typeof caseManifestSchema>;
 export type ProtectedCase = z.infer<typeof protectedCaseSchema>;

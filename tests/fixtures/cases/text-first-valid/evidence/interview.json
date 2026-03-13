@@ -1,0 +1,15 @@
+{
+  "subtype": "interview_transcript",
+  "thread": {
+    "subject": "Vestry interview",
+    "channel": "interview room"
+  },
+  "messages": [
+    {
+      "id": "message-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-12T08:00:00Z",
+      "body": "Start from the ledger transfer."
+    }
+  ]
+}

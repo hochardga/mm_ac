@@ -1,0 +1,31 @@
+{
+  "slug": "text-first-missing-source",
+  "revision": "rev-1",
+  "title": "Missing Source Case",
+  "summary": "Fixture case with a missing evidence file.",
+  "estimatedMinutes": 10,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "This package should fail validation."
+  ],
+  "evidence": [
+    {
+      "id": "missing-source",
+      "title": "Missing Source",
+      "family": "document",
+      "subtype": "memo",
+      "summary": "This evidence points to a file that does not exist.",
+      "source": "evidence/missing-source.md"
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "subtype": "dispatcher_log",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "transmitter", "label": "Transmitter", "sortable": true },
+    { "id": "status", "label": "Status" },
+    { "id": "note", "label": "Note", "filterable": true }
+  ],
+  "rows": [
+    {
+      "id": "dispatch-1",
+      "timestamp": "2026-03-09T23:54:00Z",
+      "transmitter": "Pier 4 repeater",
+      "status": "Active",
+      "note": "Routine harbor traffic."
+    },
+    {
+      "id": "dispatch-2",
+      "timestamp": "2026-03-10T00:07:00Z",
+      "transmitter": "Signal Annex B",
+      "status": "Out of service",
+      "note": "Distress burst routed through decommissioned hardware."
+    }
+  ]
+}

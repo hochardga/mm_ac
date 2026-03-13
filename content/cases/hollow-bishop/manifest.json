@@ -29,14 +29,18 @@
     {
       "id": "ledger",
       "title": "Parish Ledger Extract",
-      "kind": "document",
-      "content": "A torn ledger page shows an off-books transfer approved by Bishop Vale."
+      "family": "document",
+      "subtype": "financial_ledger",
+      "summary": "A torn ledger page records an off-books transfer approved by Bishop Vale.",
+      "source": "evidence/parish-ledger.md"
     },
     {
-      "id": "photo",
-      "title": "Scene Photograph",
-      "kind": "photo",
-      "content": "A silver chalice lies beside the victim's desk."
+      "id": "vestry-interview",
+      "title": "Vestry Interview Transcript",
+      "family": "thread",
+      "subtype": "interview_transcript",
+      "summary": "A groundskeeper describes the silver chalice found beside the victim's desk.",
+      "source": "evidence/vestry-interview.json"
     }
   ]
 }

@@ -29,8 +29,18 @@
     {
       "id": "dispatch-log",
       "title": "Dispatch Log",
-      "kind": "document",
-      "content": "The midnight signal originated from a transmitter officially out of service."
+      "family": "record",
+      "subtype": "dispatcher_log",
+      "summary": "The midnight distress burst originated from a transmitter listed as out of service.",
+      "source": "evidence/dispatch-log.json"
+    },
+    {
+      "id": "night-watch-thread",
+      "title": "Night Watch Exchange",
+      "family": "thread",
+      "subtype": "handler_message",
+      "summary": "Night-shift messages tie the vanished customs officer to the signal room before the false distress call.",
+      "source": "evidence/night-watch-thread.json"
     }
   ]
 }

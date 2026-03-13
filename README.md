@@ -31,7 +31,11 @@ The app runs at [http://127.0.0.1:3000](http://127.0.0.1:3000).
 
 - Local development uses embedded `PGlite` data under `/.data/pglite`, while tests run entirely in-memory because `NODE_ENV === "test"` triggers the runtime storage policy's memory branch.
 - Case content lives in `content/cases/*` and is synced into `case_definitions` by the seed runner and the runtime manifest sync path.
+- Evidence payloads now live under `content/cases/<slug>/evidence/` while `manifest.json` stays the player-safe case index.
+- Document evidence uses Markdown source files with frontmatter for subtype and metadata.
+- Record and thread evidence use JSON payload files keyed from the manifest.
 - Returning-agent auth uses NextAuth credentials. Signup also sets the local Ashfall agent cookie so the MVP flow works before a full session-management pass.
+- Run `pnpm validate:cases` after changing any authored evidence or manifest entry so missing files and malformed payloads fail fast.
 
 ## Vercel Deployment
 
@@ -40,13 +44,13 @@ Hosted Vercel deployments must use a shared Postgres database. Embedded
 
 Required environment variables:
 
-- `DATABASE_DRIVER=postgres`
-- `DATABASE_URL=<managed postgres url>`
+- `DATABASE_URL=<managed postgres url>` or `POSTGRES_URL=<managed postgres url>`
 - `NEXTAUTH_SECRET=<secure secret>`
 - `NEXTAUTH_URL=https://<your-project>.vercel.app`
 
 Notes:
 
+- Hosted Vercel infers the `postgres` driver automatically when `DATABASE_URL` or `POSTGRES_URL` is present. You can still set `DATABASE_DRIVER=postgres` explicitly if you prefer.
 - Local development still uses `DATABASE_DRIVER=pglite` and does not require a Postgres server.
 - Case content still comes from `content/cases/*`, and migrations resolve from `process.cwd()/src/db/migrations`, so the repo files must remain available in the deployment bundle.
 - `NEXTAUTH_URL` has to remain pointed at the hosted Vercel URL; local values break return redirects in production.

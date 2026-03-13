@@ -29,6 +29,7 @@ export async function saveNoteAction(formData: FormData) {
 export async function saveReportDraftAction(formData: FormData) {
   const caseSlug = String(formData.get("caseSlug") ?? "");
   const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const selectedEvidenceId = String(formData.get("selectedEvidenceId") ?? "");
   const suspectId = String(formData.get("suspectId") ?? "");
   const motiveId = String(formData.get("motiveId") ?? "");
   const methodId = String(formData.get("methodId") ?? "");
@@ -45,6 +46,12 @@ export async function saveReportDraftAction(formData: FormData) {
   });
 
   if (caseSlug) {
+    if (selectedEvidenceId) {
+      redirect(
+        `/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`,
+      );
+    }
+
     redirect(`/cases/${caseSlug}`);
   }
 }

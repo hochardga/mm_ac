@@ -29,8 +29,10 @@
     {
       "id": "coded-ledger",
       "title": "Coded Ledger Copy",
-      "kind": "document",
-      "content": "Three entries are scratched out beside initials matching city officials."
+      "family": "document",
+      "subtype": "legal_doc",
+      "summary": "Three scratched-out entries sit beside initials tied to city officials.",
+      "source": "evidence/coded-ledger.md"
     }
   ]
 }
