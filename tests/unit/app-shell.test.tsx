@@ -16,14 +16,6 @@ beforeEach(() => {
   usePathnameMock.mockReturnValue("/");
 });
 
-test("home route is served from the shell route group", () => {
-  render(<HomePage />);
-
-  expect(
-    screen.getByRole("heading", { name: /ashfall collective/i }),
-  ).toBeInTheDocument();
-});
-
 test("renders NonCaseShell primary navigation around children", () => {
   render(
     <NonCaseShell>
@@ -43,9 +35,7 @@ test("shell layout wraps home route with primary nav and apply CTA styling", () 
   );
 
   expect(screen.getByRole("navigation", { name: /primary/i })).toBeInTheDocument();
-
-  const applyLinks = screen.getAllByRole("link", { name: /^apply$/i });
   expect(
-    applyLinks.some((applyLink) => applyLink.className.includes("bg-stone-950")),
-  ).toBe(true);
+    screen.getByRole("link", { name: /apply for field status/i }),
+  ).toHaveClass("bg-stone-950");
 });

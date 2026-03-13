@@ -15,7 +15,7 @@ export function NonCaseShell({ children }: NonCaseShellProps) {
   return (
     <div className="min-h-screen bg-stone-100 text-stone-950">
       <SiteNavigation currentPath={pathname} />
-      <main>{children}</main>
+      {children}
     </div>
   );
 }
