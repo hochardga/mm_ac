@@ -68,20 +68,6 @@ async function seedUser(userId: string) {
   });
 }
 
-test("authenticated case render shows no global primary nav", async () => {
-  const agentId = randomUUID();
-  await seedUser(agentId);
-  setAuthenticatedSession(agentId);
-
-  render(
-    await CasePage({
-      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
-    }),
-  );
-
-  expect(screen.queryByRole("navigation", { name: /primary/i })).not.toBeInTheDocument();
-});
-
 test("authenticated case render shows Back to Vault link to /vault", async () => {
   const agentId = randomUUID();
   await seedUser(agentId);
@@ -150,7 +136,6 @@ test("debrief route gets the same navigation treatment for authenticated agents"
     }),
   );
 
-  expect(screen.queryByRole("navigation", { name: /primary/i })).not.toBeInTheDocument();
   expect(screen.getByRole("link", { name: /back to vault/i })).toHaveAttribute(
     "href",
     "/vault",
