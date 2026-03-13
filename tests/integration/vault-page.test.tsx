@@ -18,7 +18,7 @@ vi.mock("next-auth", () => ({
   getServerSession: getServerSessionMock,
 }));
 
-import VaultPage from "@/app/(app)/vault/page";
+import VaultPage from "@/app/(shell)/vault/page";
 import { caseDefinitions, playerCases, users } from "@/db/schema";
 import { closeDb, getDb } from "@/lib/db";
 
