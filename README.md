@@ -31,7 +31,11 @@ The app runs at [http://127.0.0.1:3000](http://127.0.0.1:3000).
 
 - Local development uses embedded `PGlite` data under `/.data/pglite`, while tests run entirely in-memory because `NODE_ENV === "test"` triggers the runtime storage policy's memory branch.
 - Case content lives in `content/cases/*` and is synced into `case_definitions` by the seed runner and the runtime manifest sync path.
+- Evidence payloads now live under `content/cases/<slug>/evidence/` while `manifest.json` stays the player-safe case index.
+- Document evidence uses Markdown source files with frontmatter for subtype and metadata.
+- Record and thread evidence use JSON payload files keyed from the manifest.
 - Returning-agent auth uses NextAuth credentials. Signup also sets the local Ashfall agent cookie so the MVP flow works before a full session-management pass.
+- Run `pnpm validate:cases` after changing any authored evidence or manifest entry so missing files and malformed payloads fail fast.
 
 ## Vercel Demo Deployment
 
