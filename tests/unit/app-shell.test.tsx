@@ -1,6 +1,9 @@
 import { render, screen } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
+const { cookiesMock } = vi.hoisted(() => ({
+  cookiesMock: vi.fn(),
+}));
 const { getServerSessionMock } = vi.hoisted(() => ({
   getServerSessionMock: vi.fn(),
 }));
@@ -14,13 +17,19 @@ vi.mock("next/navigation", () => ({
   usePathname: () => usePathnameMock(),
 }));
 
+vi.mock("next/headers", () => ({
+  cookies: cookiesMock,
+}));
+
 import ShellLayout from "@/app/(shell)/layout";
 
 beforeEach(() => {
+  cookiesMock.mockReset();
+  cookiesMock.mockResolvedValue({ get: vi.fn() });
   getServerSessionMock.mockReset();
   getServerSessionMock.mockResolvedValue(null);
   usePathnameMock.mockReset();
-  usePathnameMock.mockReturnValue("/");
+  usePathnameMock.mockReturnValue("/apply");
 });
 
 test("signed-out shell layout shows sign in and hides vault", async () => {
