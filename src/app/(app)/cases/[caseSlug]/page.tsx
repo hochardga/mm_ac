@@ -11,6 +11,7 @@ import {
   saveReportDraftAction,
   submitReportAction,
 } from "@/app/(app)/cases/[caseSlug]/actions";
+import { CaseReturnHeader } from "@/components/case-return-header";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
 import { authOptions } from "@/lib/auth";
@@ -55,15 +56,11 @@ export default async function CasePage({ params }: CasePageProps) {
     return (
       <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
         <div className="mx-auto max-w-5xl space-y-10">
-          <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#d96c3d]">
-              Handler channel / {lifecycle.playerCase.caseRevision}
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold">{manifest.title}</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-stone-300">
-              {manifest.summary}
-            </p>
-          </section>
+          <CaseReturnHeader
+            eyebrow={`Handler channel / ${lifecycle.playerCase.caseRevision}`}
+            summary={manifest.summary}
+            title={manifest.title}
+          />
 
           <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8">

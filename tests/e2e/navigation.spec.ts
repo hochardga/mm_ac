@@ -60,4 +60,10 @@ test("global primary nav is hidden on case routes after intake", async ({
   await expect(page.getByRole("navigation", { name: /primary/i })).toHaveCount(
     0,
   );
+  const backToVault = page.getByRole("link", { name: /back to vault/i });
+  await expect(backToVault).toBeVisible();
+
+  await backToVault.click();
+  await page.waitForURL("**/vault");
+  await expect(page.getByRole("navigation", { name: /primary/i })).toBeVisible();
 });
