@@ -14,6 +14,13 @@ export function SignOutButton() {
     setPending(true);
     void (async () => {
       try {
+        try {
+          await fetch("/api/intake-signout", {
+            method: "POST",
+          });
+        } catch {
+          // Continue with NextAuth sign out even if intake-cookie clearing fails.
+        }
         await signOut({ callbackUrl: "/" });
       } catch {
         setPending(false);

@@ -4,6 +4,9 @@ import { beforeEach, expect, test, vi } from "vitest";
 const { signOutMock } = vi.hoisted(() => ({
   signOutMock: vi.fn(),
 }));
+const { fetchMock } = vi.hoisted(() => ({
+  fetchMock: vi.fn(),
+}));
 
 vi.mock("next-auth/react", () => ({
   signOut: signOutMock,
@@ -13,9 +16,12 @@ import { SignOutButton } from "@/components/sign-out-button";
 
 beforeEach(() => {
   signOutMock.mockReset();
+  fetchMock.mockReset();
+  fetchMock.mockResolvedValue({ ok: true });
+  vi.stubGlobal("fetch", fetchMock);
 });
 
-test("calls signOut and shows pending state while sign-out is unresolved", () => {
+test("calls signOut and shows pending state while sign-out is unresolved", async () => {
   signOutMock.mockReturnValueOnce(new Promise(() => {}));
 
   render(<SignOutButton />);
@@ -23,7 +29,14 @@ test("calls signOut and shows pending state while sign-out is unresolved", () =>
   const button = screen.getByRole("button", { name: /sign out/i });
   fireEvent.click(button);
 
-  expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/" });
+  await waitFor(() =>
+    expect(fetchMock).toHaveBeenCalledWith("/api/intake-signout", {
+      method: "POST",
+    }),
+  );
+  await waitFor(() =>
+    expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/" }),
+  );
   expect(button).toBeDisabled();
   expect(button).toHaveTextContent("Signing Out...");
 });
@@ -38,6 +51,25 @@ test("clears pending and restores label when signOut rejects", async () => {
 
   expect(button).toBeDisabled();
   expect(button).toHaveTextContent("Signing Out...");
+  await waitFor(() => expect(button).not.toBeDisabled());
+  expect(button).toHaveTextContent("Sign Out");
+});
+
+test("still attempts next-auth signout when intake cookie clear request fails", async () => {
+  fetchMock.mockRejectedValueOnce(new Error("intake endpoint unavailable"));
+  signOutMock.mockRejectedValueOnce(new Error("network down"));
+
+  render(<SignOutButton />);
+
+  const button = screen.getByRole("button", { name: /sign out/i });
+  fireEvent.click(button);
+
+  await waitFor(() =>
+    expect(fetchMock).toHaveBeenCalledWith("/api/intake-signout", {
+      method: "POST",
+    }),
+  );
+  await waitFor(() => expect(signOutMock).toHaveBeenCalledTimes(1));
   await waitFor(() => expect(button).not.toBeDisabled());
   expect(button).toHaveTextContent("Sign Out");
 });

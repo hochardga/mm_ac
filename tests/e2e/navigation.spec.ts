@@ -69,6 +69,9 @@ test("navigation responds to signed-out and signed-in state changes", async ({
     page.getByRole("link", { name: /returning agent sign in/i }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /open vault/i })).toHaveCount(0);
+
+  await page.goto("/apply");
+  await expectSignedOutPrimaryNav(page);
 });
 
 test("global primary nav is hidden on case routes after intake", async ({
