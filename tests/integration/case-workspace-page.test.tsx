@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, test, vi } from "vitest";
 
 const { cookiesMock } = vi.hoisted(() => ({
@@ -89,4 +89,58 @@ test("preserves the selected evidence when saving a draft", async () => {
   );
 
   expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
+});
+
+test("renders document markdown, record tables, and thread metadata in the workspace", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "record-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Record",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  expect(screen.getByRole("columnheader", { name: /timestamp/i })).toBeInTheDocument();
+  expect(screen.getByRole("columnheader", { name: /transmitter/i })).toBeInTheDocument();
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "briar-ledger" }),
+      searchParams: Promise.resolve({ evidence: "coded-ledger" }),
+    } as never),
+  );
+
+  expect(screen.getAllByRole("heading", { name: /coded ledger copy/i }).length).toBeGreaterThan(1);
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({ evidence: "vestry-interview" }),
+    } as never),
+  );
+
+  expect(screen.getAllByText(/groundskeeper bram yates/i).length).toBeGreaterThan(0);
+  expect(screen.getByText(/2026-03-12T07:43:00Z/i)).toBeInTheDocument();
 });
