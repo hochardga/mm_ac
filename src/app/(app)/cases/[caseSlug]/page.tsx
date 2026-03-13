@@ -16,21 +16,24 @@ type CasePageProps = {
   params: Promise<{
     caseSlug: string;
   }>;
-  searchParams?: Promise<{
-    evidence?: string;
-  }>;
+};
+
+type CaseSearchParams = {
+  evidence?: string;
 };
 
 export default async function CasePage({
   params,
   searchParams,
-}: CasePageProps) {
-  const [{ caseSlug }, resolvedSearchParams, session, cookieStore] =
+}: CasePageProps & {
+  searchParams?: Promise<CaseSearchParams>;
+}) {
+  const [{ caseSlug }, session, cookieStore, resolvedSearchParams] =
     await Promise.all([
     params,
-    searchParams ?? Promise.resolve({}),
     getServerSession(authOptions),
     cookies(),
+    searchParams ?? Promise.resolve<CaseSearchParams>({}),
     ]);
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
