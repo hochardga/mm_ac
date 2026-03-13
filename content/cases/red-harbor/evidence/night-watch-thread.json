@@ -1,0 +1,28 @@
+{
+  "subtype": "handler_message",
+  "thread": {
+    "subject": "Night watch exchange",
+    "channel": "Operations relay",
+    "participants": ["Dispatcher Hadi Noor", "Dock Watch", "Signal Chief Pike"]
+  },
+  "messages": [
+    {
+      "id": "harbor-1",
+      "sender": "Dispatcher Hadi Noor",
+      "timestamp": "2026-03-10T00:11:00Z",
+      "body": "That distress ping should have been impossible. Annex B was dark before sunset."
+    },
+    {
+      "id": "harbor-2",
+      "sender": "Dock Watch",
+      "timestamp": "2026-03-10T00:13:00Z",
+      "body": "Customs Officer Vale was in the signal room earlier, arguing with Chief Pike over the cargo ledger."
+    },
+    {
+      "id": "harbor-3",
+      "sender": "Signal Chief Pike",
+      "timestamp": "2026-03-10T00:15:00Z",
+      "body": "Log everything. If annex power came back, I want to know who touched the breaker cage."
+    }
+  ]
+}

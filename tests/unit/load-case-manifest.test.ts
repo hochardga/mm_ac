@@ -25,3 +25,15 @@ test("manifest loader excludes canonical answers", async () => {
 
   expect(manifest).not.toHaveProperty("canonicalAnswers");
 });
+
+test("the shipped cases load successfully under the text-first evidence model", async () => {
+  const [briar, bishop, harbor] = await Promise.all([
+    loadCaseManifest("briar-ledger"),
+    loadCaseManifest("hollow-bishop"),
+    loadCaseManifest("red-harbor"),
+  ]);
+
+  expect(briar.evidence.some((item) => item.family === "document")).toBe(true);
+  expect(bishop.evidence.some((item) => item.family === "thread")).toBe(true);
+  expect(harbor.evidence.some((item) => item.family === "record")).toBe(true);
+});
