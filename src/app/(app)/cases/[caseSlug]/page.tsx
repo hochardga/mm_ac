@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { notes, reportDrafts } from "@/db/schema";
+import { notes, reportDrafts, users } from "@/db/schema";
 import {
   saveNoteAction,
   saveReportDraftAction,
@@ -23,6 +23,35 @@ type CasePageProps = {
   }>;
 };
 
+async function resolveStoredAgentId(input: {
+  sessionUserId?: string;
+  intakeUserId?: string;
+}) {
+  const db = await getDb();
+
+  if (input.sessionUserId) {
+    const sessionUser = await db.query.users.findFirst({
+      where: eq(users.id, input.sessionUserId),
+    });
+
+    if (sessionUser) {
+      return sessionUser.id;
+    }
+  }
+
+  if (input.intakeUserId && input.intakeUserId !== input.sessionUserId) {
+    const intakeUser = await db.query.users.findFirst({
+      where: eq(users.id, input.intakeUserId),
+    });
+
+    if (intakeUser) {
+      return intakeUser.id;
+    }
+  }
+
+  return undefined;
+}
+
 export default async function CasePage({ params }: CasePageProps) {
   const [{ caseSlug }, session, cookieStore] = await Promise.all([
     params,
@@ -31,7 +60,11 @@ export default async function CasePage({ params }: CasePageProps) {
   ]);
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
-  const userId = sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value;
+  const intakeUserId = cookieStore.get("ashfall-agent-id")?.value;
+  const userId = await resolveStoredAgentId({
+    sessionUserId,
+    intakeUserId,
+  });
 
   if (!userId) {
     redirect("/apply");

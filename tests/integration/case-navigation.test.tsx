@@ -51,6 +51,19 @@ function setAuthenticatedSession(userId: string) {
   });
 }
 
+function setAuthenticatedSessionWithCookie(
+  sessionUserId: string,
+  cookieUserId?: string,
+) {
+  getServerSessionMock.mockResolvedValue({ user: { id: sessionUserId } });
+  cookiesMock.mockResolvedValue({
+    get: (name: string) =>
+      name === "ashfall-agent-id" && cookieUserId
+        ? { value: cookieUserId }
+        : undefined,
+  });
+}
+
 function setUnauthenticatedSession() {
   getServerSessionMock.mockResolvedValue(null);
   cookiesMock.mockResolvedValue({
@@ -97,6 +110,34 @@ test("authenticated case render has exactly one level-1 heading", async () => {
   );
 
   expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
+});
+
+test("case route falls back to a valid intake cookie when the session identity is stale", async () => {
+  const cookieAgentId = randomUUID();
+  await seedUser(cookieAgentId);
+  setAuthenticatedSessionWithCookie(randomUUID(), cookieAgentId);
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    }),
+  );
+
+  expect(screen.getByRole("link", { name: /back to vault/i })).toHaveAttribute(
+    "href",
+    "/vault",
+  );
+});
+
+test("case route redirects to /apply when no stored agent identity can be resolved", async () => {
+  setAuthenticatedSessionWithCookie(randomUUID());
+
+  await expect(
+    CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    }),
+  ).rejects.toThrow("NEXT_REDIRECT:/apply");
+  expect(redirectMock).toHaveBeenCalledWith("/apply");
 });
 
 test("debrief route gets the same navigation treatment for authenticated agents", async () => {
