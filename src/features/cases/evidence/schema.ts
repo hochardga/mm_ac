@@ -83,7 +83,45 @@ export const threadEvidenceSourceSchema = z
   })
   .strict();
 
+const normalizedEvidenceBaseSchema = evidenceIndexEntrySchema.extend({
+  viewer: evidenceViewerSchema.optional(),
+});
+
+export const documentEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("document"),
+    body: z.string(),
+    meta: z.record(z.string(), evidenceMetaValueSchema),
+  })
+  .strict();
+
+export const recordEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("record"),
+    columns: z.array(recordEvidenceColumnSchema),
+    rows: z.array(recordEvidenceRowSchema),
+  })
+  .strict();
+
+export const threadEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("thread"),
+    thread: threadMetadataSchema,
+    messages: z.array(threadMessageSchema),
+  })
+  .strict();
+
+export const caseEvidenceSchema = z.discriminatedUnion("family", [
+  documentEvidenceSchema,
+  recordEvidenceSchema,
+  threadEvidenceSchema,
+]);
+
 export type EvidenceIndexEntry = z.infer<typeof evidenceIndexEntrySchema>;
 export type DocumentEvidenceSource = z.infer<typeof documentEvidenceSourceSchema>;
 export type RecordEvidenceSource = z.infer<typeof recordEvidenceSourceSchema>;
 export type ThreadEvidenceSource = z.infer<typeof threadEvidenceSourceSchema>;
+export type DocumentEvidence = z.infer<typeof documentEvidenceSchema>;
+export type RecordEvidence = z.infer<typeof recordEvidenceSchema>;
+export type ThreadEvidence = z.infer<typeof threadEvidenceSchema>;
+export type CaseEvidence = z.infer<typeof caseEvidenceSchema>;
