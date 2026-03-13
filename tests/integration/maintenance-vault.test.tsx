@@ -32,7 +32,7 @@ vi.mock("@/features/cases/load-case-manifest", () => ({
   loadCaseManifest: loadCaseManifestMock,
 }));
 
-import VaultPage from "@/app/(app)/vault/page";
+import VaultPage from "@/app/(shell)/vault/page";
 import { caseDefinitions } from "@/db/schema";
 import { closeDb, getDb } from "@/lib/db";
 

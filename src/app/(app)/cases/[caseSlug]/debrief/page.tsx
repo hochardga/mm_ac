@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
+import { CaseReturnHeader } from "@/components/case-return-header";
 import { caseDefinitions, playerCases } from "@/db/schema";
 import { getDebrief } from "@/features/debrief/get-debrief";
 import { authOptions } from "@/lib/auth";
@@ -54,15 +55,13 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
 
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
-      <section className="mx-auto max-w-4xl rounded-[2rem] border border-white/10 bg-white/5 p-8">
-        <p className="text-sm uppercase tracking-[0.3em] text-[#d96c3d]">
-          Case Debrief
-        </p>
-        <h1 className="mt-4 text-4xl font-semibold">{debrief.title}</h1>
-        <p className="mt-4 text-lg leading-8 text-stone-300">
-          {debrief.summary}
-        </p>
-      </section>
+      <div className="mx-auto max-w-4xl">
+        <CaseReturnHeader
+          eyebrow="Case Debrief"
+          summary={debrief.summary}
+          title={debrief.title}
+        />
+      </div>
     </main>
   );
 }

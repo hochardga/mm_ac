@@ -5,12 +5,13 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { notes, reportDrafts } from "@/db/schema";
+import { notes, reportDrafts, users } from "@/db/schema";
 import {
   saveNoteAction,
   saveReportDraftAction,
   submitReportAction,
 } from "@/app/(app)/cases/[caseSlug]/actions";
+import { CaseReturnHeader } from "@/components/case-return-header";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
 import { authOptions } from "@/lib/auth";
@@ -22,6 +23,35 @@ type CasePageProps = {
   }>;
 };
 
+async function resolveStoredAgentId(input: {
+  sessionUserId?: string;
+  intakeUserId?: string;
+}) {
+  const db = await getDb();
+
+  if (input.sessionUserId) {
+    const sessionUser = await db.query.users.findFirst({
+      where: eq(users.id, input.sessionUserId),
+    });
+
+    if (sessionUser) {
+      return sessionUser.id;
+    }
+  }
+
+  if (input.intakeUserId && input.intakeUserId !== input.sessionUserId) {
+    const intakeUser = await db.query.users.findFirst({
+      where: eq(users.id, input.intakeUserId),
+    });
+
+    if (intakeUser) {
+      return intakeUser.id;
+    }
+  }
+
+  return undefined;
+}
+
 export default async function CasePage({ params }: CasePageProps) {
   const [{ caseSlug }, session, cookieStore] = await Promise.all([
     params,
@@ -30,7 +60,11 @@ export default async function CasePage({ params }: CasePageProps) {
   ]);
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
-  const userId = sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value;
+  const intakeUserId = cookieStore.get("ashfall-agent-id")?.value;
+  const userId = await resolveStoredAgentId({
+    sessionUserId,
+    intakeUserId,
+  });
 
   if (!userId) {
     redirect("/apply");
@@ -55,15 +89,11 @@ export default async function CasePage({ params }: CasePageProps) {
     return (
       <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
         <div className="mx-auto max-w-5xl space-y-10">
-          <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#d96c3d]">
-              Handler channel / {lifecycle.playerCase.caseRevision}
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold">{manifest.title}</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-stone-300">
-              {manifest.summary}
-            </p>
-          </section>
+          <CaseReturnHeader
+            eyebrow={`Handler channel / ${lifecycle.playerCase.caseRevision}`}
+            summary={manifest.summary}
+            title={manifest.title}
+          />
 
           <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
