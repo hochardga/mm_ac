@@ -5,6 +5,7 @@ import { signIn } from "next-auth/react";
 
 export default function SignInPage() {
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
@@ -17,6 +18,8 @@ export default function SignInPage() {
           className="mt-8 grid gap-4"
           onSubmit={async (event) => {
             event.preventDefault();
+            setError(null);
+            setPending(true);
 
             const form = new FormData(event.currentTarget);
             const email = String(form.get("email") ?? "");
@@ -30,6 +33,7 @@ export default function SignInPage() {
 
             if (result?.error) {
               setError("Credentials rejected by Ashfall intake.");
+              setPending(false);
               return;
             }
 
@@ -54,8 +58,9 @@ export default function SignInPage() {
           <button
             className="rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black"
             type="submit"
+            disabled={pending}
           >
-            Report In
+            {pending ? "Reporting In..." : "Report In"}
           </button>
         </form>
       </div>
