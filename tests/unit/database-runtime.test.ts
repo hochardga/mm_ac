@@ -28,6 +28,36 @@ describe("resolveDatabaseRuntime", () => {
     );
   });
 
+  test("infers postgres on hosted vercel when DATABASE_URL is present", () => {
+    expect(
+      resolveDatabaseRuntime(
+        {
+          VERCEL: "1",
+          DATABASE_URL: "postgres://demo:demo@db.example.com:5432/ashfall",
+        },
+        "/repo",
+      ),
+    ).toEqual({
+      driver: "postgres",
+      connectionString: "postgres://demo:demo@db.example.com:5432/ashfall",
+    });
+  });
+
+  test("infers postgres on hosted vercel when POSTGRES_URL is present", () => {
+    expect(
+      resolveDatabaseRuntime(
+        {
+          VERCEL: "1",
+          POSTGRES_URL: "postgres://demo:demo@db.example.com:5432/ashfall",
+        },
+        "/repo",
+      ),
+    ).toEqual({
+      driver: "postgres",
+      connectionString: "postgres://demo:demo@db.example.com:5432/ashfall",
+    });
+  });
+
   test("returns postgres runtime when explicitly configured", () => {
     expect(
       resolveDatabaseRuntime(

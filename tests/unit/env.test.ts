@@ -28,4 +28,28 @@ describe("parseEnv", () => {
       DATABASE_URL: "postgres://demo:demo@db.example.com:5432/app",
     });
   });
+
+  test("infers hosted postgres from DATABASE_URL on vercel", () => {
+    expect(
+      parseEnv({
+        VERCEL: "1",
+        DATABASE_URL: " postgres://demo:demo@db.example.com:5432/app ",
+      } as NodeJS.ProcessEnv),
+    ).toEqual({
+      DATABASE_DRIVER: "postgres",
+      DATABASE_URL: "postgres://demo:demo@db.example.com:5432/app",
+    });
+  });
+
+  test("falls back to POSTGRES_URL on vercel", () => {
+    expect(
+      parseEnv({
+        VERCEL: "1",
+        POSTGRES_URL: " postgres://demo:demo@db.example.com:5432/app ",
+      } as NodeJS.ProcessEnv),
+    ).toEqual({
+      DATABASE_DRIVER: "postgres",
+      DATABASE_URL: "postgres://demo:demo@db.example.com:5432/app",
+    });
+  });
 });
