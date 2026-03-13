@@ -59,6 +59,7 @@ export async function saveReportDraftAction(formData: FormData) {
 export async function submitReportAction(formData: FormData) {
   const caseSlug = String(formData.get("caseSlug") ?? "");
   const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const selectedEvidenceId = String(formData.get("selectedEvidenceId") ?? "");
   const submissionToken = String(formData.get("submissionToken") ?? "");
   const suspectId = String(formData.get("suspectId") ?? "");
   const motiveId = String(formData.get("motiveId") ?? "");
@@ -86,5 +87,9 @@ export async function submitReportAction(formData: FormData) {
     redirect(`/cases/${caseSlug}/debrief`);
   }
 
-  revalidatePath(`/cases/${caseSlug}`);
+  if (selectedEvidenceId) {
+    redirect(`/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`);
+  }
+
+  redirect(`/cases/${caseSlug}`);
 }

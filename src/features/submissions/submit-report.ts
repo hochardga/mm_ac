@@ -102,12 +102,25 @@ export async function submitReport(input: SubmitReportInput) {
       .where(eq(playerCases.id, input.playerCaseId));
 
     await tx
-      .update(reportDrafts)
-      .set({
+      .insert(reportDrafts)
+      .values({
+        id: randomUUID(),
+        playerCaseId: input.playerCaseId,
+        suspectId: input.answers.suspectId,
+        motiveId: input.answers.motiveId,
+        methodId: input.answers.methodId,
         attemptCount: attemptNumber,
-        updatedAt: new Date(),
       })
-      .where(eq(reportDrafts.playerCaseId, input.playerCaseId));
+      .onConflictDoUpdate({
+        target: reportDrafts.playerCaseId,
+        set: {
+          suspectId: input.answers.suspectId,
+          motiveId: input.answers.motiveId,
+          methodId: input.answers.methodId,
+          attemptCount: attemptNumber,
+          updatedAt: new Date(),
+        },
+      });
 
     return {
       id: savedSubmission.id,

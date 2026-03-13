@@ -1,4 +1,4 @@
-import type { notes, reportDrafts } from "@/db/schema";
+import type { notes, reportDrafts, reportSubmissions } from "@/db/schema";
 import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
@@ -8,6 +8,7 @@ import type { loadCaseManifest } from "@/features/cases/load-case-manifest";
 type CaseManifestWithEvidence = Awaited<ReturnType<typeof loadCaseManifest>>;
 type SavedNote = typeof notes.$inferSelect | undefined;
 type SavedDraft = typeof reportDrafts.$inferSelect | undefined;
+type LatestSubmission = typeof reportSubmissions.$inferSelect | undefined;
 
 type CaseWorkspaceProps = {
   caseSlug: string;
@@ -15,6 +16,7 @@ type CaseWorkspaceProps = {
   playerCaseId: string;
   savedNote: SavedNote;
   savedDraft: SavedDraft;
+  latestSubmission: LatestSubmission;
   submissionToken: string;
   selectedEvidenceId?: string;
 };
@@ -25,6 +27,7 @@ export function CaseWorkspace({
   playerCaseId,
   savedNote,
   savedDraft,
+  latestSubmission,
   submissionToken,
   selectedEvidenceId,
 }: CaseWorkspaceProps) {
@@ -69,6 +72,7 @@ export function CaseWorkspace({
           selectedEvidenceId={selectedEvidence.id}
           manifest={manifest}
           savedDraft={savedDraft}
+          latestSubmission={latestSubmission}
           submissionToken={submissionToken}
         />
       </aside>
