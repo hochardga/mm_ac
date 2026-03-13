@@ -6,9 +6,19 @@ import { signOut } from "next-auth/react";
 export function SignOutButton() {
   const [pending, setPending] = useState(false);
 
-  async function handleClick() {
+  function handleClick() {
+    if (pending) {
+      return;
+    }
+
     setPending(true);
-    await signOut({ callbackUrl: "/" });
+    void (async () => {
+      try {
+        await signOut({ callbackUrl: "/" });
+      } catch {
+        setPending(false);
+      }
+    })();
   }
 
   return (

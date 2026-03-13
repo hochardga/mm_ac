@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
 const { signOutMock } = vi.hoisted(() => ({
@@ -26,4 +26,18 @@ test("calls signOut and shows pending state while sign-out is unresolved", () =>
   expect(signOutMock).toHaveBeenCalledWith({ callbackUrl: "/" });
   expect(button).toBeDisabled();
   expect(button).toHaveTextContent("Signing Out...");
+});
+
+test("clears pending and restores label when signOut rejects", async () => {
+  signOutMock.mockRejectedValueOnce(new Error("network down"));
+
+  render(<SignOutButton />);
+
+  const button = screen.getByRole("button", { name: /sign out/i });
+  fireEvent.click(button);
+
+  expect(button).toBeDisabled();
+  expect(button).toHaveTextContent("Signing Out...");
+  await waitFor(() => expect(button).not.toBeDisabled());
+  expect(button).toHaveTextContent("Sign Out");
 });

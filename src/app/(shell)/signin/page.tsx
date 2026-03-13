@@ -18,18 +18,29 @@ export default function SignInPage() {
           className="mt-8 grid gap-4"
           onSubmit={async (event) => {
             event.preventDefault();
+            if (pending) {
+              return;
+            }
+
             setError(null);
             setPending(true);
 
             const form = new FormData(event.currentTarget);
             const email = String(form.get("email") ?? "");
             const password = String(form.get("password") ?? "");
-            const result = await signIn("credentials", {
-              email,
-              password,
-              callbackUrl: "/vault",
-              redirect: false,
-            });
+            let result;
+            try {
+              result = await signIn("credentials", {
+                email,
+                password,
+                callbackUrl: "/vault",
+                redirect: false,
+              });
+            } catch {
+              setError("Unable to reach Ashfall intake. Try again.");
+              setPending(false);
+              return;
+            }
 
             if (result?.error) {
               setError("Credentials rejected by Ashfall intake.");
