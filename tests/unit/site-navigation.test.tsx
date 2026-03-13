@@ -9,6 +9,9 @@ test("renders the Ashfall brand plus apply, sign in, and vault links", () => {
   expect(
     screen.getByRole("link", { name: /ashfall collective/i }),
   ).toHaveAttribute("href", "/");
+  expect(
+    screen.getByRole("link", { name: /ashfall collective/i }),
+  ).toHaveAttribute("aria-current", "page");
   expect(screen.getByRole("link", { name: /^apply$/i })).toHaveAttribute(
     "href",
     "/apply",
@@ -29,5 +32,14 @@ test("marks the current route with aria-current", () => {
   expect(screen.getByRole("link", { name: /vault/i })).toHaveAttribute(
     "aria-current",
     "page",
+  );
+  expect(
+    screen.getByRole("link", { name: /ashfall collective/i }),
+  ).not.toHaveAttribute("aria-current");
+  expect(screen.getByRole("link", { name: /apply/i })).not.toHaveAttribute(
+    "aria-current",
+  );
+  expect(screen.getByRole("link", { name: /sign in/i })).not.toHaveAttribute(
+    "aria-current",
   );
 });
