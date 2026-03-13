@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, expect, test, vi } from "vitest";
 
 vi.mock("next/font/google", () => ({
@@ -22,27 +22,23 @@ test("exports Ashfall metadata values", () => {
 test("shows the demo reset notice on vercel deployments", () => {
   process.env.VERCEL = "1";
 
-  render(
+  const markup = renderToStaticMarkup(
     <RootLayout>
       <div>Child content</div>
     </RootLayout>,
   );
 
-  expect(
-    screen.getByText(/demo environment: progress may reset occasionally/i),
-  ).toBeInTheDocument();
+  expect(markup).toMatch(/demo environment: progress may reset occasionally/i);
 });
 
 test("does not show the demo reset notice on non-vercel environments", () => {
   delete process.env.VERCEL;
 
-  render(
+  const markup = renderToStaticMarkup(
     <RootLayout>
       <div>Child content</div>
     </RootLayout>,
   );
 
-  expect(
-    screen.queryByText(/demo environment: progress may reset occasionally/i),
-  ).not.toBeInTheDocument();
+  expect(markup).not.toMatch(/demo environment: progress may reset occasionally/i);
 });
