@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { notes, reportDrafts, users } from "@/db/schema";
+import { notes, reportDrafts, reportSubmissions, users } from "@/db/schema";
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
@@ -87,12 +87,16 @@ export default async function CasePage({
       openCase({ userId, caseSlug }),
     ]);
     const db = await getDb();
-    const [savedNote, savedDraft] = await Promise.all([
+    const [savedNote, savedDraft, latestSubmission] = await Promise.all([
       db.query.notes.findFirst({
         where: eq(notes.playerCaseId, lifecycle.playerCase.id),
       }),
       db.query.reportDrafts.findFirst({
         where: eq(reportDrafts.playerCaseId, lifecycle.playerCase.id),
+      }),
+      db.query.reportSubmissions.findFirst({
+        where: eq(reportSubmissions.playerCaseId, lifecycle.playerCase.id),
+        orderBy: [desc(reportSubmissions.attemptNumber)],
       }),
     ]);
     const submissionToken = randomUUID();
@@ -110,6 +114,7 @@ export default async function CasePage({
             caseSlug={caseSlug}
             manifest={manifest}
             playerCaseId={lifecycle.playerCase.id}
+            latestSubmission={latestSubmission}
             savedDraft={savedDraft}
             savedNote={savedNote}
             selectedEvidenceId={selectedEvidenceIds[0]}
