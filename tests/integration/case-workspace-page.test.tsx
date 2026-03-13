@@ -20,6 +20,8 @@ vi.mock("next-auth", () => ({
 
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
 import { users } from "@/db/schema";
+import { ReportPanel } from "@/features/cases/components/report-panel";
+import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -67,4 +69,24 @@ test("renders an evidence index, selected viewer, and persistent notes together"
   expect(
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
   ).toBeInTheDocument();
+  expect(
+    screen.getByText(/active evidence: vestry interview transcript/i),
+  ).toBeInTheDocument();
+});
+
+test("preserves the selected evidence when saving a draft", async () => {
+  const manifest = await loadCaseManifest("red-harbor");
+
+  render(
+    <ReportPanel
+      caseSlug="red-harbor"
+      playerCaseId="player-case-1"
+      selectedEvidenceId="dispatch-log"
+      manifest={manifest}
+      savedDraft={undefined}
+      submissionToken="submission-token"
+    />,
+  );
+
+  expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
 });
