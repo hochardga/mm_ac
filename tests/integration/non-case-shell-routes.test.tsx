@@ -13,6 +13,7 @@ const { listAvailableCasesMock } = vi.hoisted(() => ({
 const { pushMock } = vi.hoisted(() => ({
   pushMock: vi.fn(),
 }));
+const usePathnameMock = vi.fn();
 
 vi.mock("next-auth", () => ({
   getServerSession: getServerSessionMock,
@@ -24,6 +25,7 @@ vi.mock("next/headers", () => ({
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: pushMock }),
+  usePathname: () => usePathnameMock(),
 }));
 
 vi.mock("@/features/cases/list-available-cases", () => ({
@@ -31,7 +33,7 @@ vi.mock("@/features/cases/list-available-cases", () => ({
 }));
 
 import ApplyPage from "@/app/(shell)/apply/page";
-import SignInPage from "@/app/(shell)/signin/page";
+import ShellLayout from "@/app/(shell)/layout";
 import VaultPage from "@/app/(shell)/vault/page";
 
 beforeEach(() => {
@@ -42,28 +44,37 @@ beforeEach(() => {
   listAvailableCasesMock.mockReset();
   listAvailableCasesMock.mockResolvedValue([]);
   pushMock.mockReset();
+  usePathnameMock.mockReset();
+  usePathnameMock.mockReturnValue("/apply");
 });
 
-test("ApplyPage is served from the shell route group", () => {
-  render(<ApplyPage />);
+test("signed-out apply route inside shell shows apply and sign in only", async () => {
+  getServerSessionMock.mockResolvedValueOnce(null);
+  render(await ShellLayout({ children: <ApplyPage /> }));
 
   expect(
     screen.getByRole("heading", { name: /apply for field status/i }),
   ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /apply/i })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: /vault/i })).not.toBeInTheDocument();
 });
 
-test("SignInPage is served from the shell route group", () => {
-  render(<SignInPage />);
-
-  expect(
-    screen.getByRole("heading", { name: /return to ashfall/i }),
-  ).toBeInTheDocument();
-});
-
-test("VaultPage is served from the shell route group", async () => {
-  render(await VaultPage());
+test("signed-in vault route inside shell shows vault and sign out with styled header", async () => {
+  getServerSessionMock.mockResolvedValue({ user: { id: "agent-12" } });
+  usePathnameMock.mockReturnValue("/vault");
+  render(await ShellLayout({ children: await VaultPage() }));
 
   expect(
     screen.getByRole("heading", { name: /dossier vault/i }),
   ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /vault/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: /sign out/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: /sign in/i }),
+  ).not.toBeInTheDocument();
+  expect(screen.getByRole("banner")).toHaveClass("border-b");
+  expect(screen.getByRole("banner")).toHaveClass("bg-stone-100/95");
 });

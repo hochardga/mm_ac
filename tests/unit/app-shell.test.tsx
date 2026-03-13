@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
 const { getServerSessionMock } = vi.hoisted(() => ({
@@ -15,7 +15,6 @@ vi.mock("next/navigation", () => ({
 }));
 
 import ShellLayout from "@/app/(shell)/layout";
-import { NonCaseShell } from "@/components/non-case-shell";
 
 beforeEach(() => {
   getServerSessionMock.mockReset();
@@ -24,25 +23,26 @@ beforeEach(() => {
   usePathnameMock.mockReturnValue("/");
 });
 
-test("renders NonCaseShell primary navigation around children", () => {
-  render(
-    <NonCaseShell>
-      <p>Inner route content</p>
-    </NonCaseShell>,
-  );
-
-  expect(screen.getByRole("navigation", { name: /primary/i })).toBeInTheDocument();
-  expect(screen.getByText("Inner route content")).toBeInTheDocument();
-});
-
-test("shell layout wraps generic child content with primary nav", async () => {
+test("signed-out shell layout shows sign in and hides vault", async () => {
+  getServerSessionMock.mockResolvedValueOnce(null);
   render(await ShellLayout({ children: <p>Shell child content</p> }));
 
-  const navigation = screen.getByRole("navigation", { name: /primary/i });
-
-  expect(navigation).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
   expect(
-    within(navigation).getByRole("link", { name: /^apply$/i }),
-  ).toHaveAttribute("href", "/apply");
+    screen.queryByRole("link", { name: /vault/i }),
+  ).not.toBeInTheDocument();
   expect(screen.getByText("Shell child content")).toBeInTheDocument();
+});
+
+test("signed-in shell layout shows vault and sign out while hiding sign in", async () => {
+  getServerSessionMock.mockResolvedValueOnce({ user: { id: "agent-7" } });
+  render(await ShellLayout({ children: <p>Shell child content</p> }));
+
+  expect(screen.getByRole("link", { name: /vault/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: /sign out/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("link", { name: /sign in/i }),
+  ).not.toBeInTheDocument();
 });
