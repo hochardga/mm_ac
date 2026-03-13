@@ -14,10 +14,8 @@ export default withAuth({
         return true;
       }
 
-      return (
-        Boolean(token) ||
-        req.cookies.get("ashfall-onboarding")?.value === "active"
-      );
+      const agentId = req.cookies.get("ashfall-agent-id")?.value;
+      return Boolean(token) || Boolean(agentId);
     },
   },
 });

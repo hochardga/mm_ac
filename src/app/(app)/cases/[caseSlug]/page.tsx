@@ -5,7 +5,8 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { notes, reportDrafts } from "@/db/schema";
+import { notes, reportDrafts, users } from "@/db/schema";
+import { CaseReturnHeader } from "@/components/case-return-header";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
@@ -16,28 +17,60 @@ type CasePageProps = {
   params: Promise<{
     caseSlug: string;
   }>;
+  searchParams?: Promise<CaseSearchParams>;
 };
 
 type CaseSearchParams = {
   evidence?: string;
 };
 
+async function resolveStoredAgentId(input: {
+  sessionUserId?: string;
+  intakeUserId?: string;
+}) {
+  const db = await getDb();
+
+  if (input.sessionUserId) {
+    const sessionUser = await db.query.users.findFirst({
+      where: eq(users.id, input.sessionUserId),
+    });
+
+    if (sessionUser) {
+      return sessionUser.id;
+    }
+  }
+
+  if (input.intakeUserId && input.intakeUserId !== input.sessionUserId) {
+    const intakeUser = await db.query.users.findFirst({
+      where: eq(users.id, input.intakeUserId),
+    });
+
+    if (intakeUser) {
+      return intakeUser.id;
+    }
+  }
+
+  return undefined;
+}
+
 export default async function CasePage({
   params,
   searchParams,
-}: CasePageProps & {
-  searchParams?: Promise<CaseSearchParams>;
-}) {
+}: CasePageProps) {
   const [{ caseSlug }, session, cookieStore, resolvedSearchParams] =
     await Promise.all([
     params,
     getServerSession(authOptions),
     cookies(),
     searchParams ?? Promise.resolve<CaseSearchParams>({}),
-    ]);
+  ]);
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
-  const userId = sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value;
+  const intakeUserId = cookieStore.get("ashfall-agent-id")?.value;
+  const userId = await resolveStoredAgentId({
+    sessionUserId,
+    intakeUserId,
+  });
 
   if (!userId) {
     redirect("/apply");
@@ -61,16 +94,12 @@ export default async function CasePage({
 
     return (
       <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
-        <div className="mx-auto max-w-7xl space-y-10">
-          <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#d96c3d]">
-              Handler channel / {lifecycle.playerCase.caseRevision}
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold">{manifest.title}</h1>
-            <p className="mt-4 max-w-3xl text-lg leading-8 text-stone-300">
-              {manifest.summary}
-            </p>
-          </section>
+        <div className="mx-auto max-w-5xl space-y-10">
+          <CaseReturnHeader
+            eyebrow={`Handler channel / ${lifecycle.playerCase.caseRevision}`}
+            summary={manifest.summary}
+            title={manifest.title}
+          />
 
           <CaseWorkspace
             caseSlug={caseSlug}

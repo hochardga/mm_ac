@@ -26,7 +26,22 @@ export function DocumentEvidenceView({
           ))}
         </div>
         <div className="prose prose-invert max-w-none text-sm leading-7">
-          <ReactMarkdown remarkPlugins={[remarkGfm]}>{evidence.body}</ReactMarkdown>
+          <ReactMarkdown
+            components={{
+              h1: ({ children }) => (
+                <h3 className="text-xl font-semibold text-stone-50">{children}</h3>
+              ),
+              h2: ({ children }) => (
+                <h4 className="text-lg font-semibold text-stone-50">{children}</h4>
+              ),
+              h3: ({ children }) => (
+                <h5 className="text-base font-semibold text-stone-50">{children}</h5>
+              ),
+            }}
+            remarkPlugins={[remarkGfm]}
+          >
+            {evidence.body}
+          </ReactMarkdown>
         </div>
       </div>
     </section>
