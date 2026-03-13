@@ -10,6 +10,7 @@ import {
   recordEvidenceSourceSchema,
   threadEvidenceSourceSchema,
 } from "@/features/cases/evidence/schema";
+import { resolveCaseFilePath } from "@/features/cases/paths";
 
 type LoadEvidenceSourceOptions = {
   caseSlug: string;
@@ -22,7 +23,10 @@ export async function loadEvidenceSource({
   casesRoot,
   entry,
 }: LoadEvidenceSourceOptions) {
-  const sourcePath = path.join(casesRoot, caseSlug, entry.source);
+  const { filePath: sourcePath } = resolveCaseFilePath(caseSlug, entry.source, {
+    casesRoot,
+    label: `evidence source path for ${caseSlug}: ${entry.source}`,
+  });
   const raw = await readFile(sourcePath, "utf8");
 
   switch (entry.family) {

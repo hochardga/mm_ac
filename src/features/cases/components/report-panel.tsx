@@ -43,6 +43,7 @@ export function ReportPanel({
             className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.suspectId ?? ""}
             name="suspectId"
+            required
           >
             <option value="">Select suspect</option>
             {manifest.reportOptions.suspect.map((option) => (
@@ -61,6 +62,7 @@ export function ReportPanel({
             className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.motiveId ?? ""}
             name="motiveId"
+            required
           >
             <option value="">Select motive</option>
             {manifest.reportOptions.motive.map((option) => (
@@ -79,6 +81,7 @@ export function ReportPanel({
             className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.methodId ?? ""}
             name="methodId"
+            required
           >
             <option value="">Select method</option>
             {manifest.reportOptions.method.map((option) => (

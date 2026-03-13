@@ -19,7 +19,15 @@ export const caseManifestSourceSchema = z.object({
     method: z.array(reportOptionSchema).min(1),
   }),
   handlerPrompts: z.array(z.string()),
-  evidence: z.array(evidenceIndexEntrySchema),
+  evidence: z
+    .array(evidenceIndexEntrySchema)
+    .min(1)
+    .refine(
+      (entries) => new Set(entries.map((entry) => entry.id)).size === entries.length,
+      {
+        message: "evidence ids must be unique",
+      },
+    ),
 });
 
 export const caseManifestSchema = caseManifestSourceSchema;

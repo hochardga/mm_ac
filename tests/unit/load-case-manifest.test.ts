@@ -26,6 +26,22 @@ test("manifest loader excludes canonical answers", async () => {
   expect(manifest).not.toHaveProperty("canonicalAnswers");
 });
 
+test("rejects case slugs that escape the cases root", async () => {
+  await expect(
+    loadCaseManifest("../cases/text-first-valid", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/slug/i);
+});
+
+test("rejects evidence source paths that escape the case directory", async () => {
+  await expect(
+    loadCaseManifest("text-first-traversal-source", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/source path/i);
+});
+
 test("the shipped cases load successfully under the text-first evidence model", async () => {
   const [briar, bishop, harbor] = await Promise.all([
     loadCaseManifest("briar-ledger"),

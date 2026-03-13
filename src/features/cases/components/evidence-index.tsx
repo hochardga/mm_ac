@@ -39,7 +39,7 @@ export function EvidenceIndex({
               <Link
                 aria-label={`${isSelected ? "Viewing" : "Open"} ${item.title}`}
                 className="mt-4 inline-flex rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-50"
-                href={`/cases/${caseSlug}?evidence=${item.id}`}
+                href={`/cases/${caseSlug}?evidence=${encodeURIComponent(item.id)}`}
               >
                 {isSelected ? "Viewing Evidence" : "Open Evidence"}
               </Link>

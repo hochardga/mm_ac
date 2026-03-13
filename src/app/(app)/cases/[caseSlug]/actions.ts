@@ -47,7 +47,9 @@ export async function saveReportDraftAction(formData: FormData) {
 
   if (caseSlug) {
     if (selectedEvidenceId) {
-      redirect(`/cases/${caseSlug}?evidence=${selectedEvidenceId}`);
+      redirect(
+        `/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`,
+      );
     }
 
     redirect(`/cases/${caseSlug}`);

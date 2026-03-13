@@ -11,6 +11,21 @@ type RecordTableProps = {
 
 type SortDirection = "asc" | "desc";
 
+function getNumericSortValue(value: string | number | boolean | null | undefined) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (
+    typeof value === "string" &&
+    /^-?(?:\d+|\d+\.\d+|\.\d+)$/.test(value.trim())
+  ) {
+    return Number(value);
+  }
+
+  return null;
+}
+
 export function RecordTable({ columns, rows }: RecordTableProps) {
   const [sortState, setSortState] = useState<{
     columnId: string;
@@ -39,9 +54,14 @@ export function RecordTable({ columns, rows }: RecordTableProps) {
     }
 
     return [...nextRows].sort((left, right) => {
-      const leftValue = String(left[sortState.columnId] ?? "");
-      const rightValue = String(right[sortState.columnId] ?? "");
-      const comparison = leftValue.localeCompare(rightValue);
+      const leftValue = left[sortState.columnId] ?? "";
+      const rightValue = right[sortState.columnId] ?? "";
+      const leftNumericValue = getNumericSortValue(leftValue);
+      const rightNumericValue = getNumericSortValue(rightValue);
+      const comparison =
+        leftNumericValue !== null && rightNumericValue !== null
+          ? leftNumericValue - rightNumericValue
+          : String(leftValue).localeCompare(String(rightValue));
 
       return sortState.direction === "asc" ? comparison : comparison * -1;
     });

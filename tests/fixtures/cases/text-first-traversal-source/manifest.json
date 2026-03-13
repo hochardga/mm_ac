@@ -1,0 +1,31 @@
+{
+  "slug": "text-first-traversal-source",
+  "revision": "rev-1",
+  "title": "Traversal Fixture",
+  "summary": "Fixture case for path traversal checks.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Start with the access log."
+  ],
+  "evidence": [
+    {
+      "id": "escape-log",
+      "title": "Escaped Access Log",
+      "family": "record",
+      "subtype": "badge_swipes",
+      "summary": "This source points outside the case directory.",
+      "source": "../escape-record.json"
+    }
+  ]
+}

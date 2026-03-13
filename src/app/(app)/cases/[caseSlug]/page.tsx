@@ -21,7 +21,7 @@ type CasePageProps = {
 };
 
 type CaseSearchParams = {
-  evidence?: string;
+  evidence?: string | string[];
 };
 
 async function resolveStoredAgentId(input: {
@@ -59,11 +59,16 @@ export default async function CasePage({
 }: CasePageProps) {
   const [{ caseSlug }, session, cookieStore, resolvedSearchParams] =
     await Promise.all([
-    params,
-    getServerSession(authOptions),
-    cookies(),
-    searchParams ?? Promise.resolve<CaseSearchParams>({}),
-  ]);
+      params,
+      getServerSession(authOptions),
+      cookies(),
+      searchParams ?? Promise.resolve<CaseSearchParams>({}),
+    ]);
+  const selectedEvidenceIds = Array.isArray(resolvedSearchParams.evidence)
+    ? resolvedSearchParams.evidence
+    : resolvedSearchParams.evidence
+      ? [resolvedSearchParams.evidence]
+      : [];
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
   const intakeUserId = cookieStore.get("ashfall-agent-id")?.value;
@@ -107,7 +112,7 @@ export default async function CasePage({
             playerCaseId={lifecycle.playerCase.id}
             savedDraft={savedDraft}
             savedNote={savedNote}
-            selectedEvidenceId={resolvedSearchParams.evidence}
+            selectedEvidenceId={selectedEvidenceIds[0]}
             submissionToken={submissionToken}
           />
         </div>

@@ -92,7 +92,7 @@ The evidence index should still feel like dossier intake, but previews should be
 
 The main viewer should use one shared entry point with family-specific rendering:
 
-- `document` renders styled HTML from markdown plus structured metadata blocks
+- `document` renders styled HTML from Markdown plus structured metadata blocks
 - `record` renders a readable table with light sort and filter affordances where they materially help investigation
 - `thread` renders strongly formatted messages or transcript turns with clear metadata hierarchy
 
@@ -130,7 +130,7 @@ The validation workflow should confirm:
 - every `source` path exists
 - the payload file shape matches the declared evidence family
 - subtype-specific required fields are present
-- markdown documents, records, and threads normalize successfully
+- Markdown documents, records, and threads normalize successfully
 
 This validation should run through the existing case validation tooling so authored evidence problems are caught before shipping.
 

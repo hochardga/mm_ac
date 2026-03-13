@@ -5,8 +5,10 @@ export async function validateCasePackage(
   slug: string,
   options?: { casesRoot?: string },
 ) {
-  const manifest = await loadCaseManifest(slug, options);
-  const protectedCase = await loadProtectedCase(slug, options);
+  const [manifest, protectedCase] = await Promise.all([
+    loadCaseManifest(slug, options),
+    loadProtectedCase(slug, options),
+  ]);
 
   return {
     slug: manifest.slug,

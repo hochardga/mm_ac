@@ -70,7 +70,7 @@ export const threadMessageSchema = z
   .object({
     id: z.string(),
     sender: z.string(),
-    timestamp: z.string(),
+    timestamp: z.iso.datetime(),
     body: z.string(),
   })
   .strict();
@@ -83,14 +83,12 @@ export const threadEvidenceSourceSchema = z
   })
   .strict();
 
-const normalizedEvidenceBaseSchema = evidenceIndexEntrySchema.extend({
-  viewer: evidenceViewerSchema.optional(),
-});
+const normalizedEvidenceBaseSchema = evidenceIndexEntrySchema;
 
 export const documentEvidenceSchema = normalizedEvidenceBaseSchema
   .extend({
     family: z.literal("document"),
-    body: z.string(),
+    body: z.string().min(1),
     meta: z.record(z.string(), evidenceMetaValueSchema),
   })
   .strict();

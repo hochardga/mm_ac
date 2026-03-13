@@ -23,3 +23,25 @@ test("sorts rows by a chosen column", async () => {
   expect(rows[1]).toHaveTextContent("2026-03-01T23:55:00Z");
   expect(rows[2]).toHaveTextContent("2026-03-02T01:20:00Z");
 });
+
+test("sorts numeric-looking values numerically instead of lexicographically", async () => {
+  render(
+    <RecordTable
+      columns={[
+        { id: "amount", label: "Amount", sortable: true },
+        { id: "description", label: "Description" },
+      ]}
+      rows={[
+        { id: "high", amount: "10", description: "Ten credits" },
+        { id: "low", amount: "2", description: "Two credits" },
+      ]}
+    />,
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: /amount/i }));
+
+  const rows = screen.getAllByRole("row");
+
+  expect(rows[1]).toHaveTextContent("2");
+  expect(rows[2]).toHaveTextContent("10");
+});

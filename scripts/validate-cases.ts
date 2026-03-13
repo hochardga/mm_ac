@@ -5,7 +5,13 @@ import { validateCasePackage } from "@/features/cases/validate-case-package";
 
 async function main() {
   const casesRoot = path.join(process.cwd(), "content", "cases");
-  const slugs = await readdir(casesRoot);
+  const slugs = (
+    await readdir(casesRoot, {
+      withFileTypes: true,
+    })
+  )
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name);
 
   await Promise.all(
     slugs.map(async (slug) => {

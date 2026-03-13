@@ -91,6 +91,59 @@ test("preserves the selected evidence when saving a draft", async () => {
   expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
 });
 
+test("uses the first repeated evidence query value when the case page receives an array", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "array-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Array",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({
+        evidence: ["night-watch-thread", "dispatch-log"],
+      }),
+    } as never),
+  );
+
+  expect(
+    screen.getByText(/active evidence: night watch exchange/i),
+  ).toBeInTheDocument();
+});
+
+test("report selects require explicit choices before submission", async () => {
+  const manifest = await loadCaseManifest("red-harbor");
+
+  render(
+    <ReportPanel
+      caseSlug="red-harbor"
+      playerCaseId="player-case-1"
+      selectedEvidenceId="dispatch-log"
+      manifest={manifest}
+      savedDraft={undefined}
+      submissionToken="submission-token"
+    />,
+  );
+
+  expect(screen.getByLabelText("Suspect")).toBeRequired();
+  expect(screen.getByLabelText("Motive")).toBeRequired();
+  expect(screen.getByLabelText("Method")).toBeRequired();
+});
+
 test("renders document markdown, record tables, and thread metadata in the workspace", async () => {
   const db = await getDb();
   const userId = randomUUID();

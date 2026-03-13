@@ -71,10 +71,8 @@ test("agent can switch evidence types and keep the notebook visible", async ({
   await page.getByLabel("Motive").selectOption("smuggling");
   await page.getByLabel("Method").selectOption("signal-room");
 
-  await Promise.all([
-    page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread"),
-    page.getByRole("button", { name: /save draft/i }).click(),
-  ]);
+  await page.getByRole("button", { name: /save draft/i }).click();
+  await page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread");
 
   await expect(page.getByLabel("Suspect")).toHaveValue("dispatcher");
   await expect(page.getByLabel("Motive")).toHaveValue("smuggling");

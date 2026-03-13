@@ -1,23 +1,18 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 import { caseManifestSourceSchema } from "@/features/cases/case-schema";
 import { loadEvidenceSource } from "@/features/cases/evidence/load-evidence-source";
-
-function getCasesRoot(customRoot?: string) {
-  return customRoot ?? path.join(process.cwd(), "content", "cases");
-}
-
-function getManifestPath(casesRoot: string, slug: string) {
-  return path.join(casesRoot, slug, "manifest.json");
-}
+import { resolveCaseFilePath, resolveCasesRoot } from "@/features/cases/paths";
 
 export async function loadCaseManifest(
   slug: string,
   options?: { casesRoot?: string },
 ) {
-  const casesRoot = getCasesRoot(options?.casesRoot);
-  const raw = await readFile(getManifestPath(casesRoot, slug), "utf8");
+  const casesRoot = resolveCasesRoot(options?.casesRoot);
+  const { filePath } = resolveCaseFilePath(slug, "manifest.json", {
+    casesRoot,
+  });
+  const raw = await readFile(filePath, "utf8");
   const manifest = caseManifestSourceSchema.parse(JSON.parse(raw));
   const evidence = await Promise.all(
     manifest.evidence.map((entry) =>
