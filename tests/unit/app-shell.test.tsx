@@ -27,6 +27,9 @@ test("signed-out shell layout shows sign in and hides vault", async () => {
   getServerSessionMock.mockResolvedValueOnce(null);
   render(await ShellLayout({ children: <p>Shell child content</p> }));
 
+  expect(
+    screen.getByRole("navigation", { name: /primary/i }),
+  ).toBeInTheDocument();
   expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
   expect(
     screen.queryByRole("link", { name: /vault/i }),
@@ -38,6 +41,9 @@ test("signed-in shell layout shows vault and sign out while hiding sign in", asy
   getServerSessionMock.mockResolvedValueOnce({ user: { id: "agent-7" } });
   render(await ShellLayout({ children: <p>Shell child content</p> }));
 
+  expect(
+    screen.getByRole("navigation", { name: /primary/i }),
+  ).toBeInTheDocument();
   expect(screen.getByRole("link", { name: /vault/i })).toBeInTheDocument();
   expect(
     screen.getByRole("button", { name: /sign out/i }),

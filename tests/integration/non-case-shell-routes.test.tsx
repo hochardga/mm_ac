@@ -34,6 +34,7 @@ vi.mock("@/features/cases/list-available-cases", () => ({
 
 import ApplyPage from "@/app/(shell)/apply/page";
 import ShellLayout from "@/app/(shell)/layout";
+import SignInPage from "@/app/(shell)/signin/page";
 import VaultPage from "@/app/(shell)/vault/page";
 
 beforeEach(() => {
@@ -54,6 +55,19 @@ test("signed-out apply route inside shell shows apply and sign in only", async (
 
   expect(
     screen.getByRole("heading", { name: /apply for field status/i }),
+  ).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /apply/i })).toBeInTheDocument();
+  expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
+  expect(screen.queryByRole("link", { name: /vault/i })).not.toBeInTheDocument();
+});
+
+test("signed-out signin route inside shell shows apply and sign in only", async () => {
+  getServerSessionMock.mockResolvedValueOnce(null);
+  usePathnameMock.mockReturnValue("/signin");
+  render(await ShellLayout({ children: <SignInPage /> }));
+
+  expect(
+    screen.getByRole("heading", { name: /return to ashfall/i }),
   ).toBeInTheDocument();
   expect(screen.getByRole("link", { name: /apply/i })).toBeInTheDocument();
   expect(screen.getByRole("link", { name: /sign in/i })).toBeInTheDocument();
