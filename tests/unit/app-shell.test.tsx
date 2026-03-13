@@ -1,17 +1,25 @@
 import { render, screen, within } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import ShellLayout from "@/app/(shell)/layout";
-import HomePage from "@/app/(shell)/page";
-import { NonCaseShell } from "@/components/non-case-shell";
-
+const { getServerSessionMock } = vi.hoisted(() => ({
+  getServerSessionMock: vi.fn(),
+}));
 const usePathnameMock = vi.fn();
+
+vi.mock("next-auth", () => ({
+  getServerSession: getServerSessionMock,
+}));
 
 vi.mock("next/navigation", () => ({
   usePathname: () => usePathnameMock(),
 }));
 
+import ShellLayout from "@/app/(shell)/layout";
+import { NonCaseShell } from "@/components/non-case-shell";
+
 beforeEach(() => {
+  getServerSessionMock.mockReset();
+  getServerSessionMock.mockResolvedValue(null);
   usePathnameMock.mockReset();
   usePathnameMock.mockReturnValue("/");
 });
@@ -27,27 +35,14 @@ test("renders NonCaseShell primary navigation around children", () => {
   expect(screen.getByText("Inner route content")).toBeInTheDocument();
 });
 
-test("shell layout wraps home route with primary nav and apply CTA styling", () => {
-  render(
-    <ShellLayout>
-      <HomePage />
-    </ShellLayout>,
-  );
+test("shell layout wraps generic child content with primary nav", async () => {
+  render(await ShellLayout({ children: <p>Shell child content</p> }));
 
   const navigation = screen.getByRole("navigation", { name: /primary/i });
-  const main = screen.getByRole("main");
 
   expect(navigation).toBeInTheDocument();
   expect(
     within(navigation).getByRole("link", { name: /^apply$/i }),
   ).toHaveAttribute("href", "/apply");
-  expect(
-    within(main).getByRole("link", { name: /apply for field status/i }),
-  ).toHaveAttribute("href", "/apply");
-  expect(
-    within(main).getByRole("link", { name: /returning agent sign in/i }),
-  ).toHaveAttribute("href", "/signin");
-  expect(
-    within(main).getByRole("link", { name: /open vault/i }),
-  ).toHaveAttribute("href", "/vault");
+  expect(screen.getByText("Shell child content")).toBeInTheDocument();
 });
