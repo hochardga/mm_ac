@@ -44,4 +44,10 @@ test("shell layout wraps home route with primary nav and apply CTA styling", () 
   expect(
     within(main).getByRole("link", { name: /apply for field status/i }),
   ).toHaveAttribute("href", "/apply");
+  expect(
+    within(main).getByRole("link", { name: /returning agent sign in/i }),
+  ).toHaveAttribute("href", "/signin");
+  expect(
+    within(main).getByRole("link", { name: /open vault/i }),
+  ).toHaveAttribute("href", "/vault");
 });

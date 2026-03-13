@@ -21,6 +21,13 @@ test("shared primary navigation appears on all non-case shell routes", async ({
 }) => {
   await page.goto("/");
   await expectPrimaryNav(page);
+  await expect(
+    page.getByRole("link", { name: /apply for field status/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /returning agent sign in/i }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /open vault/i })).toBeVisible();
 
   await page.goto("/apply");
   await expectPrimaryNav(page);

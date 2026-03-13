@@ -10,12 +10,26 @@ export default function HomePage() {
         <p className="max-w-2xl text-lg text-stone-700">
           Report to your handler. First cases incoming.
         </p>
-        <Link
-          href="/apply"
-          className="inline-flex w-fit rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
-        >
-          Apply for Field Status
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/apply"
+            className="inline-flex w-fit rounded-full bg-stone-950 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
+          >
+            Apply for Field Status
+          </Link>
+          <Link
+            href="/signin"
+            className="inline-flex w-fit rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-700"
+          >
+            Returning Agent Sign In
+          </Link>
+          <Link
+            href="/vault"
+            className="inline-flex w-fit rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-700"
+          >
+            Open Vault
+          </Link>
+        </div>
       </div>
     </main>
   );
