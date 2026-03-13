@@ -6,10 +6,17 @@ vi.mock("next/font/google", () => ({
   Geist_Mono: () => ({ variable: "font-mono" }),
 }));
 
-import RootLayout from "@/app/layout";
+import RootLayout, { metadata } from "@/app/layout";
 
 afterEach(() => {
   delete process.env.VERCEL;
+});
+
+test("exports Ashfall metadata values", () => {
+  expect(metadata).toMatchObject({
+    title: "Ashfall Collective",
+    description: "Report to your handler. First cases incoming.",
+  });
 });
 
 test("shows the demo reset notice on vercel deployments", () => {
