@@ -1,16 +1,22 @@
-import "server-only";
-
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { protectedCaseSchema } from "@/features/cases/case-schema";
 
-function getProtectedPath(slug: string) {
-  return path.join(process.cwd(), "content", "cases", slug, "protected.json");
+function getCasesRoot(customRoot?: string) {
+  return customRoot ?? path.join(process.cwd(), "content", "cases");
 }
 
-export async function loadProtectedCase(slug: string) {
-  const raw = await readFile(getProtectedPath(slug), "utf8");
+function getProtectedPath(casesRoot: string, slug: string) {
+  return path.join(casesRoot, slug, "protected.json");
+}
+
+export async function loadProtectedCase(
+  slug: string,
+  options?: { casesRoot?: string },
+) {
+  const casesRoot = getCasesRoot(options?.casesRoot);
+  const raw = await readFile(getProtectedPath(casesRoot, slug), "utf8");
 
   return protectedCaseSchema.parse(JSON.parse(raw));
 }
