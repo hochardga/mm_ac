@@ -4,10 +4,14 @@ const CASE_SLUG_PATTERN = /^[A-Za-z0-9_-]+$/;
 
 function assertPathWithinRoot(root: string, target: string, label: string) {
   const relativePath = path.relative(root, target);
+  const normalizedSegments = path
+    .normalize(relativePath)
+    .split(path.sep)
+    .filter(Boolean);
 
   if (
     relativePath.startsWith("..") ||
-    relativePath.includes(`${path.sep}..`) ||
+    normalizedSegments.includes("..") ||
     path.isAbsolute(relativePath)
   ) {
     throw new Error(`Invalid ${label}`);

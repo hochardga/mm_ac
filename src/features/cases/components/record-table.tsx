@@ -84,13 +84,27 @@ export function RecordTable({ columns, rows }: RecordTableProps) {
         </label>
       ) : null}
 
-      <div className="overflow-hidden rounded-3xl border border-white/10 bg-black/20">
+      <div className="overflow-x-auto rounded-3xl border border-white/10 bg-black/20">
         <table className="min-w-full text-left text-sm text-stone-200">
           <thead className="bg-white/5 text-xs uppercase tracking-[0.2em] text-stone-400">
             <tr>
-              {columns.map((column) => (
-                <th key={column.id} className="px-4 py-3 font-medium">
-                  {column.sortable ? (
+              {columns.map((column) => {
+                const isActiveSort = sortState?.columnId === column.id;
+                const ariaSort = column.sortable
+                  ? isActiveSort
+                    ? sortState.direction === "asc"
+                      ? "ascending"
+                      : "descending"
+                    : "none"
+                  : undefined;
+
+                return (
+                  <th
+                    key={column.id}
+                    aria-sort={ariaSort}
+                    className="px-4 py-3 font-medium"
+                  >
+                    {column.sortable ? (
                     <button
                       className="inline-flex items-center gap-2"
                       onClick={() =>
@@ -112,12 +126,18 @@ export function RecordTable({ columns, rows }: RecordTableProps) {
                       type="button"
                     >
                       {column.label}
+                      {isActiveSort ? (
+                        <span aria-hidden="true" className="text-[10px] uppercase">
+                          {sortState.direction === "asc" ? "ASC" : "DESC"}
+                        </span>
+                      ) : null}
                     </button>
                   ) : (
                     column.label
                   )}
-                </th>
-              ))}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
