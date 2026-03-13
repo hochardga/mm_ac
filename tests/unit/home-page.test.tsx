@@ -4,9 +4,15 @@ import { beforeEach, expect, test, vi } from "vitest";
 const { getServerSessionMock } = vi.hoisted(() => ({
   getServerSessionMock: vi.fn(),
 }));
+const { authOptionsMock } = vi.hoisted(() => ({
+  authOptionsMock: {},
+}));
 
 vi.mock("next-auth", () => ({
   getServerSession: getServerSessionMock,
+}));
+vi.mock("@/lib/auth", () => ({
+  authOptions: authOptionsMock,
 }));
 
 import HomePage from "@/app/page";
@@ -20,6 +26,7 @@ test("signed-out home page has no primary nav and offers sign in", async () => {
 
   render(await HomePage());
 
+  expect(getServerSessionMock).toHaveBeenCalledWith(authOptionsMock);
   expect(
     screen.queryByRole("navigation", { name: /primary/i }),
   ).not.toBeInTheDocument();
@@ -41,6 +48,7 @@ test("signed-in home page swaps sign in for open vault", async () => {
 
   render(await HomePage());
 
+  expect(getServerSessionMock).toHaveBeenCalledWith(authOptionsMock);
   expect(
     screen.queryByRole("navigation", { name: /primary/i }),
   ).not.toBeInTheDocument();

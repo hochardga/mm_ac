@@ -5,7 +5,7 @@ import { authOptions } from "@/lib/auth";
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions);
-  const isSignedIn = Boolean((session?.user as { id?: string } | undefined)?.id);
+  const isSignedIn = Boolean(session?.user && "id" in session.user && session.user.id);
 
   return (
     <main className="px-6 py-16">
