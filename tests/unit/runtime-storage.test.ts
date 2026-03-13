@@ -22,21 +22,25 @@ describe("resolveRuntimeStorage", () => {
     });
   });
 
-  test("uses an ephemeral /tmp directory on vercel", () => {
-    expect(resolveRuntimeStorage({ VERCEL: "1" }, "/repo")).toEqual({
+  test("uses an explicit pglite data directory when provided", () => {
+    expect(
+      resolveRuntimeStorage(
+        {
+          PGLITE_DATA_DIR: "/tmp/ashfall-playwright-db",
+        },
+        "/repo",
+      ),
+    ).toEqual({
       kind: "filesystem",
-      dataDir: path.join("/tmp", "ashfall-collective-pglite"),
-      isEphemeral: true,
+      dataDir: "/tmp/ashfall-playwright-db",
+      isEphemeral: false,
     });
   });
 });
 
 describe("isEphemeralDemoDeployment", () => {
-  test("returns true for vercel-hosted demo deployments", () => {
+  test("still identifies vercel during the transition away from the demo banner", () => {
     expect(isEphemeralDemoDeployment({ VERCEL: "1" })).toBe(true);
-  });
-
-  test("returns false for non-vercel environments", () => {
     expect(isEphemeralDemoDeployment({} as NodeJS.ProcessEnv)).toBe(false);
   });
 });

@@ -10,6 +10,7 @@ import RootLayout, { metadata } from "@/app/layout";
 
 afterEach(() => {
   delete process.env.VERCEL;
+  delete process.env.DATABASE_DRIVER;
 });
 
 test("exports Ashfall metadata values", () => {
@@ -19,8 +20,9 @@ test("exports Ashfall metadata values", () => {
   });
 });
 
-test("shows the demo reset notice on vercel deployments", () => {
+test("does not show the reset-warning banner for hosted postgres deployments", () => {
   process.env.VERCEL = "1";
+  process.env.DATABASE_DRIVER = "postgres";
 
   const markup = renderToStaticMarkup(
     <RootLayout>
@@ -28,7 +30,7 @@ test("shows the demo reset notice on vercel deployments", () => {
     </RootLayout>,
   );
 
-  expect(markup).toMatch(/demo environment: progress may reset occasionally/i);
+  expect(markup).not.toMatch(/demo environment: progress may reset occasionally/i);
 });
 
 test("does not show the demo reset notice on non-vercel environments", () => {

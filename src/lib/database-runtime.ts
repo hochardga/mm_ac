@@ -1,0 +1,50 @@
+import { z } from "zod";
+
+import { parseEnv } from "@/lib/env";
+import {
+  resolveRuntimeStorage,
+  type RuntimeStorage,
+} from "@/lib/runtime-storage";
+
+export type DatabaseRuntime =
+  | {
+      driver: "pglite";
+      storage: RuntimeStorage;
+    }
+  | {
+      driver: "postgres";
+      connectionString: string;
+    };
+
+const postgresUrlSchema = z
+  .string()
+  .url()
+  .refine((value) => {
+    const protocol = new URL(value).protocol.replace(/:$/, "");
+
+    return protocol === "postgres" || protocol === "postgresql";
+  }, "DATABASE_URL must use postgres:// or postgresql://");
+
+export function resolveDatabaseRuntime(
+  input: NodeJS.ProcessEnv,
+  cwd = process.cwd(),
+): DatabaseRuntime {
+  const env = parseEnv(input);
+  const requestedDriver = env.DATABASE_DRIVER;
+
+  if (input.VERCEL === "1" && requestedDriver !== "postgres") {
+    throw new Error("Hosted Vercel deployments must set DATABASE_DRIVER=postgres");
+  }
+
+  if (requestedDriver === "postgres") {
+    return {
+      driver: "postgres",
+      connectionString: postgresUrlSchema.parse(env.DATABASE_URL),
+    };
+  }
+
+  return {
+    driver: "pglite",
+    storage: resolveRuntimeStorage(input, cwd),
+  };
+}
