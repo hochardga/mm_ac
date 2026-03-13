@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
-import { beforeEach, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 const { signOutMock } = vi.hoisted(() => ({
   signOutMock: vi.fn(),
@@ -19,6 +19,10 @@ beforeEach(() => {
   fetchMock.mockReset();
   fetchMock.mockResolvedValue({ ok: true });
   vi.stubGlobal("fetch", fetchMock);
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 test("calls signOut and shows pending state while sign-out is unresolved", async () => {
@@ -55,9 +59,8 @@ test("clears pending and restores label when signOut rejects", async () => {
   expect(button).toHaveTextContent("Sign Out");
 });
 
-test("still attempts next-auth signout when intake cookie clear request fails", async () => {
+test("does not continue to next-auth signout when intake cookie clear request fails", async () => {
   fetchMock.mockRejectedValueOnce(new Error("intake endpoint unavailable"));
-  signOutMock.mockRejectedValueOnce(new Error("network down"));
 
   render(<SignOutButton />);
 
@@ -69,7 +72,25 @@ test("still attempts next-auth signout when intake cookie clear request fails", 
       method: "POST",
     }),
   );
-  await waitFor(() => expect(signOutMock).toHaveBeenCalledTimes(1));
+  await waitFor(() => expect(signOutMock).not.toHaveBeenCalled());
+  await waitFor(() => expect(button).not.toBeDisabled());
+  expect(button).toHaveTextContent("Sign Out");
+});
+
+test("does not continue to next-auth signout when intake cookie clear responds non-ok", async () => {
+  fetchMock.mockResolvedValueOnce({ ok: false });
+
+  render(<SignOutButton />);
+
+  const button = screen.getByRole("button", { name: /sign out/i });
+  fireEvent.click(button);
+
+  await waitFor(() =>
+    expect(fetchMock).toHaveBeenCalledWith("/api/intake-signout", {
+      method: "POST",
+    }),
+  );
+  await waitFor(() => expect(signOutMock).not.toHaveBeenCalled());
   await waitFor(() => expect(button).not.toBeDisabled());
   expect(button).toHaveTextContent("Sign Out");
 });

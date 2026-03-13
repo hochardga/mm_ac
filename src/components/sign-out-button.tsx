@@ -14,13 +14,14 @@ export function SignOutButton() {
     setPending(true);
     void (async () => {
       try {
-        try {
-          await fetch("/api/intake-signout", {
-            method: "POST",
-          });
-        } catch {
-          // Continue with NextAuth sign out even if intake-cookie clearing fails.
+        const response = await fetch("/api/intake-signout", {
+          method: "POST",
+        });
+
+        if (!response.ok) {
+          throw new Error("Unable to clear intake cookies");
         }
+
         await signOut({ callbackUrl: "/" });
       } catch {
         setPending(false);
