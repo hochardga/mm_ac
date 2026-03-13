@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { expect, test, type Page } from "@playwright/test";
 
-async function expectPrimaryNav(page: Page) {
+async function expectSignedOutPrimaryNav(page: Page) {
   const navigation = page.getByRole("navigation", { name: /primary/i });
   await expect(navigation).toBeVisible();
   await expect(
@@ -13,51 +13,68 @@ async function expectPrimaryNav(page: Page) {
   ).toHaveAttribute("href", "/signin");
   await expect(
     navigation.getByRole("link", { name: /vault/i }),
-  ).toHaveAttribute("href", "/vault");
+  ).toHaveCount(0);
+  await expect(page.getByRole("banner")).toHaveClass(/border-b/);
+  await expect(page.getByRole("banner")).toHaveClass(/bg-stone-100\/95/);
 }
 
-test("shared primary navigation appears on all non-case shell routes", async ({
+async function completeIntake(page: Page) {
+  const email = `agent-${randomUUID()}@example.com`;
+
+  await page.goto("/apply");
+  await page.getByLabel("Operative Alias").fill("Agent Ash");
+  await page.getByLabel("Agency Email").fill(email);
+  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
+  await page.getByRole("button", { name: /submit application/i }).click();
+  await page.waitForURL("**/vault");
+}
+
+test("navigation responds to signed-out and signed-in state changes", async ({
   page,
 }) => {
   await page.goto("/");
-  await expectPrimaryNav(page);
+  await expect(page.getByRole("navigation", { name: /primary/i })).toHaveCount(
+    0,
+  );
   await expect(
     page.getByRole("link", { name: /apply for field status/i }),
   ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /returning agent sign in/i }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /open vault/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /open vault/i })).toHaveCount(0);
 
   await page.goto("/apply");
-  await expectPrimaryNav(page);
+  await expectSignedOutPrimaryNav(page);
 
   await page.goto("/signin");
-  await expectPrimaryNav(page);
+  await expectSignedOutPrimaryNav(page);
 
-  const email = `agent-${randomUUID()}@example.com`;
+  await completeIntake(page);
 
-  await page.goto("/apply");
-  await page.getByLabel("Operative Alias").fill("Agent Ash");
-  await page.getByLabel("Agency Email").fill(email);
-  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
-  await page.getByRole("button", { name: /submit application/i }).click();
-  await page.waitForURL("**/vault");
+  await expect(page.getByRole("navigation", { name: /primary/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /vault/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /sign in/i })).toHaveCount(0);
 
-  await expectPrimaryNav(page);
+  await page.getByRole("button", { name: /sign out/i }).click();
+  await page.waitForURL("**/");
+  await expect(page.getByRole("navigation", { name: /primary/i })).toHaveCount(
+    0,
+  );
+  await expect(
+    page.getByRole("link", { name: /apply for field status/i }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /returning agent sign in/i }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /open vault/i })).toHaveCount(0);
 });
 
 test("global primary nav is hidden on case routes after intake", async ({
   page,
 }) => {
-  const email = `agent-${randomUUID()}@example.com`;
-
-  await page.goto("/apply");
-  await page.getByLabel("Operative Alias").fill("Agent Ash");
-  await page.getByLabel("Agency Email").fill(email);
-  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
-  await page.getByRole("button", { name: /submit application/i }).click();
-  await page.waitForURL("**/vault");
+  await completeIntake(page);
 
   await page.goto("/cases/hollow-bishop");
 
