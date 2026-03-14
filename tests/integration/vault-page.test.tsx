@@ -207,6 +207,17 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
       name: /resume objectives/i,
     }),
   ).toHaveAttribute("href", "/cases/hollow-bishop#active-objectives");
+  expect(
+    within(draftCard as HTMLElement).getByText(/stage 1 of 2/i),
+  ).toBeInTheDocument();
+  expect(
+    within(draftCard as HTMLElement).getByText(/ledger review/i),
+  ).toBeInTheDocument();
+  expect(
+    within(draftCard as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon/i,
+    ),
+  ).toBeInTheDocument();
 
   expect(
     within(notesCard as HTMLElement).getByRole("link", {

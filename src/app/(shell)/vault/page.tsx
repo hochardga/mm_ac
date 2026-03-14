@@ -70,6 +70,30 @@ export default async function VaultPage() {
               {dossier.summary}
             </p>
 
+            {dossier.progressSnapshot ? (
+              <div className="mt-6 rounded-[1.5rem] border border-stone-200 bg-stone-50 px-4 py-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+                  Stage {dossier.progressSnapshot.focusStage.position} of{" "}
+                  {dossier.progressSnapshot.totalStageCount}
+                </p>
+                <p className="mt-2 text-sm font-semibold uppercase tracking-[0.16em] text-stone-900">
+                  {dossier.progressSnapshot.focusStage.title}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-stone-700">
+                  {dossier.progressSnapshot.solvedObjectiveCount} of{" "}
+                  {dossier.progressSnapshot.totalObjectiveCount} objectives solved
+                </p>
+                <p className="mt-1 text-sm leading-6 text-stone-700">
+                  {dossier.progressSnapshot.visibleEvidenceCount} evidence items unlocked
+                </p>
+                {dossier.progressSnapshot.nextObjectivePrompt ? (
+                  <p className="mt-2 text-sm leading-6 text-stone-700">
+                    {dossier.progressSnapshot.nextObjectivePrompt}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
             {dossier.availability === "Available" ? (
               <>
                 {dossier.continuity ? (

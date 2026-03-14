@@ -14,11 +14,19 @@ import {
   type CaseContinuitySummary,
 } from "@/features/cases/case-continuity";
 import {
+  buildCaseProgression,
+  type CaseProgressSnapshot,
+} from "@/features/cases/case-progression";
+import {
   getDisplayStatus,
   isPlayerCaseStatus,
   type PlayerCaseStatus,
 } from "@/features/cases/case-status";
-import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
+import {
+  loadAnyCaseManifest,
+  type LoadedCaseManifest,
+  type LoadedStagedCaseManifest,
+} from "@/features/cases/load-case-manifest";
 import { syncCaseDefinitions } from "@/features/cases/sync-case-definitions";
 import { getCaseAvailability } from "@/features/maintenance/get-case-availability";
 import { getDb } from "@/lib/db";
@@ -32,7 +40,14 @@ export type VaultCaseRecord = {
   displayStatus: string;
   availability: "Available" | "Maintenance" | "Hidden";
   continuity?: CaseContinuitySummary;
+  progressSnapshot?: CaseProgressSnapshot;
 };
+
+function isStagedManifest(
+  manifest: LoadedCaseManifest,
+): manifest is LoadedStagedCaseManifest {
+  return "stages" in manifest;
+}
 
 export async function listAvailableCases(
   input: { userId?: string },
@@ -134,7 +149,9 @@ export async function listAvailableCases(
       let manifest: Awaited<ReturnType<typeof loadAnyCaseManifest>> | null = null;
 
       try {
-        manifest = await loadAnyCaseManifest(definition.slug);
+        manifest = await loadAnyCaseManifest(definition.slug, playerCase
+          ? { expectedRevision: playerCase.caseRevision }
+          : undefined);
       } catch {
         broken = true;
       }
@@ -170,6 +187,21 @@ export async function listAvailableCases(
               playerCaseUpdatedAt: playerCase.updatedAt,
             })
           : undefined;
+      const progressSnapshot =
+        manifest && isStagedManifest(manifest)
+          ? buildCaseProgression({
+              manifest,
+              objectiveStates:
+                objectiveStatesByPlayerCaseId.get(playerCase?.id ?? "") ??
+                manifest.stages.flatMap((stage) =>
+                  stage.objectives.map((objective) => ({
+                    objectiveId: objective.id,
+                    stageId: stage.id,
+                    status: stage.startsUnlocked ? "active" : "locked",
+                  })),
+                ),
+            }).snapshot
+          : undefined;
 
       return {
         slug: definition.slug,
@@ -182,6 +214,7 @@ export async function listAvailableCases(
         displayStatus: getDisplayStatus(status),
         availability,
         continuity,
+        progressSnapshot,
       } satisfies VaultCaseRecord;
     }),
   );
