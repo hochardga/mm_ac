@@ -5,6 +5,8 @@ import { notFound, redirect } from "next/navigation";
 
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { caseDefinitions, playerCases } from "@/db/schema";
+import { ServiceRecordPanel } from "@/features/agents/components/service-record-panel";
+import { getServiceRecord } from "@/features/agents/get-service-record";
 import { DebriefAttemptHistory } from "@/features/debrief/components/debrief-attempt-history";
 import { DebriefReportCard } from "@/features/debrief/components/debrief-report-card";
 import { getDebrief } from "@/features/debrief/get-debrief";
@@ -54,6 +56,10 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
   const debrief = await getDebrief({
     playerCaseId: playerCase.id,
   });
+  const serviceRecord = await getServiceRecord({
+    userId,
+    excludeCaseSlug: caseSlug,
+  });
   const outcomeLabel =
     debrief.status === "completed" ? "Case solved" : "Case closed unresolved";
   const outcomeDescription =
@@ -88,6 +94,13 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
             {outcomeDescription}
           </p>
         </section>
+
+        <ServiceRecordPanel
+          description="Ashfall has updated your cross-case field record and assigned the next dossier that deserves attention."
+          eyebrow="Ashfall Collective / service record"
+          serviceRecord={serviceRecord}
+          title="Service Record"
+        />
 
         <section className="grid gap-6 lg:grid-cols-2">
           {debrief.finalReport ? (
