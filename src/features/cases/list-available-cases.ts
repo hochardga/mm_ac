@@ -158,6 +158,8 @@ export async function listAvailableCases(
           ? buildCaseContinuity({
               caseSlug: definition.slug,
               status,
+              lastViewedEvidenceId: playerCase.lastViewedEvidenceId,
+              lastViewedEvidenceAt: playerCase.lastViewedEvidenceAt,
               note: savedNoteByPlayerCaseId.get(playerCase.id),
               draft: savedDraftByPlayerCaseId.get(playerCase.id),
               latestSubmission: latestSubmissionByPlayerCaseId.get(

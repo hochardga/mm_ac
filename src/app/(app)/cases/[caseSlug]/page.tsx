@@ -12,9 +12,11 @@ import {
 } from "@/db/schema";
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { getCurrentAgentId } from "@/features/auth/current-agent";
+import { buildCaseProgression } from "@/features/cases/case-progression";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
 import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
+import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { getDb } from "@/lib/db";
 
 type CasePageProps = {
@@ -27,6 +29,15 @@ type CasePageProps = {
 type CaseSearchParams = {
   evidence?: string | string[];
 };
+
+function isStagedManifest(
+  manifest: Awaited<ReturnType<typeof loadAnyCaseManifest>>,
+): manifest is Extract<
+  Awaited<ReturnType<typeof loadAnyCaseManifest>>,
+  { stages: unknown }
+> {
+  return "stages" in manifest;
+}
 
 export default async function CasePage({
   params,
@@ -41,6 +52,7 @@ export default async function CasePage({
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
         objectiveStates: typeof playerCaseObjectives.$inferSelect[];
         objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
+        selectedEvidenceId: string | undefined;
         submissionToken: string;
       }
     | null = null;
@@ -91,6 +103,35 @@ export default async function CasePage({
         orderBy: [desc(objectiveSubmissions.createdAt)],
       }),
     ]);
+    const stagedProgression = isStagedManifest(manifest)
+      ? buildCaseProgression({
+          manifest,
+          objectiveStates: objectiveStates.map((objectiveState) => ({
+            objectiveId: objectiveState.objectiveId,
+            stageId: objectiveState.stageId,
+            status: objectiveState.status,
+          })),
+        })
+      : null;
+    const visibleEvidence = stagedProgression?.visibleEvidence ?? manifest.evidence;
+    const requestedEvidenceId =
+      selectedEvidenceIds[0] ?? lifecycle.playerCase.lastViewedEvidenceId ?? undefined;
+    const selectedEvidence =
+      visibleEvidence.find((item) => item.id === requestedEvidenceId) ??
+      visibleEvidence[0];
+
+    if (selectedEvidence) {
+      try {
+        await rememberViewedEvidence({
+          playerCaseId: lifecycle.playerCase.id,
+          evidenceId: selectedEvidence.id,
+        });
+      } catch {
+        // Rendering the case should not fail purely because refreshing remembered
+        // evidence context did not persist.
+      }
+    }
+
     caseData = {
       manifest,
       lifecycle,
@@ -99,6 +140,7 @@ export default async function CasePage({
       latestSubmission,
       objectiveStates,
       objectiveSubmissionRows,
+      selectedEvidenceId: selectedEvidence?.id,
       submissionToken: randomUUID(),
     };
   } catch {
@@ -128,7 +170,7 @@ export default async function CasePage({
           resumeTarget={caseData.lifecycle.resumeTarget}
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}
-          selectedEvidenceId={selectedEvidenceIds[0]}
+          selectedEvidenceId={caseData.selectedEvidenceId}
           submissionToken={caseData.submissionToken}
         />
       </div>

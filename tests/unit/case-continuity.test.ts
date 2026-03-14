@@ -8,6 +8,8 @@ describe("buildCaseContinuity", () => {
       caseSlug: "hollow-bishop",
       status: "in_progress",
       note: undefined,
+      lastViewedEvidenceId: "vestry-interview",
+      lastViewedEvidenceAt: new Date("2026-03-13T18:30:00.000Z"),
       draft: {
         suspectId: "bookkeeper",
         motiveId: "embezzlement",
@@ -21,9 +23,11 @@ describe("buildCaseContinuity", () => {
 
     expect(continuity.section).toBe("report");
     expect(continuity.label).toMatch(/resume report/i);
-    expect(continuity.href).toBe("/cases/hollow-bishop#draft-report");
+    expect(continuity.href).toBe(
+      "/cases/hollow-bishop?evidence=vestry-interview#draft-report",
+    );
     expect(continuity.lastActivityAt?.toISOString()).toBe(
-      "2026-03-13T18:00:00.000Z",
+      "2026-03-13T18:30:00.000Z",
     );
   });
 
@@ -31,6 +35,8 @@ describe("buildCaseContinuity", () => {
     const continuity = buildCaseContinuity({
       caseSlug: "red-harbor",
       status: "in_progress",
+      lastViewedEvidenceId: "dispatch-log",
+      lastViewedEvidenceAt: new Date("2026-03-13T19:30:00.000Z"),
       note: {
         body: "Recheck the harbor log.",
         updatedAt: new Date("2026-03-13T19:00:00.000Z"),
@@ -42,7 +48,12 @@ describe("buildCaseContinuity", () => {
 
     expect(continuity.section).toBe("notes");
     expect(continuity.label).toMatch(/resume notes/i);
-    expect(continuity.href).toBe("/cases/red-harbor#field-notes");
+    expect(continuity.href).toBe(
+      "/cases/red-harbor?evidence=dispatch-log#field-notes",
+    );
+    expect(continuity.lastActivityAt?.toISOString()).toBe(
+      "2026-03-13T19:30:00.000Z",
+    );
   });
 
   test("returns an objectives resume target when staged objective drafts exist", () => {
@@ -52,6 +63,8 @@ describe("buildCaseContinuity", () => {
       note: undefined,
       draft: undefined,
       latestSubmission: undefined,
+      lastViewedEvidenceId: "dispatch-log",
+      lastViewedEvidenceAt: new Date("2026-03-13T20:45:00.000Z"),
       objectiveStates: [
         {
           objectiveId: "trace-ledger",
@@ -70,9 +83,11 @@ describe("buildCaseContinuity", () => {
 
     expect(continuity.section).toBe("objectives");
     expect(continuity.label).toMatch(/resume objectives/i);
-    expect(continuity.href).toBe("/cases/staged-harbor#active-objectives");
+    expect(continuity.href).toBe(
+      "/cases/staged-harbor?evidence=dispatch-log#active-objectives",
+    );
     expect(continuity.lastActivityAt?.toISOString()).toBe(
-      "2026-03-13T20:30:00.000Z",
+      "2026-03-13T20:45:00.000Z",
     );
   });
 
@@ -83,6 +98,8 @@ describe("buildCaseContinuity", () => {
       note: undefined,
       draft: undefined,
       latestSubmission: undefined,
+      lastViewedEvidenceId: "vestry-interview",
+      lastViewedEvidenceAt: new Date("2026-03-13T20:35:00.000Z"),
       objectiveStates: [
         {
           objectiveId: "trace-ledger",
@@ -105,9 +122,11 @@ describe("buildCaseContinuity", () => {
 
     expect(continuity.section).toBe("objectives");
     expect(continuity.label).toMatch(/resume objectives/i);
-    expect(continuity.href).toBe("/cases/staged-harbor#active-objectives");
+    expect(continuity.href).toBe(
+      "/cases/staged-harbor?evidence=vestry-interview#active-objectives",
+    );
     expect(continuity.lastActivityAt?.toISOString()).toBe(
-      "2026-03-13T20:30:00.000Z",
+      "2026-03-13T20:35:00.000Z",
     );
   });
 
@@ -115,6 +134,8 @@ describe("buildCaseContinuity", () => {
     const continuity = buildCaseContinuity({
       caseSlug: "red-harbor",
       status: "in_progress",
+      lastViewedEvidenceId: "night-watch-thread",
+      lastViewedEvidenceAt: new Date("2026-03-13T17:15:00.000Z"),
       note: undefined,
       draft: undefined,
       latestSubmission: undefined,
@@ -123,13 +144,20 @@ describe("buildCaseContinuity", () => {
 
     expect(continuity.section).toBe("evidence");
     expect(continuity.label).toMatch(/return to evidence/i);
-    expect(continuity.href).toBe("/cases/red-harbor#evidence-intake");
+    expect(continuity.href).toBe(
+      "/cases/red-harbor?evidence=night-watch-thread#evidence-intake",
+    );
+    expect(continuity.lastActivityAt?.toISOString()).toBe(
+      "2026-03-13T17:15:00.000Z",
+    );
   });
 
   test("prefers the debrief destination for completed cases", () => {
     const continuity = buildCaseContinuity({
       caseSlug: "briar-ledger",
       status: "completed",
+      lastViewedEvidenceId: "coded-ledger",
+      lastViewedEvidenceAt: new Date("2026-03-13T18:15:00.000Z"),
       note: undefined,
       draft: undefined,
       latestSubmission: undefined,

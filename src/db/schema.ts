@@ -39,6 +39,10 @@ export const playerCases = pgTable("player_cases", {
   terminalDebriefSummary: text("terminal_debrief_summary"),
   startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  lastViewedEvidenceId: text("last_viewed_evidence_id"),
+  lastViewedEvidenceAt: timestamp("last_viewed_evidence_at", {
+    withTimezone: true,
+  }),
   gradedFailureCount: integer("graded_failure_count").notNull().default(0),
 });
 

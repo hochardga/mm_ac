@@ -43,6 +43,13 @@
       "when": 1773494998808,
       "tag": "0005_staged_case_progression",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1773508464840,
+      "tag": "0006_evidence_aware_continuity",
+      "breakpoints": true
     }
   ]
 }
