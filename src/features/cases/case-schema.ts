@@ -7,6 +7,36 @@ const objectiveOptionSchema = z.object({
   label: z.string(),
 });
 
+const evidenceListSchema = z
+  .array(evidenceIndexEntrySchema)
+  .min(1)
+  .refine(
+    (entries) => new Set(entries.map((entry) => entry.id)).size === entries.length,
+    {
+      message: "evidence ids must be unique",
+    },
+  );
+
+const legacyReportOptionSchema = z.object({
+  id: z.string(),
+  label: z.string(),
+});
+
+const legacyCaseManifestSourceSchema = z.object({
+  slug: z.string(),
+  revision: z.string(),
+  title: z.string(),
+  summary: z.string(),
+  estimatedMinutes: z.number().int().positive(),
+  reportOptions: z.object({
+    suspect: z.array(legacyReportOptionSchema).min(1),
+    motive: z.array(legacyReportOptionSchema).min(1),
+    method: z.array(legacyReportOptionSchema).min(1),
+  }),
+  handlerPrompts: z.array(z.string()),
+  evidence: evidenceListSchema,
+});
+
 const objectiveBaseSchema = z.object({
   id: z.string(),
   prompt: z.string(),
@@ -52,22 +82,14 @@ const stageSchema = z.object({
   objectives: z.array(objectiveSchema).min(1),
 });
 
-export const caseManifestSourceSchema = z
+const stagedCaseManifestSourceSchema = z
   .object({
     slug: z.string(),
     revision: z.string(),
     title: z.string(),
     summary: z.string(),
     complexity: z.enum(["light", "standard", "deep"]),
-    evidence: z
-      .array(evidenceIndexEntrySchema)
-      .min(1)
-      .refine(
-        (entries) => new Set(entries.map((entry) => entry.id)).size === entries.length,
-        {
-          message: "evidence ids must be unique",
-        },
-      ),
+    evidence: evidenceListSchema,
     stages: z.array(stageSchema).min(1),
   })
   .refine(
@@ -91,6 +113,11 @@ export const caseManifestSourceSchema = z
       path: ["stages"],
     },
   );
+
+export const caseManifestSourceSchema = z.union([
+  legacyCaseManifestSourceSchema,
+  stagedCaseManifestSourceSchema,
+]);
 
 export const caseManifestSchema = caseManifestSourceSchema;
 
@@ -121,7 +148,35 @@ const objectiveAnswerSchema = z.discriminatedUnion("type", [
     .strict(),
 ]);
 
-export const protectedCaseSchema = z.object({
+const legacyProtectedCaseSchema = z.object({
+  slug: z.string(),
+  revision: z.string(),
+  canonicalAnswers: z.object({
+    suspect: z.string(),
+    motive: z.string(),
+    method: z.string(),
+  }),
+  grading: z.object({
+    maxAttempts: z.number().int().positive(),
+  }),
+  feedbackTemplates: z.object({
+    incorrect_attempt_remaining: z.string(),
+    final_incorrect_closure: z.string(),
+    solved: z.string(),
+  }),
+  debriefs: z.object({
+    solved: z.object({
+      title: z.string(),
+      summary: z.string(),
+    }),
+    closed_unsolved: z.object({
+      title: z.string(),
+      summary: z.string(),
+    }),
+  }),
+});
+
+const stagedProtectedCaseSchema = z.object({
   slug: z.string(),
   revision: z.string(),
   grading: z.object({
@@ -139,6 +194,11 @@ export const protectedCaseSchema = z.object({
     }),
   }),
 });
+
+export const protectedCaseSchema = z.union([
+  legacyProtectedCaseSchema,
+  stagedProtectedCaseSchema,
+]);
 
 export type CaseManifestSource = z.infer<typeof caseManifestSourceSchema>;
 export type CaseManifest = z.infer<typeof caseManifestSchema>;

@@ -20,6 +20,21 @@ test("protected loader exposes grading configuration", async () => {
   });
 });
 
+test("protected loader supports legacy shipped cases", async () => {
+  const payload = await loadProtectedCase("hollow-bishop");
+
+  expect(payload.grading.maxAttempts).toBeGreaterThan(0);
+  expect(payload.canonicalAnswers).toMatchObject({
+    suspect: "bookkeeper",
+    motive: "embezzlement",
+    method: "poisoned-wine",
+  });
+  expect(payload.feedbackTemplates).toMatchObject({
+    solved: expect.any(String),
+  });
+  expect(payload.debriefs.solved.title).toMatch(/hollow bishop/i);
+});
+
 test("protected loader rejects case slugs that escape the cases root", async () => {
   await expect(
     loadProtectedCase("../cases/text-first-valid", {
