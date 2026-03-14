@@ -48,7 +48,7 @@ async function buildResumeTarget(
 
   return {
     caseSlug,
-    section: continuity.section === "debrief" ? "evidence" : continuity.section,
+    section: continuity.section,
     label: continuity.label,
     description: continuity.description,
     href: continuity.href,

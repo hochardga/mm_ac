@@ -63,10 +63,11 @@ test("keeps handler feedback in the continuity description when reopening after 
     userId,
     caseSlug: "hollow-bishop",
   });
+  const submissionToken = `feedback-${playerCase.id}`;
 
   await submitReport({
     playerCaseId: playerCase.id,
-    submissionToken: "feedback-token",
+    submissionToken,
     answers: {
       suspectId: "groundskeeper",
       motiveId: "blackmail",
@@ -81,4 +82,39 @@ test("keeps handler feedback in the continuity description when reopening after 
 
   expect(reopened.resumeTarget.section).toBe("report");
   expect(reopened.resumeTarget.description).toMatch(/handler feedback/i);
+});
+
+test("keeps the debrief section when reopening a solved case", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "solved-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Solved",
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+
+  await submitReport({
+    playerCaseId: playerCase.id,
+    submissionToken: `solved-${playerCase.id}`,
+    answers: {
+      suspectId: "bookkeeper",
+      motiveId: "embezzlement",
+      methodId: "poisoned-wine",
+    },
+  });
+
+  const reopened = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+
+  expect(reopened.resumeTarget.section).toBe("debrief");
+  expect(reopened.resumeTarget.href).toBe("/cases/hollow-bishop/debrief");
 });

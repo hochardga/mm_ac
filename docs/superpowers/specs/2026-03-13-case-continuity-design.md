@@ -2,10 +2,6 @@
 
 Date: 2026-03-13
 
-## Approval Context
-
-The user explicitly asked for autonomous execution while offline. This design records the assumptions and recommendation I would normally walk through interactively, then uses that documented direction as approval to proceed.
-
 ## Summary
 
 Ashfall Collective already preserves the core state a returning player cares about: case status, saved notes, saved draft answers, submission feedback, and a computed `resumeTarget` when a case is reopened. The current UI does very little with that information. The vault cards stay generic, in-progress cases do not tell the player what work is waiting for them, and terminal cases still look like they should reopen the case file instead of the debrief.
