@@ -55,6 +55,8 @@ async function buildResumeTarget(
       | "in_progress"
       | "completed"
       | "closed_unsolved",
+    lastViewedEvidenceId: playerCase.lastViewedEvidenceId,
+    lastViewedEvidenceAt: playerCase.lastViewedEvidenceAt,
     note: savedNote,
     draft: savedDraft,
     latestSubmission,

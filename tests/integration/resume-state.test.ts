@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { users } from "@/db/schema";
 import { openCase } from "@/features/cases/open-case";
+import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveNote } from "@/features/notes/save-note";
 import { submitObjective } from "@/features/submissions/submit-objective";
@@ -125,4 +126,36 @@ test("keeps the debrief section when reopening a solved case", async () => {
 
   expect(reopened.resumeTarget.section).toBe("debrief");
   expect(reopened.resumeTarget.href).toBe("/cases/hollow-bishop/debrief");
+});
+
+test("includes remembered evidence in the resume target when reopening a case", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "remembered-evidence-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Evidence",
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await rememberViewedEvidence({
+    playerCaseId: playerCase.id,
+    evidenceId: "night-watch-thread",
+  });
+
+  const reopened = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  expect(reopened.playerCase.lastViewedEvidenceId).toBe("night-watch-thread");
+  expect(reopened.resumeTarget.href).toBe(
+    "/cases/red-harbor?evidence=night-watch-thread#evidence-intake",
+  );
 });
