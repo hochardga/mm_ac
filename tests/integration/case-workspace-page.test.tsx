@@ -31,6 +31,7 @@ import type { LoadedStagedCaseManifest } from "@/features/cases/load-case-manife
 import { openCase } from "@/features/cases/open-case";
 import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { saveNote } from "@/features/notes/save-note";
+import { submitObjective } from "@/features/submissions/submit-objective";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -662,4 +663,108 @@ test("renders staged objectives with gated evidence and objective continuity lin
   expect(
     screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
   ).toHaveAttribute("id", "active-objectives");
+});
+
+test("renders live failure pressure and attempt history for staged cases in progress", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "attempt-ledger-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Attempt Ledger",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+
+  await submitObjective({
+    playerCaseId: playerCase.id,
+    objectiveId: "chalice-relevance",
+    submissionToken: "live-ledger-advisory-1",
+    payload: {
+      type: "boolean",
+      value: false,
+    },
+  });
+  await submitObjective({
+    playerCaseId: playerCase.id,
+    objectiveId: "identify-poisoner",
+    submissionToken: "live-ledger-graded-1",
+    payload: {
+      type: "single_choice",
+      choiceId: "groundskeeper",
+    },
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  const activeObjectivesSection = screen
+    .getByRole("heading", { name: /active objectives/i })
+    .closest("section");
+  const completedObjectivesSection = screen
+    .getByRole("heading", { name: /completed objectives/i })
+    .closest("section");
+
+  expect(activeObjectivesSection).not.toBeNull();
+  expect(completedObjectivesSection).not.toBeNull();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(
+      /2 safe graded submissions remain/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(
+      /1 of 3 graded failures spent/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(
+      /latest graded feedback/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(
+      /attempt ledger/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(
+      /filed answer:\s*groundskeeper bram yates/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(activeObjectivesSection as HTMLElement).getByText(/^incorrect$/i),
+  ).toBeInTheDocument();
+  expect(
+    within(completedObjectivesSection as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(completedObjectivesSection as HTMLElement).getByText(
+      /objective solved/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(completedObjectivesSection as HTMLElement).getByText(
+      /filed answer:\s*no/i,
+    ),
+  ).toBeInTheDocument();
 });

@@ -10,6 +10,7 @@ import { CaseContinuityBanner } from "@/features/cases/components/case-continuit
 import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
+import type { ObjectiveReviewState } from "@/features/cases/objective-review-state";
 import { ReportPanel } from "@/features/cases/components/report-panel";
 import { buildCaseProgression } from "@/features/cases/case-progression";
 import type { openCase } from "@/features/cases/open-case";
@@ -35,6 +36,7 @@ type CaseWorkspaceProps = {
   latestSubmission: LatestSubmission;
   objectiveStates: ObjectiveState;
   objectiveSubmissions: ObjectiveSubmissionRows;
+  stagedReviewState?: ObjectiveReviewState;
   submissionToken: string;
   selectedEvidenceId?: string;
   resumeTarget: ResumeTarget;
@@ -61,6 +63,7 @@ export function CaseWorkspace({
   latestSubmission,
   objectiveStates,
   objectiveSubmissions,
+  stagedReviewState,
   submissionToken,
   selectedEvidenceId,
   resumeTarget,
@@ -137,6 +140,7 @@ export function CaseWorkspace({
               objectiveRows={objectiveStates}
               objectiveSubmissions={objectiveSubmissions}
               playerCaseId={playerCaseId}
+              reviewState={stagedReviewState}
               selectedEvidenceId={selectedEvidence.id}
               solvedObjectives={stagedProgression.solvedObjectives}
               submissionToken={submissionToken}
