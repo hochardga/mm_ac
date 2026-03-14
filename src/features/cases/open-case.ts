@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { and, eq } from "drizzle-orm";
 
 import { analyticsEvents, notes, playerCases, reportDrafts } from "@/db/schema";
+import { buildCaseContinuity } from "@/features/cases/case-continuity";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb, type AppTransaction } from "@/lib/db";
@@ -22,10 +23,22 @@ async function buildResumeTarget(
       where: eq(reportDrafts.playerCaseId, playerCase.id),
     }),
   ]);
+  const continuity = buildCaseContinuity({
+    caseSlug,
+    status: playerCase.status as
+      | "new"
+      | "in_progress"
+      | "completed"
+      | "closed_unsolved",
+    note: savedNote,
+    draft: savedDraft,
+    latestSubmission: undefined,
+    playerCaseUpdatedAt: playerCase.updatedAt,
+  });
 
   return {
     caseSlug,
-    section: savedDraft ? "report" : savedNote ? "notes" : "evidence",
+    section: continuity.section === "debrief" ? "evidence" : continuity.section,
     noteBody: savedNote?.body ?? "",
     draft: savedDraft
       ? {
@@ -34,8 +47,7 @@ async function buildResumeTarget(
           methodId: savedDraft.methodId,
         }
       : null,
-    lastActivityAt:
-      savedDraft?.updatedAt ?? savedNote?.updatedAt ?? playerCase.updatedAt,
+    lastActivityAt: continuity.lastActivityAt ?? playerCase.updatedAt,
   };
 }
 
