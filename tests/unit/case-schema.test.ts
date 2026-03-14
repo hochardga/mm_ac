@@ -21,7 +21,7 @@ const baseManifest = {
           type: "single_choice",
           stakes: "graded",
           options: [{ id: "bookkeeper", label: "Bookkeeper Mara Quinn" }],
-          successUnlocks: { stageIds: ["confrontation"], resolvesCase: false },
+          successUnlocks: { stageIds: [], resolvesCase: false },
         },
       ],
     },
@@ -63,6 +63,30 @@ test("rejects duplicate evidence ids", () => {
   ).toThrow(/unique/i);
 });
 
+test("rejects staged evidence ids that are not present", () => {
+  expect(() =>
+    caseManifestSourceSchema.parse({
+      ...baseManifest,
+      evidence: [
+        {
+          id: "ledger",
+          title: "Ledger Extract",
+          family: "document",
+          subtype: "financial_ledger",
+          summary: "A damaged ledger.",
+          source: "evidence/ledger.md",
+        },
+      ],
+      stages: [
+        {
+          ...baseManifest.stages[0],
+          evidenceIds: ["missing-evidence"],
+        },
+      ],
+    }),
+  ).toThrow(/evidence/i);
+});
+
 test("rejects duplicate stage ids", () => {
   expect(() =>
     caseManifestSourceSchema.parse({
@@ -85,6 +109,35 @@ test("rejects duplicate stage ids", () => {
         {
           ...baseManifest.stages[0],
           id: "briefing",
+        },
+      ],
+    }),
+  ).toThrow(/stage/i);
+});
+
+test("rejects success unlocks that reference missing stages", () => {
+  expect(() =>
+    caseManifestSourceSchema.parse({
+      ...baseManifest,
+      evidence: [
+        {
+          id: "ledger",
+          title: "Ledger Extract",
+          family: "document",
+          subtype: "financial_ledger",
+          summary: "A damaged ledger.",
+          source: "evidence/ledger.md",
+        },
+      ],
+      stages: [
+        {
+          ...baseManifest.stages[0],
+          objectives: [
+            {
+              ...baseManifest.stages[0].objectives[0],
+              successUnlocks: { stageIds: ["missing-stage"], resolvesCase: false },
+            },
+          ],
         },
       ],
     }),
@@ -182,4 +235,62 @@ test("rejects code-entry objectives with options", () => {
       ],
     }),
   ).toThrow(/option/i);
+});
+
+test("accepts staged objectives with multiple types", () => {
+  expect(() =>
+    caseManifestSourceSchema.parse({
+      ...baseManifest,
+      evidence: [
+        {
+          id: "ledger",
+          title: "Ledger Extract",
+          family: "document",
+          subtype: "financial_ledger",
+          summary: "A damaged ledger.",
+          source: "evidence/ledger.md",
+        },
+      ],
+      stages: [
+        {
+          ...baseManifest.stages[0],
+          objectives: [
+            {
+              id: "pick-suspect",
+              prompt: "Who doctored the books?",
+              type: "single_choice",
+              stakes: "graded",
+              options: [{ id: "bookkeeper", label: "Bookkeeper Mara Quinn" }],
+              successUnlocks: { stageIds: [], resolvesCase: false },
+            },
+            {
+              id: "pick-evidence",
+              prompt: "Select all relevant entries.",
+              type: "multi_choice",
+              stakes: "advisory",
+              options: [
+                { id: "ledger", label: "Ledger" },
+                { id: "receipt", label: "Receipt" },
+              ],
+              successUnlocks: { stageIds: [], resolvesCase: false },
+            },
+            {
+              id: "confirm-entry",
+              prompt: "Does the record match?",
+              type: "boolean",
+              stakes: "advisory",
+              successUnlocks: { stageIds: [], resolvesCase: false },
+            },
+            {
+              id: "enter-code",
+              prompt: "Enter the lock code.",
+              type: "code_entry",
+              stakes: "graded",
+              successUnlocks: { stageIds: [], resolvesCase: true },
+            },
+          ],
+        },
+      ],
+    }),
+  ).not.toThrow();
 });

@@ -1,11 +1,14 @@
 import path from "node:path";
 
-import { loadProtectedCase } from "@/features/cases/load-protected-case";
+import {
+  loadProtectedCase,
+  loadStagedProtectedCase,
+} from "@/features/cases/load-protected-case";
 
 const fixturesRoot = path.join(process.cwd(), "tests", "fixtures", "cases");
 
 test("protected loader exposes grading configuration", async () => {
-  const payload = await loadProtectedCase("staged-valid", {
+  const payload = await loadStagedProtectedCase("staged-valid", {
     casesRoot: fixturesRoot,
   });
 
@@ -13,6 +16,18 @@ test("protected loader exposes grading configuration", async () => {
   expect(payload.canonicalAnswers["pick-suspect"]).toMatchObject({
     type: "single_choice",
     choiceId: "bookkeeper",
+  });
+  expect(payload.canonicalAnswers["pick-evidence"]).toMatchObject({
+    type: "multi_choice",
+    choiceIds: ["ledger", "receipt"],
+  });
+  expect(payload.canonicalAnswers["confirm-entry"]).toMatchObject({
+    type: "boolean",
+    value: true,
+  });
+  expect(payload.canonicalAnswers["enter-code"]).toMatchObject({
+    type: "code_entry",
+    value: "VESPER-17",
   });
   expect(payload.debriefs).toEqual({
     solved: { title: "Debrief", summary: "Solved summary" },
@@ -45,7 +60,7 @@ test("protected loader rejects case slugs that escape the cases root", async () 
 
 test("protected loader rejects mismatched expected revisions", async () => {
   await expect(
-    loadProtectedCase("staged-valid", {
+    loadStagedProtectedCase("staged-valid", {
       casesRoot: fixturesRoot,
       expectedRevision: "rev-does-not-exist",
     }),

@@ -22,7 +22,7 @@ const legacyReportOptionSchema = z.object({
   label: z.string(),
 });
 
-const legacyCaseManifestSourceSchema = z.object({
+export const legacyCaseManifestSourceSchema = z.object({
   slug: z.string(),
   revision: z.string(),
   title: z.string(),
@@ -82,7 +82,7 @@ const stageSchema = z.object({
   objectives: z.array(objectiveSchema).min(1),
 });
 
-const stagedCaseManifestSourceSchema = z
+export const stagedCaseManifestSourceSchema = z
   .object({
     slug: z.string(),
     revision: z.string(),
@@ -110,6 +110,32 @@ const stagedCaseManifestSourceSchema = z
     },
     {
       message: "objective ids must be unique",
+      path: ["stages"],
+    },
+  )
+  .refine(
+    (manifest) => {
+      const evidenceIds = new Set(manifest.evidence.map((entry) => entry.id));
+      return manifest.stages.every((stage) =>
+        stage.evidenceIds.every((id) => evidenceIds.has(id)),
+      );
+    },
+    {
+      message: "stage evidence ids must reference evidence entries",
+      path: ["stages"],
+    },
+  )
+  .refine(
+    (manifest) => {
+      const stageIds = new Set(manifest.stages.map((stage) => stage.id));
+      return manifest.stages.every((stage) =>
+        stage.objectives.every((objective) =>
+          objective.successUnlocks.stageIds.every((id) => stageIds.has(id)),
+        ),
+      );
+    },
+    {
+      message: "success unlock stage ids must reference stages",
       path: ["stages"],
     },
   );
@@ -148,7 +174,7 @@ const objectiveAnswerSchema = z.discriminatedUnion("type", [
     .strict(),
 ]);
 
-const legacyProtectedCaseSchema = z.object({
+export const legacyProtectedCaseSchema = z.object({
   slug: z.string(),
   revision: z.string(),
   canonicalAnswers: z.object({
@@ -176,7 +202,7 @@ const legacyProtectedCaseSchema = z.object({
   }),
 });
 
-const stagedProtectedCaseSchema = z.object({
+export const stagedProtectedCaseSchema = z.object({
   slug: z.string(),
   revision: z.string(),
   grading: z.object({
@@ -200,6 +226,16 @@ export const protectedCaseSchema = z.union([
   stagedProtectedCaseSchema,
 ]);
 
+export type LegacyCaseManifestSource = z.infer<
+  typeof legacyCaseManifestSourceSchema
+>;
+export type StagedCaseManifestSource = z.infer<
+  typeof stagedCaseManifestSourceSchema
+>;
 export type CaseManifestSource = z.infer<typeof caseManifestSourceSchema>;
+export type LegacyCaseManifest = z.infer<typeof legacyCaseManifestSourceSchema>;
+export type StagedCaseManifest = z.infer<typeof stagedCaseManifestSourceSchema>;
 export type CaseManifest = z.infer<typeof caseManifestSchema>;
+export type LegacyProtectedCase = z.infer<typeof legacyProtectedCaseSchema>;
+export type StagedProtectedCase = z.infer<typeof stagedProtectedCaseSchema>;
 export type ProtectedCase = z.infer<typeof protectedCaseSchema>;

@@ -29,7 +29,32 @@
           "type": "single_choice",
           "stakes": "graded",
           "options": [{ "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }],
-          "successUnlocks": { "stageIds": ["confrontation"], "resolvesCase": false }
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "pick-evidence",
+          "prompt": "Select all relevant entries.",
+          "type": "multi_choice",
+          "stakes": "advisory",
+          "options": [
+            { "id": "ledger", "label": "Ledger" },
+            { "id": "receipt", "label": "Receipt" }
+          ],
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "confirm-entry",
+          "prompt": "Does the record match?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "enter-code",
+          "prompt": "Enter the lock code.",
+          "type": "code_entry",
+          "stakes": "graded",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
         }
       ]
     }
