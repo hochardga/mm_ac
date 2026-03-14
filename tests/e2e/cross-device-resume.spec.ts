@@ -22,7 +22,9 @@ test("saved notes and drafts resume across browser contexts", async ({
   await primaryPage.getByLabel("Response").selectOption("false");
   await primaryPage.getByRole("button", { name: /submit objective/i }).click();
   await expect(
-    primaryPage.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+    primaryPage.getByRole("heading", {
+      name: /who poisoned the sacramental wine to silence the bishop/i,
+    }),
   ).toBeVisible();
   await primaryPage.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
@@ -41,7 +43,9 @@ test("saved notes and drafts resume across browser contexts", async ({
     /cross-device proof/i,
   );
   await expect(
-    secondaryPage.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+    secondaryPage.getByRole("heading", {
+      name: /who poisoned the sacramental wine to silence the bishop/i,
+    }),
   ).toBeVisible();
   await expect(secondaryPage.getByLabel("Response")).toHaveValue("bookkeeper");
 

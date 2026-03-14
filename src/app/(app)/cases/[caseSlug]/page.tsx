@@ -12,8 +12,13 @@ import {
 } from "@/db/schema";
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { getCurrentAgentId } from "@/features/auth/current-agent";
+import { buildCaseProgression } from "@/features/cases/case-progression";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
-import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
+import {
+  loadAnyCaseManifest,
+  type LoadedCaseManifest,
+  type LoadedStagedCaseManifest,
+} from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
 import { getDb } from "@/lib/db";
 
@@ -27,6 +32,12 @@ type CasePageProps = {
 type CaseSearchParams = {
   evidence?: string | string[];
 };
+
+function isStagedManifest(
+  manifest: LoadedCaseManifest,
+): manifest is LoadedStagedCaseManifest {
+  return "stages" in manifest;
+}
 
 export default async function CasePage({
   params,
@@ -109,11 +120,23 @@ export default async function CasePage({
     notFound();
   }
 
+  const progressSnapshot = isStagedManifest(caseData.manifest)
+    ? buildCaseProgression({
+        manifest: caseData.manifest,
+        objectiveStates: caseData.objectiveStates.map((objectiveState) => ({
+          objectiveId: objectiveState.objectiveId,
+          stageId: objectiveState.stageId,
+          status: objectiveState.status,
+        })),
+      }).snapshot
+    : undefined;
+
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
       <div className="mx-auto max-w-5xl space-y-10">
         <CaseReturnHeader
           eyebrow={`Handler channel / ${caseData.lifecycle.playerCase.caseRevision}`}
+          progressSnapshot={progressSnapshot}
           summary={caseData.manifest.summary}
           title={caseData.manifest.title}
         />

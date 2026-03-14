@@ -98,7 +98,9 @@ test("global primary nav is hidden on case routes after intake", async ({
   await page.getByLabel("Response").selectOption("false");
   await page.getByRole("button", { name: /submit objective/i }).click();
   await expect(
-    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+    page.getByRole("heading", {
+      name: /who poisoned the sacramental wine to silence the bishop/i,
+    }),
   ).toBeVisible();
   await page.getByLabel("Response").selectOption("bookkeeper");
   await page.getByRole("button", { name: /submit objective/i }).click();

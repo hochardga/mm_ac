@@ -1,15 +1,20 @@
 import Link from "next/link";
 
+import { StagedProgressSnapshot } from "@/features/cases/components/staged-progress-snapshot";
+import type { CaseProgressSnapshot } from "@/features/cases/case-progression";
+
 type CaseReturnHeaderProps = {
   eyebrow: string;
   title: string;
   summary: string;
+  progressSnapshot?: CaseProgressSnapshot;
 };
 
 export function CaseReturnHeader({
   eyebrow,
   title,
   summary,
+  progressSnapshot,
 }: CaseReturnHeaderProps) {
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
@@ -34,6 +39,11 @@ export function CaseReturnHeader({
       <p className="mt-4 max-w-3xl text-lg leading-8 text-stone-300">
         {summary}
       </p>
+      {progressSnapshot ? (
+        <div className="mt-8">
+          <StagedProgressSnapshot snapshot={progressSnapshot} />
+        </div>
+      ) : null}
     </section>
   );
 }

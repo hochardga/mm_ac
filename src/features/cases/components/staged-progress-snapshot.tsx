@@ -35,7 +35,7 @@ export function StagedProgressSnapshot({
   }
 
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
       <p className="text-xs uppercase tracking-[0.25em] text-[#f0b48f]">
         Investigation Snapshot
       </p>
@@ -69,6 +69,6 @@ export function StagedProgressSnapshot({
           </p>
         </div>
       ) : null}
-    </section>
+    </div>
   );
 }

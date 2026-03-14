@@ -11,7 +11,6 @@ import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
 import { ReportPanel } from "@/features/cases/components/report-panel";
-import { StagedProgressSnapshot } from "@/features/cases/components/staged-progress-snapshot";
 import { buildCaseProgression } from "@/features/cases/case-progression";
 import type { openCase } from "@/features/cases/open-case";
 import type {
@@ -92,10 +91,6 @@ export function CaseWorkspace({
 
   return (
     <div className="space-y-6">
-      {stagedProgression ? (
-        <StagedProgressSnapshot snapshot={stagedProgression.snapshot} />
-      ) : null}
-
       {resumeTarget.section === "notes" ||
       resumeTarget.section === "report" ||
       resumeTarget.section === "objectives" ? (

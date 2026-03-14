@@ -26,6 +26,8 @@ test("agent can review evidence, unlock the next objective, and save a staged dr
   await expect(
     page.getByRole("heading", { name: /active objectives/i }),
   ).toBeVisible();
+  await expect(page.getByText(/stage 1 of 2/i)).toBeVisible();
+  await expect(page.getByText(/ledger review/i)).toBeVisible();
 
   await page.getByLabel("Field Notes").fill("Check the receipts.");
   await page.getByRole("button", { name: /save notes/i }).click();
@@ -33,8 +35,12 @@ test("agent can review evidence, unlock the next objective, and save a staged dr
 
   await page.getByLabel("Response").selectOption("false");
   await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(page.getByText(/stage 2 of 2/i)).toBeVisible();
+  await expect(page.getByText(/poison proof/i)).toBeVisible();
   await expect(
-    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+    page.getByRole("heading", {
+      name: /who poisoned the sacramental wine to silence the bishop/i,
+    }),
   ).toBeVisible();
 
   await page.getByLabel("Response").selectOption("bookkeeper");
