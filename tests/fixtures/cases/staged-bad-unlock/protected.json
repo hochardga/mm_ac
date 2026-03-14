@@ -1,0 +1,14 @@
+{
+  "slug": "staged-bad-unlock",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 1
+  },
+  "canonicalAnswers": {
+    "pick-suspect": { "type": "single_choice", "choiceId": "bookkeeper" }
+  },
+  "debriefs": {
+    "solved": { "title": "Debrief", "summary": "Solved summary" },
+    "closed_unsolved": { "title": "Closed", "summary": "Closed summary" }
+  }
+}

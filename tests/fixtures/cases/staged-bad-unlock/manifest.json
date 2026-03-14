@@ -1,0 +1,37 @@
+{
+  "slug": "staged-bad-unlock",
+  "revision": "rev-1",
+  "title": "Bad Unlock Case",
+  "summary": "An invalid staged package that references a missing stage.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Ledger Extract",
+      "family": "document",
+      "subtype": "financial_ledger",
+      "summary": "A damaged ledger.",
+      "source": "evidence/ledger.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Review the ledger and make initial findings.",
+      "handlerPrompts": ["Start with the ledger."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who doctored the books?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [{ "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }],
+          "successUnlocks": { "stageIds": ["missing-stage"], "resolvesCase": false }
+        }
+      ]
+    }
+  ]
+}
