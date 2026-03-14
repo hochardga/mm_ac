@@ -10,6 +10,21 @@ type ProgressObjective = LoadedStagedCaseManifest["stages"][number]["objectives"
   stageId: string;
 };
 
+export type CaseProgressSnapshot = {
+  focusStage: {
+    id: string;
+    title: string;
+    summary: string;
+    position: number;
+  };
+  visibleStageCount: number;
+  totalStageCount: number;
+  solvedObjectiveCount: number;
+  totalObjectiveCount: number;
+  visibleEvidenceCount: number;
+  nextObjectivePrompt?: string;
+};
+
 type BuildCaseProgressionInput = {
   manifest: LoadedStagedCaseManifest;
   objectiveStates: ObjectiveState[];
@@ -20,6 +35,7 @@ type CaseProgression = {
   solvedObjectives: ProgressObjective[];
   visibleEvidence: LoadedStagedCaseManifest["evidence"];
   visibleHandlerPrompts: string[];
+  snapshot: CaseProgressSnapshot;
   completed: boolean;
 };
 
@@ -51,6 +67,9 @@ export function buildCaseProgression(
   const visibleEvidenceIds = new Set(
     visibleStages.flatMap((stage) => stage.evidenceIds),
   );
+  const visibleEvidence = input.manifest.evidence.filter((entry) =>
+    visibleEvidenceIds.has(entry.id),
+  );
   const activeObjectives: ProgressObjective[] = [];
   const solvedObjectives: ProgressObjective[] = [];
 
@@ -78,13 +97,38 @@ export function buildCaseProgression(
     }
   }
 
+  const focusStage =
+    visibleStages.find((stage) =>
+      activeObjectives.some((objective) => objective.stageId === stage.id),
+    ) ?? visibleStages.at(-1);
+
+  if (!focusStage) {
+    throw new Error("Staged case progression requires at least one visible stage");
+  }
+
   return {
     activeObjectives,
     solvedObjectives,
-    visibleEvidence: input.manifest.evidence.filter((entry) =>
-      visibleEvidenceIds.has(entry.id),
-    ),
+    visibleEvidence,
     visibleHandlerPrompts: visibleStages.flatMap((stage) => stage.handlerPrompts),
+    snapshot: {
+      focusStage: {
+        id: focusStage.id,
+        title: focusStage.title,
+        summary: focusStage.summary,
+        position:
+          input.manifest.stages.findIndex((stage) => stage.id === focusStage.id) + 1,
+      },
+      visibleStageCount: visibleStages.length,
+      totalStageCount: input.manifest.stages.length,
+      solvedObjectiveCount: solvedObjectives.length,
+      totalObjectiveCount: input.manifest.stages.reduce(
+        (count, stage) => count + stage.objectives.length,
+        0,
+      ),
+      visibleEvidenceCount: visibleEvidence.length,
+      nextObjectivePrompt: activeObjectives[0]?.prompt,
+    },
     completed: input.manifest.stages.every((stage) =>
       stage.objectives.every(
         (objective) => objectiveStateById.get(objective.id)?.status === "solved",
