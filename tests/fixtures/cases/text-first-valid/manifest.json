@@ -3,21 +3,7 @@
   "revision": "rev-1",
   "title": "Fixture Case",
   "summary": "Fixture case for text-first evidence.",
-  "estimatedMinutes": 45,
-  "reportOptions": {
-    "suspect": [
-      { "id": "suspect-a", "label": "Suspect A" }
-    ],
-    "motive": [
-      { "id": "motive-a", "label": "Motive A" }
-    ],
-    "method": [
-      { "id": "method-a", "label": "Method A" }
-    ]
-  },
-  "handlerPrompts": [
-    "Start with the ledger."
-  ],
+  "complexity": "standard",
   "evidence": [
     {
       "id": "ledger",
@@ -42,6 +28,26 @@
       "subtype": "interview_transcript",
       "summary": "Transcript from the vestry interview.",
       "source": "evidence/interview.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Review the opening file.",
+      "handlerPrompts": ["Start with the ledger."],
+      "evidenceIds": ["ledger", "access-log", "interview"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who doctored the books?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [{ "id": "suspect-a", "label": "Suspect A" }],
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
     }
   ]
 }

@@ -3,21 +3,7 @@
   "revision": "rev-1",
   "title": "Traversal Fixture",
   "summary": "Fixture case for path traversal checks.",
-  "estimatedMinutes": 30,
-  "reportOptions": {
-    "suspect": [
-      { "id": "suspect-a", "label": "Suspect A" }
-    ],
-    "motive": [
-      { "id": "motive-a", "label": "Motive A" }
-    ],
-    "method": [
-      { "id": "method-a", "label": "Method A" }
-    ]
-  },
-  "handlerPrompts": [
-    "Start with the access log."
-  ],
+  "complexity": "light",
   "evidence": [
     {
       "id": "escape-log",
@@ -26,6 +12,26 @@
       "subtype": "badge_swipes",
       "summary": "This source points outside the case directory.",
       "source": "../escape-record.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Review the opening file.",
+      "handlerPrompts": ["Start with the access log."],
+      "evidenceIds": ["escape-log"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who doctored the books?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [{ "id": "suspect-a", "label": "Suspect A" }],
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
     }
   ]
 }

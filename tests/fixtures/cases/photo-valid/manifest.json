@@ -3,21 +3,7 @@
   "revision": "rev-1",
   "title": "Photo Fixture Case",
   "summary": "Fixture case for photo evidence.",
-  "estimatedMinutes": 30,
-  "reportOptions": {
-    "suspect": [
-      { "id": "suspect-a", "label": "Suspect A" }
-    ],
-    "motive": [
-      { "id": "motive-a", "label": "Motive A" }
-    ],
-    "method": [
-      { "id": "method-a", "label": "Method A" }
-    ]
-  },
-  "handlerPrompts": [
-    "Inspect the still image first."
-  ],
+  "complexity": "light",
   "evidence": [
     {
       "id": "scene-photo",
@@ -26,6 +12,25 @@
       "subtype": "scene_photo",
       "summary": "A fixture still image from the vestry.",
       "source": "evidence/scene-photo.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Inspect the opening evidence.",
+      "handlerPrompts": ["Inspect the still image first."],
+      "evidenceIds": ["scene-photo"],
+      "objectives": [
+        {
+          "id": "verify-photo",
+          "prompt": "Does the photo match the report?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
     }
   ]
 }

@@ -5,9 +5,15 @@ import { loadProtectedCase } from "@/features/cases/load-protected-case";
 const fixturesRoot = path.join(process.cwd(), "tests", "fixtures", "cases");
 
 test("protected loader exposes grading configuration", async () => {
-  const payload = await loadProtectedCase("hollow-bishop");
+  const payload = await loadProtectedCase("staged-valid", {
+    casesRoot: fixturesRoot,
+  });
 
-  expect(payload.canonicalAnswers.suspect).toBeDefined();
+  expect(payload.grading.maxGradedFailures).toBe(3);
+  expect(payload.canonicalAnswers["pick-suspect"]).toMatchObject({
+    type: "single_choice",
+    choiceId: "bookkeeper",
+  });
 });
 
 test("protected loader rejects case slugs that escape the cases root", async () => {
@@ -20,7 +26,8 @@ test("protected loader rejects case slugs that escape the cases root", async () 
 
 test("protected loader rejects mismatched expected revisions", async () => {
   await expect(
-    loadProtectedCase("hollow-bishop", {
+    loadProtectedCase("staged-valid", {
+      casesRoot: fixturesRoot,
       expectedRevision: "rev-does-not-exist",
     }),
   ).rejects.toThrow(/revision/i);
