@@ -1,5 +1,12 @@
 import "server-only";
 
+import { inArray } from "drizzle-orm";
+
+import { notes, reportDrafts, reportSubmissions } from "@/db/schema";
+import {
+  buildCaseContinuity,
+  type CaseContinuitySummary,
+} from "@/features/cases/case-continuity";
 import {
   getDisplayStatus,
   isPlayerCaseStatus,
@@ -18,6 +25,7 @@ export type VaultCaseRecord = {
   status: PlayerCaseStatus;
   displayStatus: string;
   availability: "Available" | "Maintenance" | "Hidden";
+  continuity?: CaseContinuitySummary;
 };
 
 export async function listAvailableCases(
@@ -38,12 +46,45 @@ export async function listAvailableCases(
         where: (playerCase, { eq }) => eq(playerCase.userId, input.userId!),
       })
     : [];
+  const playerCaseIds = existingPlayerCases.map((playerCase) => playerCase.id);
+  const [savedNotes, savedDrafts, savedSubmissions] =
+    playerCaseIds.length > 0
+      ? await Promise.all([
+          db.query.notes.findMany({
+            where: inArray(notes.playerCaseId, playerCaseIds),
+          }),
+          db.query.reportDrafts.findMany({
+            where: inArray(reportDrafts.playerCaseId, playerCaseIds),
+          }),
+          db.query.reportSubmissions.findMany({
+            where: inArray(reportSubmissions.playerCaseId, playerCaseIds),
+          }),
+        ])
+      : [[], [], []];
   const playerCaseByDefinitionId = new Map(
     existingPlayerCases.map((playerCase) => [
       playerCase.caseDefinitionId,
       playerCase,
     ]),
   );
+  const savedNoteByPlayerCaseId = new Map(
+    savedNotes.map((note) => [note.playerCaseId, note]),
+  );
+  const savedDraftByPlayerCaseId = new Map(
+    savedDrafts.map((draft) => [draft.playerCaseId, draft]),
+  );
+  const latestSubmissionByPlayerCaseId = new Map<
+    string,
+    (typeof savedSubmissions)[number]
+  >();
+
+  for (const submission of savedSubmissions) {
+    const current = latestSubmissionByPlayerCaseId.get(submission.playerCaseId);
+
+    if (!current || submission.attemptNumber > current.attemptNumber) {
+      latestSubmissionByPlayerCaseId.set(submission.playerCaseId, submission);
+    }
+  }
 
   const dossiers = await Promise.all(
     definitions.map(async (definition) => {
@@ -72,6 +113,19 @@ export async function listAvailableCases(
       const status = isPlayerCaseStatus(playerStatus)
         ? playerStatus
         : "new";
+      const continuity =
+        playerCase && availability === "Available"
+          ? buildCaseContinuity({
+              caseSlug: definition.slug,
+              status,
+              note: savedNoteByPlayerCaseId.get(playerCase.id),
+              draft: savedDraftByPlayerCaseId.get(playerCase.id),
+              latestSubmission: latestSubmissionByPlayerCaseId.get(
+                playerCase.id,
+              ),
+              playerCaseUpdatedAt: playerCase.updatedAt,
+            })
+          : undefined;
 
       return {
         slug: definition.slug,
@@ -83,6 +137,7 @@ export async function listAvailableCases(
         status,
         displayStatus: getDisplayStatus(status),
         availability,
+        continuity,
       } satisfies VaultCaseRecord;
     }),
   );

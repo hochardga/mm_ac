@@ -1,14 +1,17 @@
 import type { notes, reportDrafts, reportSubmissions } from "@/db/schema";
+import { CaseContinuityBanner } from "@/features/cases/components/case-continuity-banner";
 import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
 import { ReportPanel } from "@/features/cases/components/report-panel";
+import type { openCase } from "@/features/cases/open-case";
 import type { loadCaseManifest } from "@/features/cases/load-case-manifest";
 
 type CaseManifestWithEvidence = Awaited<ReturnType<typeof loadCaseManifest>>;
 type SavedNote = typeof notes.$inferSelect | undefined;
 type SavedDraft = typeof reportDrafts.$inferSelect | undefined;
 type LatestSubmission = typeof reportSubmissions.$inferSelect | undefined;
+type ResumeTarget = Awaited<ReturnType<typeof openCase>>["resumeTarget"];
 
 type CaseWorkspaceProps = {
   caseSlug: string;
@@ -19,6 +22,7 @@ type CaseWorkspaceProps = {
   latestSubmission: LatestSubmission;
   submissionToken: string;
   selectedEvidenceId?: string;
+  resumeTarget: ResumeTarget;
 };
 
 export function CaseWorkspace({
@@ -30,6 +34,7 @@ export function CaseWorkspace({
   latestSubmission,
   submissionToken,
   selectedEvidenceId,
+  resumeTarget,
 }: CaseWorkspaceProps) {
   const selectedEvidence =
     manifest.evidence.find((item) => item.id === selectedEvidenceId) ??
@@ -40,42 +45,51 @@ export function CaseWorkspace({
   }
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)_24rem]">
-      <EvidenceIndex
-        caseSlug={caseSlug}
-        evidence={manifest.evidence}
-        selectedEvidenceId={selectedEvidence.id}
-      />
-
-      <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
-
-      <aside className="space-y-6">
-        <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-          <h2 className="text-2xl font-semibold">Handler Directives</h2>
-          <ul className="mt-6 space-y-4 text-sm leading-7 text-stone-300">
-            {manifest.handlerPrompts.map((prompt) => (
-              <li key={prompt}>{prompt}</li>
-            ))}
-          </ul>
-        </section>
-
-        <CaseNotesPanel
-          caseSlug={caseSlug}
-          playerCaseId={playerCaseId}
-          savedNote={savedNote}
-          selectedEvidenceTitle={selectedEvidence.title}
+    <div className="space-y-6">
+      {resumeTarget.section === "notes" || resumeTarget.section === "report" ? (
+        <CaseContinuityBanner
+          description={resumeTarget.description}
+          label={resumeTarget.label}
         />
+      ) : null}
 
-        <ReportPanel
+      <section className="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)_24rem]">
+        <EvidenceIndex
           caseSlug={caseSlug}
-          playerCaseId={playerCaseId}
+          evidence={manifest.evidence}
           selectedEvidenceId={selectedEvidence.id}
-          manifest={manifest}
-          savedDraft={savedDraft}
-          latestSubmission={latestSubmission}
-          submissionToken={submissionToken}
         />
-      </aside>
-    </section>
+
+        <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
+
+        <aside className="space-y-6">
+          <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+            <h2 className="text-2xl font-semibold">Handler Directives</h2>
+            <ul className="mt-6 space-y-4 text-sm leading-7 text-stone-300">
+              {manifest.handlerPrompts.map((prompt) => (
+                <li key={prompt}>{prompt}</li>
+              ))}
+            </ul>
+          </section>
+
+          <CaseNotesPanel
+            caseSlug={caseSlug}
+            playerCaseId={playerCaseId}
+            savedNote={savedNote}
+            selectedEvidenceTitle={selectedEvidence.title}
+          />
+
+          <ReportPanel
+            caseSlug={caseSlug}
+            playerCaseId={playerCaseId}
+            selectedEvidenceId={selectedEvidence.id}
+            manifest={manifest}
+            savedDraft={savedDraft}
+            latestSubmission={latestSubmission}
+            submissionToken={submissionToken}
+          />
+        </aside>
+      </section>
+    </div>
   );
 }

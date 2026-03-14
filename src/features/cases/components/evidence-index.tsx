@@ -14,7 +14,10 @@ export function EvidenceIndex({
   selectedEvidenceId,
 }: EvidenceIndexProps) {
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <section
+      className="rounded-[2rem] border border-white/10 bg-white/5 p-6"
+      id="evidence-intake"
+    >
       <h2 className="text-2xl font-semibold">Evidence Intake</h2>
       <div className="mt-6 grid gap-4">
         {evidence.map((item) => {

@@ -2,9 +2,16 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
-import { analyticsEvents, notes, playerCases, reportDrafts } from "@/db/schema";
+import {
+  analyticsEvents,
+  notes,
+  playerCases,
+  reportDrafts,
+  reportSubmissions,
+} from "@/db/schema";
+import { buildCaseContinuity } from "@/features/cases/case-continuity";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb, type AppTransaction } from "@/lib/db";
@@ -14,18 +21,37 @@ async function buildResumeTarget(
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {
-  const [savedNote, savedDraft] = await Promise.all([
+  const [savedNote, savedDraft, latestSubmission] = await Promise.all([
     tx.query.notes.findFirst({
       where: eq(notes.playerCaseId, playerCase.id),
     }),
     tx.query.reportDrafts.findFirst({
       where: eq(reportDrafts.playerCaseId, playerCase.id),
     }),
+    tx.query.reportSubmissions.findFirst({
+      where: eq(reportSubmissions.playerCaseId, playerCase.id),
+      orderBy: [desc(reportSubmissions.attemptNumber)],
+    }),
   ]);
+  const continuity = buildCaseContinuity({
+    caseSlug,
+    status: playerCase.status as
+      | "new"
+      | "in_progress"
+      | "completed"
+      | "closed_unsolved",
+    note: savedNote,
+    draft: savedDraft,
+    latestSubmission,
+    playerCaseUpdatedAt: playerCase.updatedAt,
+  });
 
   return {
     caseSlug,
-    section: savedDraft ? "report" : savedNote ? "notes" : "evidence",
+    section: continuity.section,
+    label: continuity.label,
+    description: continuity.description,
+    href: continuity.href,
     noteBody: savedNote?.body ?? "",
     draft: savedDraft
       ? {
@@ -34,8 +60,7 @@ async function buildResumeTarget(
           methodId: savedDraft.methodId,
         }
       : null,
-    lastActivityAt:
-      savedDraft?.updatedAt ?? savedNote?.updatedAt ?? playerCase.updatedAt,
+    lastActivityAt: continuity.lastActivityAt ?? playerCase.updatedAt,
   };
 }
 
