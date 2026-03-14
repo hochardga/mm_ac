@@ -7,6 +7,7 @@ import { normalizeObjectivePayload } from "@/features/cases/objective-payload";
 import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveReportDraft } from "@/features/drafts/save-report-draft";
 import { saveNote } from "@/features/notes/save-note";
+import { submitObjective } from "@/features/submissions/submit-objective";
 import { submitReport } from "@/features/submissions/submit-report";
 
 export async function saveNoteAction(formData: FormData) {
@@ -113,6 +114,43 @@ export async function submitReportAction(formData: FormData) {
       motiveId,
       methodId,
     },
+  });
+
+  if (result.nextStatus === "completed" || result.nextStatus === "closed_unsolved") {
+    redirect(`/cases/${caseSlug}/debrief`);
+  }
+
+  if (selectedEvidenceId) {
+    redirect(`/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`);
+  }
+
+  redirect(`/cases/${caseSlug}`);
+}
+
+export async function submitObjectiveAction(formData: FormData) {
+  const caseSlug = String(formData.get("caseSlug") ?? "");
+  const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const objectiveId = String(formData.get("objectiveId") ?? "");
+  const objectiveType = String(formData.get("objectiveType") ?? "");
+  const submissionToken = String(formData.get("submissionToken") ?? "");
+  const selectedEvidenceId = String(formData.get("selectedEvidenceId") ?? "");
+
+  if (
+    !caseSlug ||
+    !playerCaseId ||
+    !objectiveId ||
+    !objectiveType ||
+    !submissionToken
+  ) {
+    throw new Error("Objective submission context is incomplete");
+  }
+
+  const payload = normalizeObjectivePayload(objectiveType, formData);
+  const result = await submitObjective({
+    playerCaseId,
+    objectiveId,
+    submissionToken,
+    payload,
   });
 
   if (result.nextStatus === "completed" || result.nextStatus === "closed_unsolved") {
