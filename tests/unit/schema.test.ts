@@ -7,9 +7,13 @@ test("exports the expected baseline tables", () => {
       "caseDefinitions",
       "playerCases",
       "notes",
-      "reportDrafts",
-      "reportSubmissions",
       "analyticsEvents",
+      "playerCaseObjectives",
+      "objectiveSubmissions",
     ]),
   );
+});
+
+test("playerCases exposes the graded failure counter", () => {
+  expect(schema.playerCases.gradedFailureCount).toBeDefined();
 });

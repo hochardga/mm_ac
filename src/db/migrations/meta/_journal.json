@@ -36,6 +36,13 @@
       "when": 1773267068767,
       "tag": "0004_whole_darkstar",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1773494998808,
+      "tag": "0005_staged_case_progression",
+      "breakpoints": true
     }
   ]
 }

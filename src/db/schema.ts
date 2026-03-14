@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -31,6 +31,7 @@ export const playerCases = pgTable("player_cases", {
   terminalDebriefSummary: text("terminal_debrief_summary"),
   startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  gradedFailureCount: integer("graded_failure_count").notNull().default(0),
 });
 
 export const notes = pgTable("notes", {
@@ -67,6 +68,34 @@ export const reportSubmissions = pgTable("report_submissions", {
   attemptNumber: integer("attempt_number").notNull(),
   nextStatus: text("next_status").notNull(),
   feedback: text("feedback").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const playerCaseObjectives = pgTable("player_case_objectives", {
+  id: text("id").primaryKey(),
+  playerCaseId: text("player_case_id")
+    .notNull()
+    .references(() => playerCases.id, { onDelete: "cascade" }),
+  stageId: text("stage_id").notNull(),
+  objectiveId: text("objective_id").notNull(),
+  status: text("status").notNull(),
+  draftPayload: jsonb("draft_payload"),
+  solvedAt: timestamp("solved_at", { withTimezone: true }),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const objectiveSubmissions = pgTable("objective_submissions", {
+  id: text("id").primaryKey(),
+  playerCaseId: text("player_case_id")
+    .notNull()
+    .references(() => playerCases.id, { onDelete: "cascade" }),
+  objectiveId: text("objective_id").notNull(),
+  submissionToken: text("submission_token").notNull().unique(),
+  answerPayload: jsonb("answer_payload").notNull(),
+  isCorrect: boolean("is_correct").notNull(),
+  feedback: text("feedback").notNull(),
+  nextStatus: text("next_status").notNull(),
+  attemptNumber: integer("attempt_number").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -107,6 +136,8 @@ export const playerCasesRelations = relations(playerCases, ({ one, many }) => ({
   notes: many(notes),
   reportDrafts: many(reportDrafts),
   reportSubmissions: many(reportSubmissions),
+  playerCaseObjectives: many(playerCaseObjectives),
+  objectiveSubmissions: many(objectiveSubmissions),
 }));
 
 export const notesRelations = relations(notes, ({ one }) => ({
@@ -128,6 +159,26 @@ export const reportSubmissionsRelations = relations(
   ({ one }) => ({
     playerCase: one(playerCases, {
       fields: [reportSubmissions.playerCaseId],
+      references: [playerCases.id],
+    }),
+  }),
+);
+
+export const playerCaseObjectivesRelations = relations(
+  playerCaseObjectives,
+  ({ one }) => ({
+    playerCase: one(playerCases, {
+      fields: [playerCaseObjectives.playerCaseId],
+      references: [playerCases.id],
+    }),
+  }),
+);
+
+export const objectiveSubmissionsRelations = relations(
+  objectiveSubmissions,
+  ({ one }) => ({
+    playerCase: one(playerCases, {
+      fields: [objectiveSubmissions.playerCaseId],
       references: [playerCases.id],
     }),
   }),
