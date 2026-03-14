@@ -66,6 +66,15 @@ test("rejects photo assets that escape the case directory", async () => {
   ).rejects.toThrow(/image path/i);
 });
 
+test("rejects manifest loads when the expected revision does not match", async () => {
+  await expect(
+    loadCaseManifest("text-first-valid", {
+      casesRoot: fixturesRoot,
+      expectedRevision: "rev-does-not-exist",
+    }),
+  ).rejects.toThrow(/revision/i);
+});
+
 test("the shipped cases load successfully with photo evidence included", async () => {
   const [briar, bishop, harbor] = await Promise.all([
     loadCaseManifest("briar-ledger"),

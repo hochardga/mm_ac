@@ -17,3 +17,11 @@ test("protected loader rejects case slugs that escape the cases root", async () 
     }),
   ).rejects.toThrow(/slug/i);
 });
+
+test("protected loader rejects mismatched expected revisions", async () => {
+  await expect(
+    loadProtectedCase("hollow-bishop", {
+      expectedRevision: "rev-does-not-exist",
+    }),
+  ).rejects.toThrow(/revision/i);
+});
