@@ -44,7 +44,7 @@ export function CaseWorkspace({
         selectedEvidenceId={selectedEvidence.id}
       />
 
-      <EvidenceViewer evidence={selectedEvidence} />
+      <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
 
       <aside className="space-y-6">
         <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
