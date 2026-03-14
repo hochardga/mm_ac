@@ -74,10 +74,16 @@ test("renders an evidence index, selected viewer, and persistent notes together"
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
   ).toBeInTheDocument();
   expect(
-    screen.getByText(/was the silver chalice actually the murder weapon/i),
-  ).toBeInTheDocument();
+    screen.getAllByText(/was the silver chalice actually the murder weapon/i)
+      .length,
+  ).toBeGreaterThan(0);
   expect(
     screen.getByText(/active evidence: vestry interview transcript/i),
+  ).toBeInTheDocument();
+  expect(screen.getByText(/stage 1 of 2/i)).toBeInTheDocument();
+  expect(screen.getByText(/ledger review/i)).toBeInTheDocument();
+  expect(
+    screen.getByText(/3 evidence items unlocked/i),
   ).toBeInTheDocument();
 });
 
@@ -527,8 +533,8 @@ test("renders staged objectives with gated evidence and objective continuity lin
     screen.getByRole("heading", { name: /active objectives/i }),
   ).toBeInTheDocument();
   expect(
-    screen.getByText(/who signed the transfer order/i),
-  ).toBeInTheDocument();
+    screen.getAllByText(/who signed the transfer order/i).length,
+  ).toBeGreaterThan(0);
   expect(
     screen.queryByText(/sealed archive memorandum/i),
   ).not.toBeInTheDocument();
