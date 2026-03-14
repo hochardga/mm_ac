@@ -27,7 +27,10 @@ export function ReportPanel({
   submissionToken,
 }: ReportPanelProps) {
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <section
+      className="rounded-[2rem] border border-white/10 bg-white/5 p-6"
+      id="draft-report"
+    >
       <h2 className="text-2xl font-semibold">Draft Report</h2>
       {latestSubmission?.nextStatus === "in_progress" ? (
         <div className="mt-6 rounded-[1.5rem] border border-[#d96c3d]/40 bg-[#d96c3d]/10 p-4">

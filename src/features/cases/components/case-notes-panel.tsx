@@ -17,7 +17,10 @@ export function CaseNotesPanel({
   selectedEvidenceTitle,
 }: CaseNotesPanelProps) {
   return (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <section
+      className="rounded-[2rem] border border-white/10 bg-white/5 p-6"
+      id="field-notes"
+    >
       <h2 className="text-2xl font-semibold">Field Notes</h2>
       <p className="mt-3 text-xs uppercase tracking-[0.2em] text-stone-400">
         Active evidence: {selectedEvidenceTitle}

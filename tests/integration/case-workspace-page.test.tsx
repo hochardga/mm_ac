@@ -22,6 +22,8 @@ import CasePage from "@/app/(app)/cases/[caseSlug]/page";
 import { users } from "@/db/schema";
 import { ReportPanel } from "@/features/cases/components/report-panel";
 import { loadCaseManifest } from "@/features/cases/load-case-manifest";
+import { openCase } from "@/features/cases/open-case";
+import { saveNote } from "@/features/notes/save-note";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -197,4 +199,64 @@ test("renders document markdown, record tables, and photo evidence in the worksp
   expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
   expect(screen.getByText(/parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
+});
+
+test("shows restored progress with quick links when reopening a case with saved notes", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "continuity-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Continuity",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+
+  await saveNote({
+    playerCaseId: playerCase.id,
+    body: "Check the vestry ledger again.",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByText(/ashfall restored your saved progress/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: /jump to evidence intake/i }),
+  ).toHaveAttribute("href", "#evidence-intake");
+  expect(
+    screen.getByRole("link", { name: /jump to field notes/i }),
+  ).toHaveAttribute("href", "#field-notes");
+  expect(
+    screen.getByRole("link", { name: /jump to draft report/i }),
+  ).toHaveAttribute("href", "#draft-report");
+
+  expect(
+    screen.getByRole("heading", { name: /evidence intake/i }).closest("section"),
+  ).toHaveAttribute("id", "evidence-intake");
+  expect(
+    screen.getByRole("heading", { name: /field notes/i }).closest("section"),
+  ).toHaveAttribute("id", "field-notes");
+  expect(
+    screen.getByRole("heading", { name: /draft report/i }).closest("section"),
+  ).toHaveAttribute("id", "draft-report");
 });

@@ -39,11 +39,14 @@ async function buildResumeTarget(
   return {
     caseSlug,
     section: continuity.section === "debrief" ? "evidence" : continuity.section,
+    label: continuity.label,
+    description: continuity.description,
+    href: continuity.href,
     noteBody: savedNote?.body ?? "",
     draft: savedDraft
       ? {
-          suspectId: savedDraft.suspectId,
-          motiveId: savedDraft.motiveId,
+        suspectId: savedDraft.suspectId,
+        motiveId: savedDraft.motiveId,
           methodId: savedDraft.methodId,
         }
       : null,

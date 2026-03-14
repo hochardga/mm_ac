@@ -110,14 +110,15 @@ export default async function CasePage({
             title={manifest.title}
           />
 
-          <CaseWorkspace
-            caseSlug={caseSlug}
-            manifest={manifest}
-            playerCaseId={lifecycle.playerCase.id}
-            latestSubmission={latestSubmission}
-            savedDraft={savedDraft}
-            savedNote={savedNote}
-            selectedEvidenceId={selectedEvidenceIds[0]}
+        <CaseWorkspace
+          caseSlug={caseSlug}
+          manifest={manifest}
+          playerCaseId={lifecycle.playerCase.id}
+          latestSubmission={latestSubmission}
+          resumeTarget={lifecycle.resumeTarget}
+          savedDraft={savedDraft}
+          savedNote={savedNote}
+          selectedEvidenceId={selectedEvidenceIds[0]}
             submissionToken={submissionToken}
           />
         </div>
