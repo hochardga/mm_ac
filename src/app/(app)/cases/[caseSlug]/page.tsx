@@ -14,6 +14,7 @@ import { CaseReturnHeader } from "@/components/case-return-header";
 import { getCurrentAgentId } from "@/features/auth/current-agent";
 import { buildCaseProgression } from "@/features/cases/case-progression";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
+import { listEvidenceBookmarks } from "@/features/cases/evidence-bookmarks";
 import {
   loadAnyCaseManifest,
   type LoadedCaseManifest,
@@ -53,6 +54,7 @@ export default async function CasePage({
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
         objectiveStates: typeof playerCaseObjectives.$inferSelect[];
         objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
+        bookmarkedEvidenceIds: string[];
         selectedEvidenceId: string | undefined;
         submissionToken: string;
       }
@@ -85,6 +87,7 @@ export default async function CasePage({
       latestSubmission,
       objectiveStates,
       objectiveSubmissionRows,
+      bookmarkedEvidenceRows,
     ] = await Promise.all([
       db.query.notes.findFirst({
         where: eq(notes.playerCaseId, lifecycle.playerCase.id),
@@ -103,6 +106,9 @@ export default async function CasePage({
         where: eq(objectiveSubmissions.playerCaseId, lifecycle.playerCase.id),
         orderBy: [desc(objectiveSubmissions.createdAt)],
       }),
+      listEvidenceBookmarks({
+        playerCaseId: lifecycle.playerCase.id,
+      }),
     ]);
     const stagedProgression = isStagedManifest(manifest)
       ? buildCaseProgression({
@@ -120,6 +126,10 @@ export default async function CasePage({
     const selectedEvidence =
       visibleEvidence.find((item) => item.id === requestedEvidenceId) ??
       visibleEvidence[0];
+    const visibleEvidenceIds = new Set(visibleEvidence.map((item) => item.id));
+    const bookmarkedEvidenceIds = bookmarkedEvidenceRows
+      .map((bookmark) => bookmark.evidenceId)
+      .filter((evidenceId) => visibleEvidenceIds.has(evidenceId));
 
     if (selectedEvidence) {
       try {
@@ -141,6 +151,7 @@ export default async function CasePage({
       latestSubmission,
       objectiveStates,
       objectiveSubmissionRows,
+      bookmarkedEvidenceIds,
       selectedEvidenceId: selectedEvidence?.id,
       submissionToken: randomUUID(),
     };
@@ -180,6 +191,7 @@ export default async function CasePage({
           latestSubmission={caseData.latestSubmission}
           objectiveStates={caseData.objectiveStates}
           objectiveSubmissions={caseData.objectiveSubmissionRows}
+          bookmarkedEvidenceIds={caseData.bookmarkedEvidenceIds}
           resumeTarget={caseData.lifecycle.resumeTarget}
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}

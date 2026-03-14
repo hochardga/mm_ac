@@ -22,6 +22,7 @@ vi.mock("next-auth", () => ({
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
 import {
   objectiveSubmissions,
+  playerCaseEvidenceBookmarks,
   playerCaseObjectives,
   playerCases,
   users,
@@ -74,6 +75,9 @@ test("renders an evidence index, selected viewer, and persistent notes together"
     screen.getByRole("heading", { name: /field notes/i }),
   ).toBeInTheDocument();
   expect(
+    screen.getByRole("heading", { name: /investigation board/i }),
+  ).toBeInTheDocument();
+  expect(
     screen.getByRole("heading", { name: /active objectives/i }),
   ).toBeInTheDocument();
   expect(
@@ -85,6 +89,12 @@ test("renders an evidence index, selected viewer, and persistent notes together"
   ).toBeGreaterThan(0);
   expect(
     screen.getByText(/active evidence: vestry interview transcript/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: /pin to board/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(/pin evidence from the active viewer/i),
   ).toBeInTheDocument();
   const headerSection = screen
     .getByRole("heading", { name: /the hollow bishop/i })
@@ -128,7 +138,14 @@ test("preserves the selected evidence when saving an objective draft", async () 
     } as never),
   );
 
-  expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
+  const objectiveForm = screen
+    .getByRole("button", { name: /submit objective/i })
+    .closest("form");
+
+  expect(objectiveForm).not.toBeNull();
+  expect(
+    within(objectiveForm as HTMLElement).getByDisplayValue("dispatch-log"),
+  ).toBeInTheDocument();
 });
 
 test("loads the case manifest using the player's pinned revision", async () => {
@@ -438,6 +455,172 @@ test("falls back to the first visible evidence and repairs stale remembered evid
     screen.getByText(/active evidence: dispatch log/i),
   ).toBeInTheDocument();
   expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("dispatch-log");
+});
+
+test("renders pinned evidence in the investigation board and switches the active label", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "board-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Board",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db.insert(playerCaseEvidenceBookmarks).values({
+    id: randomUUID(),
+    playerCaseId: playerCase.id,
+    evidenceId: "dispatch-log",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  const boardSection = screen
+    .getByRole("heading", { name: /investigation board/i })
+    .closest("section");
+
+  expect(boardSection).not.toBeNull();
+  expect(
+    within(boardSection as HTMLElement).getByText(/dispatch log/i),
+  ).toBeInTheDocument();
+  expect(
+    within(boardSection as HTMLElement).getByRole("link", {
+      name: /open evidence dispatch log/i,
+    }),
+  ).toHaveAttribute("href", "/cases/red-harbor?evidence=dispatch-log");
+  expect(
+    screen.getByRole("button", { name: /remove from board/i }),
+  ).toBeInTheDocument();
+});
+
+test("renders pinned evidence in the order it was bookmarked", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "board-order-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Board Order",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db.insert(playerCaseEvidenceBookmarks).values([
+    {
+      id: randomUUID(),
+      playerCaseId: playerCase.id,
+      evidenceId: "night-watch-thread",
+      createdAt: new Date("2026-03-14T10:00:00.000Z"),
+    },
+    {
+      id: randomUUID(),
+      playerCaseId: playerCase.id,
+      evidenceId: "dispatch-log",
+      createdAt: new Date("2026-03-14T10:05:00.000Z"),
+    },
+  ]);
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  const boardSection = screen
+    .getByRole("heading", { name: /investigation board/i })
+    .closest("section");
+
+  expect(boardSection).not.toBeNull();
+  const boardHeadings = within(boardSection as HTMLElement)
+    .getAllByRole("heading", { level: 3 })
+    .map((heading) => heading.textContent);
+
+  expect(boardHeadings).toEqual(["Night Watch Exchange", "Dispatch Log"]);
+});
+
+test("omits stale bookmarked evidence ids from the investigation board", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "stale-board-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Stale Board",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db.insert(playerCaseEvidenceBookmarks).values({
+    id: randomUUID(),
+    playerCaseId: playerCase.id,
+    evidenceId: "missing-evidence",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  const boardSection = screen
+    .getByRole("heading", { name: /investigation board/i })
+    .closest("section");
+
+  expect(boardSection).not.toBeNull();
+  expect(
+    within(boardSection as HTMLElement).queryByText(/missing-evidence/i),
+  ).not.toBeInTheDocument();
+  expect(
+    within(boardSection as HTMLElement).getByText(/pin evidence from the active viewer/i),
+  ).toBeInTheDocument();
 });
 
 test("renders staged objectives with gated evidence and objective continuity links", async () => {

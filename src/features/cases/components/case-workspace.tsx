@@ -10,6 +10,7 @@ import { CaseContinuityBanner } from "@/features/cases/components/case-continuit
 import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
+import { InvestigationBoardPanel } from "@/features/cases/components/investigation-board-panel";
 import { ReportPanel } from "@/features/cases/components/report-panel";
 import { buildCaseProgression } from "@/features/cases/case-progression";
 import type { openCase } from "@/features/cases/open-case";
@@ -35,6 +36,7 @@ type CaseWorkspaceProps = {
   latestSubmission: LatestSubmission;
   objectiveStates: ObjectiveState;
   objectiveSubmissions: ObjectiveSubmissionRows;
+  bookmarkedEvidenceIds?: string[];
   submissionToken: string;
   selectedEvidenceId?: string;
   resumeTarget: ResumeTarget;
@@ -61,6 +63,7 @@ export function CaseWorkspace({
   latestSubmission,
   objectiveStates,
   objectiveSubmissions,
+  bookmarkedEvidenceIds,
   submissionToken,
   selectedEvidenceId,
   resumeTarget,
@@ -79,6 +82,14 @@ export function CaseWorkspace({
   const selectedEvidence =
     visibleEvidence.find((item) => item.id === selectedEvidenceId) ??
     visibleEvidence[0];
+  const visibleEvidenceById = new Map(
+    visibleEvidence.map((item) => [item.id, item] as const),
+  );
+  const bookmarkedEvidence = (bookmarkedEvidenceIds ?? []).flatMap((evidenceId) => {
+    const bookmarkedItem = visibleEvidenceById.get(evidenceId);
+
+    return bookmarkedItem ? [bookmarkedItem] : [];
+  });
 
   if (!selectedEvidence) {
     return null;
@@ -109,7 +120,13 @@ export function CaseWorkspace({
           selectedEvidenceId={selectedEvidence.id}
         />
 
-        <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
+        <EvidenceViewer
+          bookmarkedEvidenceIds={bookmarkedEvidenceIds ?? []}
+          caseSlug={caseSlug}
+          evidence={selectedEvidence}
+          playerCaseId={playerCaseId}
+          selectedEvidenceId={selectedEvidence.id}
+        />
 
         <aside className="space-y-6">
           <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
@@ -128,6 +145,12 @@ export function CaseWorkspace({
             playerCaseId={playerCaseId}
             savedNote={savedNote}
             selectedEvidenceTitle={selectedEvidence.title}
+          />
+
+          <InvestigationBoardPanel
+            caseSlug={caseSlug}
+            evidence={bookmarkedEvidence}
+            selectedEvidenceId={selectedEvidence.id}
           />
 
           {stagedProgression ? (
