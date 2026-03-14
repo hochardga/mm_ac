@@ -513,6 +513,65 @@ test("renders pinned evidence in the investigation board and switches the active
   ).toBeInTheDocument();
 });
 
+test("renders pinned evidence in the order it was bookmarked", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "board-order-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Board Order",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db.insert(playerCaseEvidenceBookmarks).values([
+    {
+      id: randomUUID(),
+      playerCaseId: playerCase.id,
+      evidenceId: "night-watch-thread",
+      createdAt: new Date("2026-03-14T10:00:00.000Z"),
+    },
+    {
+      id: randomUUID(),
+      playerCaseId: playerCase.id,
+      evidenceId: "dispatch-log",
+      createdAt: new Date("2026-03-14T10:05:00.000Z"),
+    },
+  ]);
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  const boardSection = screen
+    .getByRole("heading", { name: /investigation board/i })
+    .closest("section");
+
+  expect(boardSection).not.toBeNull();
+  const boardHeadings = within(boardSection as HTMLElement)
+    .getAllByRole("heading", { level: 3 })
+    .map((heading) => heading.textContent);
+
+  expect(boardHeadings).toEqual(["Night Watch Exchange", "Dispatch Log"]);
+});
+
 test("omits stale bookmarked evidence ids from the investigation board", async () => {
   const db = await getDb();
   const userId = randomUUID();

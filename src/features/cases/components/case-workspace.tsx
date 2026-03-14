@@ -82,10 +82,14 @@ export function CaseWorkspace({
   const selectedEvidence =
     visibleEvidence.find((item) => item.id === selectedEvidenceId) ??
     visibleEvidence[0];
-  const bookmarkedEvidenceSet = new Set(bookmarkedEvidenceIds ?? []);
-  const bookmarkedEvidence = visibleEvidence.filter((item) =>
-    bookmarkedEvidenceSet.has(item.id),
+  const visibleEvidenceById = new Map(
+    visibleEvidence.map((item) => [item.id, item] as const),
   );
+  const bookmarkedEvidence = (bookmarkedEvidenceIds ?? []).flatMap((evidenceId) => {
+    const bookmarkedItem = visibleEvidenceById.get(evidenceId);
+
+    return bookmarkedItem ? [bookmarkedItem] : [];
+  });
 
   if (!selectedEvidence) {
     return null;
