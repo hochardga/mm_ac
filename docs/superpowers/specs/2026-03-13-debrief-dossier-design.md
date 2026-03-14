@@ -8,7 +8,7 @@ Ashfall Collective already gives the player a satisfying loop up to the moment a
 
 This improvement should turn the debrief into a true case recap. The page should show the case outcome, the player's final submitted theory using human-readable labels, Ashfall's final reconstruction of the correct answer set, and a lightweight attempt timeline. That gives terminal states more emotional payoff, helps players learn from failures, and creates a clearer bridge back to the vault.
 
-Because the user asked me to continue without waiting for questions or approval, this design assumes the best next improvement is debrief depth rather than another new gameplay mechanic.
+Prioritize improving debrief depth as the next iteration rather than introducing a new gameplay mechanic.
 
 ## Goals
 

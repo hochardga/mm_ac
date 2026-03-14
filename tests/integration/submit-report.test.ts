@@ -162,3 +162,43 @@ test("keeps the player's final theory alongside the solution after a terminal mi
     feedback: "Red Harbor is closed without a prosecutable case.",
   });
 });
+
+test("rejects debrief lookups when the stored case revision no longer matches authored content", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "revision-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Revision",
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+
+  await submitReport({
+    playerCaseId: playerCase.id,
+    submissionToken: "revision-token",
+    answers: {
+      suspectId: "bookkeeper",
+      motiveId: "embezzlement",
+      methodId: "poisoned-wine",
+    },
+  });
+
+  await db
+    .update(playerCases)
+    .set({
+      caseRevision: "rev-does-not-exist",
+    })
+    .where(eq(playerCases.id, playerCase.id));
+
+  await expect(
+    getDebrief({
+      playerCaseId: playerCase.id,
+    }),
+  ).rejects.toThrow(/revision/i);
+});

@@ -174,6 +174,9 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
   expect(
     screen.getByRole("heading", { name: /ashfall reconstruction/i }),
   ).toBeInTheDocument();
+  const attemptHistorySection = screen
+    .getByRole("heading", { name: /attempt history/i })
+    .closest("section");
   const finalReportSection = screen
     .getByRole("heading", { name: /your final report/i })
     .closest("section");
@@ -181,6 +184,7 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
     .getByRole("heading", { name: /ashfall reconstruction/i })
     .closest("section");
 
+  expect(attemptHistorySection).not.toBeNull();
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
   expect(
@@ -208,6 +212,12 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
     within(reconstructionSection as HTMLElement).getByText(
       "Electrocution in the signal room",
     ),
+  ).toBeInTheDocument();
+  expect(
+    within(attemptHistorySection as HTMLElement).getAllByText("In Progress"),
+  ).toHaveLength(2);
+  expect(
+    within(attemptHistorySection as HTMLElement).getByText("Closed Unsolved"),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/red harbor is closed without a prosecutable case/i),

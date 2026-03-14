@@ -1,6 +1,10 @@
+import type { PlayerCaseStatus } from "@/features/cases/case-status";
+
+type DebriefAttemptStatus = Exclude<PlayerCaseStatus, "new">;
+
 type DebriefAttempt = {
   attemptNumber: number;
-  nextStatus: string;
+  nextStatus: DebriefAttemptStatus;
   suspect: string;
   motive: string;
   method: string;
@@ -11,14 +15,14 @@ type DebriefAttemptHistoryProps = {
   attempts: DebriefAttempt[];
 };
 
-function formatAttemptStatus(status: string) {
+function formatAttemptStatus(status: DebriefAttemptStatus) {
   switch (status) {
+    case "in_progress":
+      return "In Progress";
     case "completed":
       return "Accepted";
     case "closed_unsolved":
       return "Closed Unsolved";
-    default:
-      return "Reopened";
   }
 }
 

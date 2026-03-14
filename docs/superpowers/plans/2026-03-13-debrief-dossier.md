@@ -69,10 +69,13 @@ Update `src/features/debrief/get-debrief.ts` so it:
 - returns a serializable object shaped like:
 
 ```ts
+type DebriefStatus = "completed" | "closed_unsolved";
+type DebriefAttemptStatus = "in_progress" | DebriefStatus;
+
 {
   title: string;
   summary: string;
-  status: "completed" | "closed_unsolved";
+  status: DebriefStatus;
   finalReport?: {
     suspect: string;
     motive: string;
@@ -86,7 +89,7 @@ Update `src/features/debrief/get-debrief.ts` so it:
   };
   attempts: Array<{
     attemptNumber: number;
-    nextStatus: string;
+    nextStatus: DebriefAttemptStatus;
     suspect: string;
     motive: string;
     method: string;

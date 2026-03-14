@@ -63,8 +63,12 @@ export async function getDebrief(input: { playerCaseId: string }) {
   }
 
   const [manifest, protectedCase, attempts] = await Promise.all([
-    loadCaseManifest(caseDefinition.slug),
-    loadProtectedCase(caseDefinition.slug),
+    loadCaseManifest(caseDefinition.slug, {
+      expectedRevision: playerCase.caseRevision,
+    }),
+    loadProtectedCase(caseDefinition.slug, {
+      expectedRevision: playerCase.caseRevision,
+    }),
     db.query.reportSubmissions.findMany({
       where: eq(reportSubmissions.playerCaseId, input.playerCaseId),
       orderBy: [asc(reportSubmissions.attemptNumber)],
