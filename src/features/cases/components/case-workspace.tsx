@@ -35,6 +35,7 @@ type CaseWorkspaceProps = {
   latestSubmission: LatestSubmission;
   objectiveStates: ObjectiveState;
   objectiveSubmissions: ObjectiveSubmissionRows;
+  bookmarkedEvidenceIds?: string[];
   submissionToken: string;
   selectedEvidenceId?: string;
   resumeTarget: ResumeTarget;
@@ -61,6 +62,7 @@ export function CaseWorkspace({
   latestSubmission,
   objectiveStates,
   objectiveSubmissions,
+  bookmarkedEvidenceIds,
   submissionToken,
   selectedEvidenceId,
   resumeTarget,

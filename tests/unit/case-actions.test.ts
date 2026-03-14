@@ -15,6 +15,9 @@ const { saveObjectiveDraftMock } = vi.hoisted(() => ({
 const { submitObjectiveMock } = vi.hoisted(() => ({
   submitObjectiveMock: vi.fn(),
 }));
+const { toggleEvidenceBookmarkMock } = vi.hoisted(() => ({
+  toggleEvidenceBookmarkMock: vi.fn(),
+}));
 const { cookiesMock } = vi.hoisted(() => ({
   cookiesMock: vi.fn(),
 }));
@@ -54,15 +57,15 @@ vi.mock("@/features/submissions/submit-objective", () => ({
   submitObjective: submitObjectiveMock,
 }));
 
+vi.mock("@/features/cases/evidence-bookmarks", () => ({
+  toggleEvidenceBookmark: toggleEvidenceBookmarkMock,
+}));
+
 vi.mock("@/features/submissions/submit-report", () => ({
   submitReport: vi.fn(),
 }));
 
-import {
-  saveObjectiveDraftAction,
-  saveReportDraftAction,
-  submitObjectiveAction,
-} from "@/app/(app)/cases/[caseSlug]/actions";
+import * as caseActions from "@/app/(app)/cases/[caseSlug]/actions";
 import { caseDefinitions, playerCases, users } from "@/db/schema";
 import { closeDb, getDb } from "@/lib/db";
 
@@ -71,6 +74,7 @@ afterEach(async () => {
   saveReportDraftMock.mockReset();
   saveObjectiveDraftMock.mockReset();
   submitObjectiveMock.mockReset();
+  toggleEvidenceBookmarkMock.mockReset();
   cookiesMock.mockReset();
   getServerSessionMock.mockReset();
   await closeDb();
@@ -209,4 +213,72 @@ test("rejects objective submissions for a player case owned by another agent", a
 
   await expect(submitObjectiveAction(formData)).rejects.toThrow(/not authorized/i);
   expect(submitObjectiveMock).not.toHaveBeenCalled();
+});
+
+const {
+  saveObjectiveDraftAction,
+  saveReportDraftAction,
+  submitObjectiveAction,
+} = caseActions;
+
+test("exports a bookmark toggle action", () => {
+  expect("toggleEvidenceBookmarkAction" in caseActions).toBe(true);
+});
+
+test("encodes selected evidence id when redirecting after a bookmark toggle", async () => {
+  const userId = randomUUID();
+  const playerCaseId = await seedPlayerCase(userId);
+  const toggleEvidenceBookmarkAction = (
+    caseActions as Record<string, unknown>
+  ).toggleEvidenceBookmarkAction as ((formData: FormData) => Promise<unknown>) | undefined;
+
+  setAuthenticatedSession(userId);
+  toggleEvidenceBookmarkMock.mockResolvedValue({
+    bookmarked: true,
+    bookmarks: [],
+  });
+
+  const formData = new FormData();
+  formData.set("caseSlug", "red-harbor");
+  formData.set("playerCaseId", playerCaseId);
+  formData.set("selectedEvidenceId", "night/watch & thread");
+  formData.set("evidenceId", "dispatch-log");
+
+  expect(toggleEvidenceBookmarkAction).toBeTypeOf("function");
+
+  await expect(toggleEvidenceBookmarkAction?.(formData)).rejects.toThrow(
+    "NEXT_REDIRECT:/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
+  );
+  expect(toggleEvidenceBookmarkMock).toHaveBeenCalledWith({
+    playerCaseId,
+    evidenceId: "dispatch-log",
+  });
+  expect(redirectMock).toHaveBeenCalledWith(
+    "/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
+  );
+});
+
+test("rejects bookmark toggles for a player case owned by another agent", async () => {
+  const ownerId = randomUUID();
+  const attackerId = randomUUID();
+  const playerCaseId = await seedPlayerCase(ownerId);
+  const toggleEvidenceBookmarkAction = (
+    caseActions as Record<string, unknown>
+  ).toggleEvidenceBookmarkAction as ((formData: FormData) => Promise<unknown>) | undefined;
+
+  await seedUser(attackerId);
+  setAuthenticatedSession(attackerId);
+
+  const formData = new FormData();
+  formData.set("caseSlug", "red-harbor");
+  formData.set("playerCaseId", playerCaseId);
+  formData.set("selectedEvidenceId", "dispatch-log");
+  formData.set("evidenceId", "dispatch-log");
+
+  expect(toggleEvidenceBookmarkAction).toBeTypeOf("function");
+
+  await expect(toggleEvidenceBookmarkAction?.(formData)).rejects.toThrow(
+    /not authorized/i,
+  );
+  expect(toggleEvidenceBookmarkMock).not.toHaveBeenCalled();
 });

@@ -6,6 +6,8 @@ import { redirect } from "next/navigation";
 
 import { playerCases } from "@/db/schema";
 import { getCurrentAgentId } from "@/features/auth/current-agent";
+import { toggleEvidenceBookmark } from "@/features/cases/evidence-bookmarks";
+import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { normalizeObjectivePayload } from "@/features/cases/objective-payload";
 import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveReportDraft } from "@/features/drafts/save-report-draft";
@@ -54,6 +56,38 @@ export async function saveNoteAction(formData: FormData) {
   if (caseSlug) {
     revalidatePath(`/cases/${caseSlug}`);
   }
+}
+
+export async function toggleEvidenceBookmarkAction(formData: FormData) {
+  const caseSlug = String(formData.get("caseSlug") ?? "");
+  const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const evidenceId = String(formData.get("evidenceId") ?? "");
+  const selectedEvidenceId = String(formData.get("selectedEvidenceId") ?? "");
+
+  if (!caseSlug || !playerCaseId || !evidenceId) {
+    throw new Error("Bookmark context is incomplete");
+  }
+
+  const playerCase = await requireOwnedPlayerCase(playerCaseId);
+  const manifest = await loadAnyCaseManifest(caseSlug, {
+    expectedRevision: playerCase.caseRevision,
+  });
+  const evidenceExists = manifest.evidence.some((evidence) => evidence.id === evidenceId);
+
+  if (!evidenceExists) {
+    throw new Error("Evidence could not be found");
+  }
+
+  await toggleEvidenceBookmark({
+    playerCaseId,
+    evidenceId,
+  });
+
+  if (selectedEvidenceId) {
+    redirect(`/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`);
+  }
+
+  redirect(`/cases/${caseSlug}`);
 }
 
 export async function saveReportDraftAction(formData: FormData) {
