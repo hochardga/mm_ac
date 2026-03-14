@@ -176,6 +176,22 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
       /who poisoned the sacramental wine to silence the bishop\?/i,
     ),
   ).toHaveLength(1);
+  const serviceRecordSection = screen
+    .getByRole("heading", { name: /service record/i })
+    .closest("section");
+
+  expect(serviceRecordSection).not.toBeNull();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByText(/1 of 3 dossiers cleared/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByText(/1 dossiers cleared/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByRole("link", {
+      name: /open case file/i,
+    }),
+  ).toHaveAttribute("href", "/cases/red-harbor");
 });
 
 test("renders a closed-unsolved debrief dossier with the player's final theory and solution", async () => {
@@ -270,4 +286,20 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
   expect(
     screen.getByText(/red harbor is closed without a prosecutable case/i),
   ).toBeInTheDocument();
+  const serviceRecordSection = screen
+    .getByRole("heading", { name: /service record/i })
+    .closest("section");
+
+  expect(serviceRecordSection).not.toBeNull();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByText(/0 of 3 dossiers cleared/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByText(/1 unresolved closures/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecordSection as HTMLElement).getByRole("link", {
+      name: /open case file/i,
+    }),
+  ).toHaveAttribute("href", "/cases/briar-ledger");
 });
