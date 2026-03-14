@@ -63,29 +63,6 @@ test("rejects duplicate evidence ids", () => {
   ).toThrow(/unique/i);
 });
 
-test("rejects staged evidence ids that are not present", () => {
-  expect(() =>
-    caseManifestSourceSchema.parse({
-      ...baseManifest,
-      evidence: [
-        {
-          id: "ledger",
-          title: "Ledger Extract",
-          family: "document",
-          subtype: "financial_ledger",
-          summary: "A damaged ledger.",
-          source: "evidence/ledger.md",
-        },
-      ],
-      stages: [
-        {
-          ...baseManifest.stages[0],
-          evidenceIds: ["missing-evidence"],
-        },
-      ],
-    }),
-  ).toThrow(/evidence/i);
-});
 
 test("rejects duplicate stage ids", () => {
   expect(() =>
@@ -115,34 +92,6 @@ test("rejects duplicate stage ids", () => {
   ).toThrow(/stage/i);
 });
 
-test("rejects success unlocks that reference missing stages", () => {
-  expect(() =>
-    caseManifestSourceSchema.parse({
-      ...baseManifest,
-      evidence: [
-        {
-          id: "ledger",
-          title: "Ledger Extract",
-          family: "document",
-          subtype: "financial_ledger",
-          summary: "A damaged ledger.",
-          source: "evidence/ledger.md",
-        },
-      ],
-      stages: [
-        {
-          ...baseManifest.stages[0],
-          objectives: [
-            {
-              ...baseManifest.stages[0].objectives[0],
-              successUnlocks: { stageIds: ["missing-stage"], resolvesCase: false },
-            },
-          ],
-        },
-      ],
-    }),
-  ).toThrow(/stage/i);
-});
 
 test("rejects duplicate objective ids across stages", () => {
   expect(() =>

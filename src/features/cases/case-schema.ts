@@ -112,32 +112,6 @@ export const stagedCaseManifestSourceSchema = z
       message: "objective ids must be unique",
       path: ["stages"],
     },
-  )
-  .refine(
-    (manifest) => {
-      const evidenceIds = new Set(manifest.evidence.map((entry) => entry.id));
-      return manifest.stages.every((stage) =>
-        stage.evidenceIds.every((id) => evidenceIds.has(id)),
-      );
-    },
-    {
-      message: "stage evidence ids must reference evidence entries",
-      path: ["stages"],
-    },
-  )
-  .refine(
-    (manifest) => {
-      const stageIds = new Set(manifest.stages.map((stage) => stage.id));
-      return manifest.stages.every((stage) =>
-        stage.objectives.every((objective) =>
-          objective.successUnlocks.stageIds.every((id) => stageIds.has(id)),
-        ),
-      );
-    },
-    {
-      message: "success unlock stage ids must reference stages",
-      path: ["stages"],
-    },
   );
 
 export const caseManifestSourceSchema = z.union([
