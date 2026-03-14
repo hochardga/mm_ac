@@ -46,6 +46,25 @@ export const playerCases = pgTable("player_cases", {
   gradedFailureCount: integer("graded_failure_count").notNull().default(0),
 });
 
+export const playerCaseEvidenceBookmarks = pgTable(
+  "player_case_evidence_bookmarks",
+  {
+    id: text("id").primaryKey(),
+    playerCaseId: text("player_case_id")
+      .notNull()
+      .references(() => playerCases.id, { onDelete: "cascade" }),
+    evidenceId: text("evidence_id").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => ({
+    playerCaseEvidenceBookmarkUnique: unique(
+      "player_case_evidence_bookmarks_player_case_id_evidence_id_unique",
+    ).on(table.playerCaseId, table.evidenceId),
+  }),
+);
+
 export const notes = pgTable("notes", {
   id: text("id").primaryKey(),
   playerCaseId: text("player_case_id")
@@ -164,9 +183,20 @@ export const playerCasesRelations = relations(playerCases, ({ one, many }) => ({
   notes: many(notes),
   reportDrafts: many(reportDrafts),
   reportSubmissions: many(reportSubmissions),
+  playerCaseEvidenceBookmarks: many(playerCaseEvidenceBookmarks),
   playerCaseObjectives: many(playerCaseObjectives),
   objectiveSubmissions: many(objectiveSubmissions),
 }));
+
+export const playerCaseEvidenceBookmarksRelations = relations(
+  playerCaseEvidenceBookmarks,
+  ({ one }) => ({
+    playerCase: one(playerCases, {
+      fields: [playerCaseEvidenceBookmarks.playerCaseId],
+      references: [playerCases.id],
+    }),
+  }),
+);
 
 export const notesRelations = relations(notes, ({ one }) => ({
   playerCase: one(playerCases, {
