@@ -63,4 +63,102 @@ test("stores a solved submission once and exposes a stable debrief snapshot", as
   expect(savedPlayerCase?.terminalDebriefTitle).toBe("Debrief: The Hollow Bishop");
   expect(savedSubmissions).toHaveLength(1);
   expect(debrief.title).toBe("Debrief: The Hollow Bishop");
+  expect(debrief.status).toBe("completed");
+  expect(debrief.finalReport).toEqual({
+    suspect: "Bookkeeper Mara Quinn",
+    motive: "Embezzlement cover-up",
+    method: "Poisoned sacramental wine",
+    attemptNumber: 1,
+  });
+  expect(debrief.solution).toEqual({
+    suspect: "Bookkeeper Mara Quinn",
+    motive: "Embezzlement cover-up",
+    method: "Poisoned sacramental wine",
+  });
+  expect(debrief.attempts).toEqual([
+    {
+      attemptNumber: 1,
+      nextStatus: "completed",
+      suspect: "Bookkeeper Mara Quinn",
+      motive: "Embezzlement cover-up",
+      method: "Poisoned sacramental wine",
+      feedback: "Your report is accepted. The director is authorizing a full debrief.",
+    },
+  ]);
+});
+
+test("keeps the player's final theory alongside the solution after a terminal miss", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "unsolved-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Harbor",
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await submitReport({
+    playerCaseId: playerCase.id,
+    submissionToken: "token-1",
+    answers: {
+      suspectId: "captain",
+      motiveId: "insurance",
+      methodId: "drowned",
+    },
+  });
+  await submitReport({
+    playerCaseId: playerCase.id,
+    submissionToken: "token-2",
+    answers: {
+      suspectId: "captain",
+      motiveId: "insurance",
+      methodId: "drowned",
+    },
+  });
+  await submitReport({
+    playerCaseId: playerCase.id,
+    submissionToken: "token-3",
+    answers: {
+      suspectId: "captain",
+      motiveId: "insurance",
+      methodId: "drowned",
+    },
+  });
+
+  const debrief = await getDebrief({
+    playerCaseId: playerCase.id,
+  });
+
+  expect(debrief.status).toBe("closed_unsolved");
+  expect(debrief.finalReport).toEqual({
+    suspect: "Captain Lena Morrow",
+    motive: "Insurance fraud",
+    method: "Forced overboard drowning",
+    attemptNumber: 3,
+  });
+  expect(debrief.solution).toEqual({
+    suspect: "Radio Chief Soren Pike",
+    motive: "Smuggling protection",
+    method: "Electrocution in the signal room",
+  });
+  expect(debrief.attempts).toHaveLength(3);
+  expect(debrief.attempts.map((attempt) => attempt.nextStatus)).toEqual([
+    "in_progress",
+    "in_progress",
+    "closed_unsolved",
+  ]);
+  expect(debrief.attempts[2]).toEqual({
+    attemptNumber: 3,
+    nextStatus: "closed_unsolved",
+    suspect: "Captain Lena Morrow",
+    motive: "Insurance fraud",
+    method: "Forced overboard drowning",
+    feedback: "Red Harbor is closed without a prosecutable case.",
+  });
 });
