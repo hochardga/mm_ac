@@ -48,10 +48,14 @@ export function normalizeObjectivePayload(
       };
     }
     case "multi_choice": {
-      const choiceIds = formData
-        .getAll("choiceIds")
-        .map((value) => String(value).trim())
-        .filter((value) => value.length > 0);
+      const choiceIds = Array.from(
+        new Set(
+          formData
+            .getAll("choiceIds")
+            .map((value) => String(value).trim())
+            .filter((value) => value.length > 0),
+        ),
+      );
 
       if (choiceIds.length === 0) {
         throw new Error("multi_choice objective requires at least one choice");

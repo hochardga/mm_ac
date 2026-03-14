@@ -85,3 +85,25 @@ test("derives visible evidence and active objectives from staged objective rows"
   expect(progression.solvedObjectives).toEqual([]);
   expect(progression.completed).toBe(false);
 });
+
+test("unlocks the next staged objective after a solved prerequisite", () => {
+  const progression = buildCaseProgression({
+    manifest,
+    objectiveStates: [
+      { objectiveId: "pick-suspect", stageId: "briefing", status: "solved" },
+      { objectiveId: "enter-code", stageId: "confrontation", status: "active" },
+    ],
+  });
+
+  expect(progression.solvedObjectives.map((objective) => objective.id)).toEqual([
+    "pick-suspect",
+  ]);
+  expect(progression.activeObjectives.map((objective) => objective.id)).toEqual([
+    "enter-code",
+  ]);
+  expect(progression.visibleEvidence.map((entry) => entry.id)).toEqual([
+    "ledger",
+    "letter",
+  ]);
+  expect(progression.completed).toBe(false);
+});

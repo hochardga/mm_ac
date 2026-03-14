@@ -6,7 +6,7 @@ meta:
 ---
 # Coded Ledger Copy
 
-Three entries are scratched out beside the initials `DW` beside the same relief-cycle mark.
+Three entries are scratched out next to the initials `DW` at the same relief-cycle mark.
 
 The erased lines cluster around one repayment cycle, and each missing name sits next to a notation about emergency relief funds.
 

@@ -1,5 +1,13 @@
 import { relations } from "drizzle-orm";
-import { boolean, integer, jsonb, pgTable, text, timestamp } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  unique,
+} from "drizzle-orm/pg-core";
 
 export const users = pgTable("users", {
   id: text("id").primaryKey(),
@@ -71,33 +79,49 @@ export const reportSubmissions = pgTable("report_submissions", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
-export const playerCaseObjectives = pgTable("player_case_objectives", {
-  id: text("id").primaryKey(),
-  playerCaseId: text("player_case_id")
-    .notNull()
-    .references(() => playerCases.id, { onDelete: "cascade" }),
-  stageId: text("stage_id").notNull(),
-  objectiveId: text("objective_id").notNull(),
-  status: text("status").notNull(),
-  draftPayload: jsonb("draft_payload"),
-  solvedAt: timestamp("solved_at", { withTimezone: true }),
-  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const playerCaseObjectives = pgTable(
+  "player_case_objectives",
+  {
+    id: text("id").primaryKey(),
+    playerCaseId: text("player_case_id")
+      .notNull()
+      .references(() => playerCases.id, { onDelete: "cascade" }),
+    stageId: text("stage_id").notNull(),
+    objectiveId: text("objective_id").notNull(),
+    status: text("status").notNull(),
+    draftPayload: jsonb("draft_payload"),
+    solvedAt: timestamp("solved_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    playerCaseObjectiveUnique: unique(
+      "player_case_objectives_player_case_id_objective_id_unique",
+    ).on(table.playerCaseId, table.objectiveId),
+  }),
+);
 
-export const objectiveSubmissions = pgTable("objective_submissions", {
-  id: text("id").primaryKey(),
-  playerCaseId: text("player_case_id")
-    .notNull()
-    .references(() => playerCases.id, { onDelete: "cascade" }),
-  objectiveId: text("objective_id").notNull(),
-  submissionToken: text("submission_token").notNull().unique(),
-  answerPayload: jsonb("answer_payload").notNull(),
-  isCorrect: boolean("is_correct").notNull(),
-  feedback: text("feedback").notNull(),
-  nextStatus: text("next_status").notNull(),
-  attemptNumber: integer("attempt_number").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
-});
+export const objectiveSubmissions = pgTable(
+  "objective_submissions",
+  {
+    id: text("id").primaryKey(),
+    playerCaseId: text("player_case_id")
+      .notNull()
+      .references(() => playerCases.id, { onDelete: "cascade" }),
+    objectiveId: text("objective_id").notNull(),
+    submissionToken: text("submission_token").notNull().unique(),
+    answerPayload: jsonb("answer_payload").notNull(),
+    isCorrect: boolean("is_correct").notNull(),
+    feedback: text("feedback").notNull(),
+    nextStatus: text("next_status").notNull(),
+    attemptNumber: integer("attempt_number").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => ({
+    objectiveAttemptUnique: unique(
+      "objective_submissions_player_case_id_objective_id_attempt_number_unique",
+    ).on(table.playerCaseId, table.objectiveId, table.attemptNumber),
+  }),
+);
 
 export const analyticsEvents = pgTable("analytics_events", {
   id: text("id").primaryKey(),

@@ -1,0 +1,57 @@
+{
+  "slug": "staged-orphan",
+  "revision": "rev-1",
+  "title": "Orphaned Stage Fixture",
+  "summary": "Fixture that leaves one stage unreachable.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Ledger Extract",
+      "family": "document",
+      "subtype": "legal_doc",
+      "summary": "A single ledger page.",
+      "source": "evidence/ledger.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Reachable opening stage.",
+      "handlerPrompts": ["Start here."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who forged the ledger?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            { "id": "suspect-a", "label": "Suspect A" },
+            { "id": "suspect-b", "label": "Suspect B" }
+          ],
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    },
+    {
+      "id": "buried-stage",
+      "startsUnlocked": false,
+      "title": "Buried Stage",
+      "summary": "This stage is never unlocked.",
+      "handlerPrompts": ["No one should reach this."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "unreachable-code",
+          "prompt": "Enter the hidden code.",
+          "type": "code_entry",
+          "stakes": "graded",
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        }
+      ]
+    }
+  ]
+}

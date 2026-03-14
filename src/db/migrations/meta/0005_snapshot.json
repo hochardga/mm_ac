@@ -281,6 +281,15 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
+        "objective_submissions_player_case_id_objective_id_attempt_number_unique": {
+          "name": "objective_submissions_player_case_id_objective_id_attempt_number_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "player_case_id",
+            "objective_id",
+            "attempt_number"
+          ]
+        },
         "objective_submissions_submission_token_unique": {
           "name": "objective_submissions_submission_token_unique",
           "nullsNotDistinct": false,
@@ -364,7 +373,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "player_case_objectives_player_case_id_objective_id_unique": {
+          "name": "player_case_objectives_player_case_id_objective_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "player_case_id",
+            "objective_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

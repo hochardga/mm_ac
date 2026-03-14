@@ -60,6 +60,14 @@ test("rejects staged packages whose unlock graph contains a cycle", async () => 
   ).rejects.toThrow(/cycle/i);
 });
 
+test("rejects staged packages with an unreachable locked stage", async () => {
+  await expect(
+    validateCasePackage("staged-orphan", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/unreachable|orphan/i);
+});
+
 test("accepts a staged package when its unlocks are valid", async () => {
   await expect(
     validateCasePackage("staged-valid", {

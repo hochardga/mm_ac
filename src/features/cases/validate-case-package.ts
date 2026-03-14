@@ -35,8 +35,11 @@ function isStagedManifest(
 function validateStagedUnlocks(manifest: LoadedStagedCaseManifest) {
   const stageById = new Map(manifest.stages.map((stage) => [stage.id, stage]));
   const evidenceIds = new Set(manifest.evidence.map((entry) => entry.id));
+  const initiallyUnlockedStageIds = manifest.stages
+    .filter((stage) => stage.startsUnlocked)
+    .map((stage) => stage.id);
 
-  if (!manifest.stages.some((stage) => stage.startsUnlocked)) {
+  if (initiallyUnlockedStageIds.length === 0) {
     throw new Error("no stage starts unlocked");
   }
 
@@ -87,5 +90,33 @@ function validateStagedUnlocks(manifest: LoadedStagedCaseManifest) {
 
   for (const stage of manifest.stages) {
     visit(stage.id);
+  }
+
+  const reachableStageIds = new Set<string>(initiallyUnlockedStageIds);
+  const queue = [...initiallyUnlockedStageIds];
+
+  while (queue.length > 0) {
+    const currentStageId = queue.shift();
+
+    if (!currentStageId) {
+      continue;
+    }
+
+    for (const neighbor of adjacency.get(currentStageId) ?? []) {
+      if (reachableStageIds.has(neighbor)) {
+        continue;
+      }
+
+      reachableStageIds.add(neighbor);
+      queue.push(neighbor);
+    }
+  }
+
+  const unreachableStages = manifest.stages
+    .map((stage) => stage.id)
+    .filter((stageId) => !reachableStageIds.has(stageId));
+
+  if (unreachableStages.length > 0) {
+    throw new Error(`unreachable stages: ${unreachableStages.join(", ")}`);
   }
 }

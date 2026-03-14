@@ -1,8 +1,6 @@
 import { randomUUID } from "node:crypto";
 
 import { desc, eq } from "drizzle-orm";
-import { getServerSession } from "next-auth";
-import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import {
@@ -11,13 +9,12 @@ import {
   playerCaseObjectives,
   reportDrafts,
   reportSubmissions,
-  users,
 } from "@/db/schema";
 import { CaseReturnHeader } from "@/components/case-return-header";
+import { getCurrentAgentId } from "@/features/auth/current-agent";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
 import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
-import { authOptions } from "@/lib/auth";
 import { getDb } from "@/lib/db";
 
 type CasePageProps = {
@@ -30,35 +27,6 @@ type CasePageProps = {
 type CaseSearchParams = {
   evidence?: string | string[];
 };
-
-async function resolveStoredAgentId(input: {
-  sessionUserId?: string;
-  intakeUserId?: string;
-}) {
-  const db = await getDb();
-
-  if (input.sessionUserId) {
-    const sessionUser = await db.query.users.findFirst({
-      where: eq(users.id, input.sessionUserId),
-    });
-
-    if (sessionUser) {
-      return sessionUser.id;
-    }
-  }
-
-  if (input.intakeUserId && input.intakeUserId !== input.sessionUserId) {
-    const intakeUser = await db.query.users.findFirst({
-      where: eq(users.id, input.intakeUserId),
-    });
-
-    if (intakeUser) {
-      return intakeUser.id;
-    }
-  }
-
-  return undefined;
-}
 
 export default async function CasePage({
   params,
@@ -76,35 +44,27 @@ export default async function CasePage({
         submissionToken: string;
       }
     | null = null;
-  const [{ caseSlug }, session, cookieStore, resolvedSearchParams] =
+  const [{ caseSlug }, resolvedSearchParams, userId] =
     await Promise.all([
       params,
-      getServerSession(authOptions),
-      cookies(),
       searchParams ?? Promise.resolve<CaseSearchParams>({}),
+      getCurrentAgentId(),
     ]);
   const selectedEvidenceIds = Array.isArray(resolvedSearchParams.evidence)
     ? resolvedSearchParams.evidence
     : resolvedSearchParams.evidence
       ? [resolvedSearchParams.evidence]
       : [];
-  const sessionUserId =
-    session?.user && "id" in session.user ? String(session.user.id) : undefined;
-  const intakeUserId = cookieStore.get("ashfall-agent-id")?.value;
-  const userId = await resolveStoredAgentId({
-    sessionUserId,
-    intakeUserId,
-  });
 
   if (!userId) {
     redirect("/apply");
   }
 
   try {
-    const [manifest, lifecycle] = await Promise.all([
-      loadAnyCaseManifest(caseSlug),
-      openCase({ userId, caseSlug }),
-    ]);
+    const lifecycle = await openCase({ userId, caseSlug });
+    const manifest = await loadAnyCaseManifest(caseSlug, {
+      expectedRevision: lifecycle.playerCase.caseRevision,
+    });
     const db = await getDb();
     const [
       savedNote,

@@ -5,6 +5,7 @@ import { asc, eq } from "drizzle-orm";
 import {
   caseDefinitions,
   objectiveSubmissions,
+  playerCaseObjectives,
   playerCases,
   reportSubmissions,
 } from "@/db/schema";
@@ -288,11 +289,18 @@ function buildLegacyDebrief(
 function buildStagedDebrief(
   manifest: LoadedStagedCaseManifest,
   protectedCase: StagedProtectedCase,
+  objectiveStates: typeof playerCaseObjectives.$inferSelect[],
   attempts: typeof objectiveSubmissions.$inferSelect[],
 ) {
   const objectiveMap = getStagedObjectiveMap(manifest);
-  const gradedObjectives = manifest.stages.flatMap((stage) =>
-    stage.objectives.filter((objective) => objective.stakes === "graded"),
+  const debriefObjectiveIds = new Set([
+    ...objectiveStates
+      .filter((objectiveState) => objectiveState.status === "solved")
+      .map((objectiveState) => objectiveState.objectiveId),
+    ...attempts.map((attempt) => attempt.objectiveId),
+  ]);
+  const debriefObjectives = manifest.stages.flatMap((stage) =>
+    stage.objectives.filter((objective) => debriefObjectiveIds.has(objective.id)),
   );
   const latestSubmissionByObjective = new Map<string, (typeof attempts)[number]>();
 
@@ -300,7 +308,7 @@ function buildStagedDebrief(
     latestSubmissionByObjective.set(attempt.objectiveId, attempt);
   }
 
-  const solution = gradedObjectives.map((objective) => {
+  const solution = debriefObjectives.map((objective) => {
     const canonicalAnswer = protectedCase.canonicalAnswers[objective.id];
 
     if (!canonicalAnswer) {
@@ -313,7 +321,7 @@ function buildStagedDebrief(
     } satisfies DebriefEntry;
   });
 
-  const finalEntries = gradedObjectives.flatMap((objective) => {
+  const finalEntries = debriefObjectives.flatMap((objective) => {
     const canonicalAnswer = protectedCase.canonicalAnswers[objective.id];
     const latestSubmission = latestSubmissionByObjective.get(objective.id);
 
@@ -337,22 +345,22 @@ function buildStagedDebrief(
     finalReport:
       finalEntries.length > 0
         ? {
-            eyebrow: "Latest graded answers",
+            eyebrow: "Latest objective answers",
             entries: finalEntries,
           }
         : undefined,
     solution,
-    attempts: attempts.flatMap((attempt) => {
+    attempts: attempts.flatMap((attempt, globalAttemptIndex) => {
       const objective = objectiveMap.get(attempt.objectiveId);
       const canonicalAnswer = protectedCase.canonicalAnswers[attempt.objectiveId];
 
-      if (!objective || objective.stakes !== "graded" || !canonicalAnswer) {
+      if (!objective || !canonicalAnswer) {
         return [];
       }
 
       return [
         {
-          attemptNumber: attempt.attemptNumber,
+          attemptNumber: globalAttemptIndex + 1,
           nextStatus: toDebriefAttemptStatus(attempt.nextStatus),
           feedback: attempt.feedback,
           entries: [
@@ -423,11 +431,21 @@ export async function getDebrief(
   }
 
   if (isStagedManifest(manifest) && isStagedProtectedCase(protectedCase)) {
-    const attempts = await db.query.objectiveSubmissions.findMany({
-      where: eq(objectiveSubmissions.playerCaseId, input.playerCaseId),
-      orderBy: [asc(objectiveSubmissions.createdAt)],
-    });
-    const staged = buildStagedDebrief(manifest, protectedCase, attempts);
+    const [objectiveStates, attempts] = await Promise.all([
+      db.query.playerCaseObjectives.findMany({
+        where: eq(playerCaseObjectives.playerCaseId, input.playerCaseId),
+      }),
+      db.query.objectiveSubmissions.findMany({
+        where: eq(objectiveSubmissions.playerCaseId, input.playerCaseId),
+        orderBy: [asc(objectiveSubmissions.createdAt)],
+      }),
+    ]);
+    const staged = buildStagedDebrief(
+      manifest,
+      protectedCase,
+      objectiveStates,
+      attempts,
+    );
 
     return {
       title: playerCase.terminalDebriefTitle,

@@ -44,7 +44,11 @@
           "prompt": "Who doctored the books?",
           "type": "single_choice",
           "stakes": "graded",
-          "options": [{ "id": "suspect-a", "label": "Suspect A" }],
+          "options": [
+            { "id": "suspect-a", "label": "Suspect A" },
+            { "id": "suspect-b", "label": "Suspect B" },
+            { "id": "suspect-c", "label": "Suspect C" }
+          ],
           "successUnlocks": { "stageIds": [], "resolvesCase": true }
         }
       ]

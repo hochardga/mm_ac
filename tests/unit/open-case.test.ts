@@ -46,7 +46,9 @@ test("pins the latest revision on first open and emits case_started once", async
   });
 
   const openedCases = await db.select().from(playerCases);
-  const objectiveRows = await db.select().from(playerCaseObjectives);
+  const objectiveRows = (await db.select().from(playerCaseObjectives)).sort((left, right) =>
+    left.objectiveId.localeCompare(right.objectiveId),
+  );
   const trackedEvents = await db.select().from(analyticsEvents);
 
   expect(first.playerCase.status).toBe("in_progress");

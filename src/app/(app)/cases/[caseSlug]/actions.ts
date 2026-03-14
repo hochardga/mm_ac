@@ -1,14 +1,41 @@
 "use server";
 
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { playerCases } from "@/db/schema";
+import { getCurrentAgentId } from "@/features/auth/current-agent";
 import { normalizeObjectivePayload } from "@/features/cases/objective-payload";
 import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveReportDraft } from "@/features/drafts/save-report-draft";
 import { saveNote } from "@/features/notes/save-note";
 import { submitObjective } from "@/features/submissions/submit-objective";
 import { submitReport } from "@/features/submissions/submit-report";
+import { getDb } from "@/lib/db";
+
+async function requireOwnedPlayerCase(playerCaseId: string) {
+  const agentId = await getCurrentAgentId();
+
+  if (!agentId) {
+    throw new Error("Agent is not authenticated");
+  }
+
+  const db = await getDb();
+  const playerCase = await db.query.playerCases.findFirst({
+    where: eq(playerCases.id, playerCaseId),
+  });
+
+  if (!playerCase) {
+    throw new Error("Player case not found");
+  }
+
+  if (playerCase.userId !== agentId) {
+    throw new Error("Not authorized to access this player case");
+  }
+
+  return playerCase;
+}
 
 export async function saveNoteAction(formData: FormData) {
   const caseSlug = String(formData.get("caseSlug") ?? "");
@@ -70,6 +97,7 @@ export async function saveObjectiveDraftAction(formData: FormData) {
     throw new Error("Objective draft context is incomplete");
   }
 
+  await requireOwnedPlayerCase(playerCaseId);
   const payload = normalizeObjectivePayload(objectiveType, formData);
 
   await saveObjectiveDraft({
@@ -145,6 +173,7 @@ export async function submitObjectiveAction(formData: FormData) {
     throw new Error("Objective submission context is incomplete");
   }
 
+  await requireOwnedPlayerCase(playerCaseId);
   const payload = normalizeObjectivePayload(objectiveType, formData);
   const result = await submitObjective({
     playerCaseId,

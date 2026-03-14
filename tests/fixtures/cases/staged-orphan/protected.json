@@ -1,0 +1,21 @@
+{
+  "slug": "staged-orphan",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 3
+  },
+  "canonicalAnswers": {
+    "pick-suspect": { "type": "single_choice", "choiceId": "suspect-a" },
+    "unreachable-code": { "type": "code_entry", "value": "HIDDEN" }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Solved",
+      "summary": "Solved summary"
+    },
+    "closed_unsolved": {
+      "title": "Closed",
+      "summary": "Closed summary"
+    }
+  }
+}

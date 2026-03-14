@@ -120,11 +120,27 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
   expect(reconstructionSection).not.toBeNull();
   expect(
     within(finalReportSection as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(finalReportSection as HTMLElement).getByText("No"),
+  ).toBeInTheDocument();
+  expect(
+    within(finalReportSection as HTMLElement).getByText(
       /who poisoned the sacramental wine to silence the bishop\?/i,
     ),
   ).toBeInTheDocument();
   expect(
     within(finalReportSection as HTMLElement).getByText("Bookkeeper Mara Quinn"),
+  ).toBeInTheDocument();
+  expect(
+    within(reconstructionSection as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(reconstructionSection as HTMLElement).getByText("No"),
   ).toBeInTheDocument();
   expect(
     within(reconstructionSection as HTMLElement).getByText(
@@ -135,6 +151,23 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
     within(reconstructionSection as HTMLElement).getByText(
       "Bookkeeper Mara Quinn",
     ),
+  ).toBeInTheDocument();
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getAllByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
+  ).toHaveLength(1);
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getByText("Attempt 1"),
+  ).toBeInTheDocument();
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getByText("Attempt 2"),
   ).toBeInTheDocument();
   expect(
     within(screen.getByRole("heading", { name: /attempt history/i }).closest(

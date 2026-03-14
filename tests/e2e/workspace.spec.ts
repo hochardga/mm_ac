@@ -39,9 +39,10 @@ test("agent can review evidence, unlock the next objective, and save a staged dr
 
   await page.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
-    page.waitForLoadState("networkidle"),
+    page.waitForURL("**/cases/hollow-bishop*"),
     page.getByRole("button", { name: /save draft/i }).click(),
   ]);
+  await page.reload();
 
   await expect(page.getByLabel("Response")).toHaveValue("bookkeeper");
 });
@@ -74,8 +75,11 @@ test("agent can switch evidence types and keep the notebook visible", async ({
 
   await page.getByLabel("Response").selectOption("dispatcher");
 
-  await page.getByRole("button", { name: /save draft/i }).click();
-  await page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread");
+  await Promise.all([
+    page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread"),
+    page.getByRole("button", { name: /save draft/i }).click(),
+  ]);
+  await page.reload();
 
   await expect(page.getByLabel("Response")).toHaveValue("dispatcher");
 });

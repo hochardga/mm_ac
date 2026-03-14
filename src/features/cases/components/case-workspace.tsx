@@ -117,8 +117,8 @@ export function CaseWorkspace({
             <ul className="mt-6 space-y-4 text-sm leading-7 text-stone-300">
               {(stagedProgression?.visibleHandlerPrompts ??
                 (isLegacyManifest(manifest) ? manifest.handlerPrompts : [])
-              ).map((prompt) => (
-                <li key={prompt}>{prompt}</li>
+              ).map((prompt, index) => (
+                <li key={`handler-prompt-${index}`}>{prompt}</li>
               ))}
             </ul>
           </section>

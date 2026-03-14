@@ -111,6 +111,46 @@ test("preserves the selected evidence when saving an objective draft", async () 
   expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
 });
 
+test("loads the case manifest using the player's pinned revision", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "revision-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Revision",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "hollow-bishop",
+  });
+  const loadAnyCaseManifestSpy = vi.spyOn(
+    caseManifestLoader,
+    "loadAnyCaseManifest",
+  );
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  expect(loadAnyCaseManifestSpy).toHaveBeenCalledWith("hollow-bishop", {
+    expectedRevision: playerCase.caseRevision,
+  });
+});
+
 test("uses the first repeated evidence query value when the case page receives an array", async () => {
   const db = await getDb();
   const userId = randomUUID();

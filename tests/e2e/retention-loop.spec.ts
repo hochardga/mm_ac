@@ -39,7 +39,7 @@ test("player can return, solve a case, and launch a second case", async ({
   ).toBeVisible();
   await page.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
-    page.waitForLoadState("networkidle"),
+    page.waitForURL("**/cases/hollow-bishop*"),
     page.getByRole("button", { name: /save draft/i }).click(),
   ]);
   await expect(page.getByLabel("Response")).toHaveValue("bookkeeper");

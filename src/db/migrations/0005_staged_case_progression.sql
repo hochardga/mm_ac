@@ -9,7 +9,8 @@ CREATE TABLE "objective_submissions" (
 	"next_status" text NOT NULL,
 	"attempt_number" integer NOT NULL,
 	"created_at" timestamp with time zone DEFAULT now() NOT NULL,
-	CONSTRAINT "objective_submissions_submission_token_unique" UNIQUE("submission_token")
+	CONSTRAINT "objective_submissions_submission_token_unique" UNIQUE("submission_token"),
+	CONSTRAINT "objective_submissions_player_case_id_objective_id_attempt_number_unique" UNIQUE("player_case_id","objective_id","attempt_number")
 );
 --> statement-breakpoint
 CREATE TABLE "player_case_objectives" (
@@ -20,7 +21,8 @@ CREATE TABLE "player_case_objectives" (
 	"status" text NOT NULL,
 	"draft_payload" jsonb,
 	"solved_at" timestamp with time zone,
-	"updated_at" timestamp with time zone DEFAULT now() NOT NULL
+	"updated_at" timestamp with time zone DEFAULT now() NOT NULL,
+	CONSTRAINT "player_case_objectives_player_case_id_objective_id_unique" UNIQUE("player_case_id","objective_id")
 );
 --> statement-breakpoint
 ALTER TABLE "player_cases" ADD COLUMN "graded_failure_count" integer DEFAULT 0 NOT NULL;--> statement-breakpoint
