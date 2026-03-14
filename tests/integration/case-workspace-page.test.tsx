@@ -20,10 +20,16 @@ vi.mock("next-auth", () => ({
 }));
 
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
-import { objectiveSubmissions, playerCaseObjectives, users } from "@/db/schema";
+import {
+  objectiveSubmissions,
+  playerCaseObjectives,
+  playerCases,
+  users,
+} from "@/db/schema";
 import * as caseManifestLoader from "@/features/cases/load-case-manifest";
 import type { LoadedStagedCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
+import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { saveNote } from "@/features/notes/save-note";
 import { closeDb, getDb } from "@/lib/db";
 
@@ -342,6 +348,96 @@ test("shows restored progress with quick links when reopening a case with saved 
   expect(
     screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
   ).toHaveAttribute("id", "active-objectives");
+});
+
+test("reopens on the remembered evidence when no evidence query is present", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "remembered-workspace-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Remembered Workspace",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await rememberViewedEvidence({
+    playerCaseId: playerCase.id,
+    evidenceId: "night-watch-thread",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByText(/active evidence: night watch exchange/i),
+  ).toBeInTheDocument();
+});
+
+test("falls back to the first visible evidence and repairs stale remembered evidence ids", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "stale-evidence-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Stale Evidence",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db
+    .update(playerCases)
+    .set({
+      lastViewedEvidenceId: "missing-evidence",
+      lastViewedEvidenceAt: new Date("2026-03-14T00:00:00.000Z"),
+    })
+    .where(eq(playerCases.id, playerCase.id));
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+    } as never),
+  );
+
+  const refreshedPlayerCase = await db.query.playerCases.findFirst({
+    where: eq(playerCases.id, playerCase.id),
+  });
+
+  expect(
+    screen.getByText(/active evidence: dispatch log/i),
+  ).toBeInTheDocument();
+  expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("dispatch-log");
 });
 
 test("renders staged objectives with gated evidence and objective continuity links", async () => {

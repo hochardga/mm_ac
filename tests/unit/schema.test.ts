@@ -19,3 +19,12 @@ test("exports the expected baseline tables", () => {
 test("playerCases exposes the graded failure counter", () => {
   expect(schema.playerCases.gradedFailureCount).toBeDefined();
 });
+
+test("playerCases exposes remembered evidence continuity fields", () => {
+  expect(schema.playerCases.lastViewedEvidenceId.name).toBe(
+    "last_viewed_evidence_id",
+  );
+  expect(schema.playerCases.lastViewedEvidenceAt.name).toBe(
+    "last_viewed_evidence_at",
+  );
+});

@@ -151,6 +151,8 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
       caseDefinitionId: hollowBishopId,
       caseRevision: "rev-1",
       status: "in_progress",
+      lastViewedEvidenceId: "vestry-interview",
+      lastViewedEvidenceAt: new Date("2026-03-14T01:00:00.000Z"),
     },
     {
       id: redHarborPlayerCaseId,
@@ -158,6 +160,8 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
       caseDefinitionId: redHarborId,
       caseRevision: "rev-1",
       status: "in_progress",
+      lastViewedEvidenceId: "dispatch-log",
+      lastViewedEvidenceAt: new Date("2026-03-14T01:30:00.000Z"),
     },
     {
       id: briarLedgerPlayerCaseId,
@@ -206,7 +210,10 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
     within(draftCard as HTMLElement).getByRole("link", {
       name: /resume objectives/i,
     }),
-  ).toHaveAttribute("href", "/cases/hollow-bishop#active-objectives");
+  ).toHaveAttribute(
+    "href",
+    "/cases/hollow-bishop?evidence=vestry-interview#active-objectives",
+  );
   expect(
     within(draftCard as HTMLElement).getByText(/stage 1 of 2/i),
   ).toBeInTheDocument();
@@ -223,7 +230,10 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
     within(notesCard as HTMLElement).getByRole("link", {
       name: /resume notes/i,
     }),
-  ).toHaveAttribute("href", "/cases/red-harbor#field-notes");
+  ).toHaveAttribute(
+    "href",
+    "/cases/red-harbor?evidence=dispatch-log#field-notes",
+  );
 
   expect(
     within(completedCard as HTMLElement).getByRole("link", {

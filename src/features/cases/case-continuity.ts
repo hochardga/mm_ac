@@ -44,6 +44,8 @@ export type CaseContinuitySummary = {
 type BuildCaseContinuityInput = {
   caseSlug: string;
   status: PlayerCaseStatus;
+  lastViewedEvidenceId?: string | null;
+  lastViewedEvidenceAt?: Date | null;
   note: SavedNote;
   draft: SavedDraft;
   latestSubmission: LatestSubmission;
@@ -51,6 +53,32 @@ type BuildCaseContinuityInput = {
   objectiveSubmissions?: ObjectiveSubmission[];
   playerCaseUpdatedAt: Date;
 };
+
+function buildCaseHref(
+  caseSlug: string,
+  anchor: string,
+  lastViewedEvidenceId?: string | null,
+) {
+  const baseHref = lastViewedEvidenceId
+    ? `/cases/${caseSlug}?evidence=${encodeURIComponent(lastViewedEvidenceId)}`
+    : `/cases/${caseSlug}`;
+
+  return `${baseHref}#${anchor}`;
+}
+
+function getLatestDate(...dates: Array<Date | null | undefined>) {
+  return dates.reduce<Date | undefined>((latest, current) => {
+    if (!current) {
+      return latest;
+    }
+
+    if (!latest || current > latest) {
+      return current;
+    }
+
+    return latest;
+  }, undefined);
+}
 
 export function buildCaseContinuity(
   input: BuildCaseContinuityInput,
@@ -96,15 +124,17 @@ export function buildCaseContinuity(
       description: latestObjectiveSubmission
         ? "Objective feedback is waiting in your active objectives."
         : "Your active objective draft is saved and ready to continue.",
-      href: `/cases/${input.caseSlug}#active-objectives`,
-      lastActivityAt:
-        latestObjectiveDraft && latestObjectiveSubmission
-          ? latestObjectiveDraft.updatedAt > latestObjectiveSubmission.createdAt
-            ? latestObjectiveDraft.updatedAt
-            : latestObjectiveSubmission.createdAt
-          : latestObjectiveSubmission?.createdAt ??
-            latestObjectiveDraft?.updatedAt ??
-            input.playerCaseUpdatedAt,
+      href: buildCaseHref(
+        input.caseSlug,
+        "active-objectives",
+        input.lastViewedEvidenceId,
+      ),
+      lastActivityAt: getLatestDate(
+        latestObjectiveDraft?.updatedAt,
+        latestObjectiveSubmission?.createdAt,
+        input.lastViewedEvidenceAt,
+        input.playerCaseUpdatedAt,
+      ),
     };
   }
 
@@ -119,8 +149,16 @@ export function buildCaseContinuity(
       description: hasHandlerFeedback
         ? `Handler feedback is waiting on your report revision. ${attemptLabel}`.trim()
         : `Your draft report is saved and ready to continue. ${attemptLabel}`.trim(),
-      href: `/cases/${input.caseSlug}#draft-report`,
-      lastActivityAt: input.draft.updatedAt,
+      href: buildCaseHref(
+        input.caseSlug,
+        "draft-report",
+        input.lastViewedEvidenceId,
+      ),
+      lastActivityAt: getLatestDate(
+        input.draft.updatedAt,
+        input.lastViewedEvidenceAt,
+        input.playerCaseUpdatedAt,
+      ),
     };
   }
 
@@ -129,8 +167,16 @@ export function buildCaseContinuity(
       section: "notes",
       label: "Resume Notes",
       description: "Your field notes are saved and ready to revisit.",
-      href: `/cases/${input.caseSlug}#field-notes`,
-      lastActivityAt: input.note.updatedAt,
+      href: buildCaseHref(
+        input.caseSlug,
+        "field-notes",
+        input.lastViewedEvidenceId,
+      ),
+      lastActivityAt: getLatestDate(
+        input.note.updatedAt,
+        input.lastViewedEvidenceAt,
+        input.playerCaseUpdatedAt,
+      ),
     };
   }
 
@@ -138,8 +184,12 @@ export function buildCaseContinuity(
     section: "evidence",
     label: "Return to Evidence",
     description: "Reopen the dossier and continue reviewing evidence.",
-    href: `/cases/${input.caseSlug}#evidence-intake`,
-    lastActivityAt: input.playerCaseUpdatedAt,
+    href: buildCaseHref(
+      input.caseSlug,
+      "evidence-intake",
+      input.lastViewedEvidenceId,
+    ),
+    lastActivityAt: input.lastViewedEvidenceAt ?? input.playerCaseUpdatedAt,
   };
 }
 
