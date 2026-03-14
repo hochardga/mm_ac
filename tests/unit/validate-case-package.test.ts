@@ -19,3 +19,19 @@ test("throws when an evidence source path is missing", async () => {
     }),
   ).rejects.toThrow(/missing-source/i);
 });
+
+test("rejects photo assets with unsupported extensions", async () => {
+  await expect(
+    validateCasePackage("photo-bad-extension", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/extension/i);
+});
+
+test("throws when a photo asset file is missing", async () => {
+  await expect(
+    validateCasePackage("photo-missing-asset", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/scene-photo\.png/i);
+});

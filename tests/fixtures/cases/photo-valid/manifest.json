@@ -1,0 +1,31 @@
+{
+  "slug": "photo-valid",
+  "revision": "rev-1",
+  "title": "Photo Fixture Case",
+  "summary": "Fixture case for photo evidence.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Inspect the still image first."
+  ],
+  "evidence": [
+    {
+      "id": "scene-photo",
+      "title": "Scene Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "A fixture still image from the vestry.",
+      "source": "evidence/scene-photo.json"
+    }
+  ]
+}

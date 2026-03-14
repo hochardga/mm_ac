@@ -1,0 +1,6 @@
+{
+  "subtype": "scene_photo",
+  "image": "evidence/scene-photo.txt",
+  "caption": "The asset extension should fail validation.",
+  "sourceLabel": "Fixture archive"
+}

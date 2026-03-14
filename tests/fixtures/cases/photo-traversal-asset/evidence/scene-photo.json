@@ -1,0 +1,6 @@
+{
+  "subtype": "scene_photo",
+  "image": "../escape-record.json",
+  "caption": "The image path should not escape the case directory.",
+  "sourceLabel": "Fixture archive"
+}
