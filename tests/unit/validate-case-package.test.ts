@@ -35,3 +35,11 @@ test("throws when a photo asset file is missing", async () => {
     }),
   ).rejects.toThrow(/scene-photo\.png/i);
 });
+
+test("rejects photo assets that escape the case directory through symlinks", async () => {
+  await expect(
+    validateCasePackage("photo-symlink-asset", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/image path/i);
+});

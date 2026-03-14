@@ -1,6 +1,6 @@
 {
   "subtype": "scene_photo",
-  "image": "evidence/scene-photo.png",
+  "image": "evidence/../evidence/scene-photo.png",
   "caption": "The vestry desk and fallen chalice.",
   "sourceLabel": "Fixture archive"
 }

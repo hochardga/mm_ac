@@ -144,7 +144,7 @@ test("report selects require explicit choices before submission", async () => {
   expect(screen.getByLabelText("Method")).toBeRequired();
 });
 
-test("renders document markdown, record tables, thread metadata, and photo evidence in the workspace", async () => {
+test("renders document markdown, record tables, and photo evidence in the workspace", async () => {
   const db = await getDb();
   const userId = randomUUID();
 

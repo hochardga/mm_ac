@@ -1,0 +1,27 @@
+{
+  "slug": "photo-symlink-asset",
+  "revision": "rev-1",
+  "canonicalAnswers": {
+    "suspect": "suspect-a",
+    "motive": "motive-a",
+    "method": "method-a"
+  },
+  "grading": {
+    "maxAttempts": 3
+  },
+  "feedbackTemplates": {
+    "incorrect_attempt_remaining": "Keep digging.",
+    "final_incorrect_closure": "The case is closed.",
+    "solved": "Case closed."
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Solved",
+      "summary": "You solved the case."
+    },
+    "closed_unsolved": {
+      "title": "Closed",
+      "summary": "The case is closed unsolved."
+    }
+  }
+}

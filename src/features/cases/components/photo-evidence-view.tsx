@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { buildPhotoAssetUrl } from "@/features/cases/evidence/photo-asset-url";
 import type { PhotoEvidence } from "@/features/cases/evidence/schema";
@@ -17,6 +17,24 @@ export function PhotoEvidenceView({
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const imageSrc = buildPhotoAssetUrl(caseSlug, evidence.image);
   const displayDate = evidence.date ?? "Unknown";
+
+  useEffect(() => {
+    if (!isPreviewOpen) {
+      return undefined;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsPreviewOpen(false);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isPreviewOpen]);
 
   return (
     <>

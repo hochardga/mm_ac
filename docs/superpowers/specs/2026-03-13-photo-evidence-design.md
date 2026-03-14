@@ -31,8 +31,8 @@ The player experience should stay consistent with the current workspace. Photo e
 
 - Support galleries, alternate shots, or multiple images inside one evidence item.
 - Add optional metadata blocks such as camera details or chain-of-custody fields in phase one.
-- Add thumbnails to the evidence intake list.
-- Add zoom, pan, annotation, or other deep inspection controls.
+- Include thumbnails in the evidence intake list.
+- Provide deep-inspection controls such as zoom, pan, or annotation.
 - Introduce subtype-specific UI layouts.
 
 ## Product Approach

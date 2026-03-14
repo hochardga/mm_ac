@@ -91,11 +91,13 @@ export async function loadEvidenceSource({
         );
       }
 
-      await resolvePhotoAsset(caseSlug, source.image, { casesRoot });
+      const resolvedAsset = await resolvePhotoAsset(caseSlug, source.image, {
+        casesRoot,
+      });
 
       return caseEvidenceSchema.parse({
         ...entry,
-        image: source.image,
+        image: resolvedAsset.relativePath,
         caption: source.caption,
         sourceLabel: source.sourceLabel,
         date: source.date,

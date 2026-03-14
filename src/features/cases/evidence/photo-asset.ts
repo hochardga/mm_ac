@@ -1,7 +1,10 @@
-import { access } from "node:fs/promises";
+import { access, realpath } from "node:fs/promises";
 import path from "node:path";
 
-import { resolveCaseFilePath } from "@/features/cases/paths";
+import {
+  assertPathWithinRoot,
+  resolveCaseFilePath,
+} from "@/features/cases/paths";
 
 const PHOTO_CONTENT_TYPES = {
   ".jpg": "image/jpeg",
@@ -29,9 +32,18 @@ export async function resolvePhotoAsset(
   }
 
   await access(resolved.filePath);
+  const realFilePath = await realpath(resolved.filePath);
+
+  assertPathWithinRoot(
+    resolved.caseDir,
+    realFilePath,
+    `photo image path for ${caseSlug}: ${assetPath}`,
+  );
 
   return {
     ...resolved,
+    filePath: realFilePath,
+    relativePath: path.relative(resolved.caseDir, realFilePath).split(path.sep).join("/"),
     contentType,
   };
 }

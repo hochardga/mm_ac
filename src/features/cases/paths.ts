@@ -2,7 +2,7 @@ import path from "node:path";
 
 const CASE_SLUG_PATTERN = /^[A-Za-z0-9_-]+$/;
 
-function assertPathWithinRoot(root: string, target: string, label: string) {
+export function assertPathWithinRoot(root: string, target: string, label: string) {
   const relativePath = path.relative(root, target);
   const normalizedSegments = path
     .normalize(relativePath)

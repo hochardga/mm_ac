@@ -1,0 +1,31 @@
+{
+  "slug": "photo-symlink-asset",
+  "revision": "rev-1",
+  "title": "Symlink Photo Asset",
+  "summary": "Fixture case with a symlinked photo asset.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Reject photo symlinks that escape the case directory."
+  ],
+  "evidence": [
+    {
+      "id": "scene-photo",
+      "title": "Symlink Scene Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "The image path resolves through a symlink outside the case root.",
+      "source": "evidence/scene-photo.json"
+    }
+  ]
+}
