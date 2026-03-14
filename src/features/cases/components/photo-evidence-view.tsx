@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-import { buildPhotoAssetUrl } from "@/features/cases/evidence/photo-asset";
+import { buildPhotoAssetUrl } from "@/features/cases/evidence/photo-asset-url";
 import type { PhotoEvidence } from "@/features/cases/evidence/schema";
 
 type PhotoEvidenceViewProps = {
@@ -52,11 +52,11 @@ export function PhotoEvidenceView({
       </section>
 
       {isPreviewOpen ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-stone-950/90 p-6">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-stone-950/90 p-6">
           <div
             aria-label={evidence.title}
             aria-modal="true"
-            className="w-full max-w-4xl rounded-[2rem] border border-white/10 bg-stone-900 p-6 shadow-2xl"
+            className="mx-auto my-8 w-full max-w-4xl rounded-[2rem] border border-white/10 bg-stone-900 p-6 shadow-2xl"
             role="dialog"
           >
             <div className="flex items-start justify-between gap-4">
@@ -74,7 +74,7 @@ export function PhotoEvidenceView({
                 Close preview
               </button>
             </div>
-            <div className="mt-6 space-y-4">
+            <div className="mt-6 max-h-[calc(100vh-12rem)] space-y-4 overflow-y-auto pr-1">
               <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-stone-950/80">
                 <img
                   alt={evidence.caption}
