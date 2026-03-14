@@ -16,15 +16,33 @@ type LoadCaseManifestOptions = {
   expectedRevision?: string;
 };
 
-export type LoadedLegacyCaseManifest = Omit<LegacyCaseManifest, "evidence"> & {
-  evidence: CaseEvidence[];
-};
-export type LoadedStagedCaseManifest = Omit<StagedCaseManifest, "evidence"> & {
-  evidence: CaseEvidence[];
-};
-export type LoadedCaseManifest =
-  | LoadedLegacyCaseManifest
-  | LoadedStagedCaseManifest;
+type ManifestWithLoadedEvidence<
+  TManifest extends LegacyCaseManifest | StagedCaseManifest,
+> = TManifest extends LegacyCaseManifest | StagedCaseManifest
+  ? Omit<TManifest, "evidence"> & {
+      evidence: CaseEvidence[];
+    }
+  : never;
+
+export type LoadedLegacyCaseManifest = ManifestWithLoadedEvidence<LegacyCaseManifest>;
+export type LoadedStagedCaseManifest = ManifestWithLoadedEvidence<StagedCaseManifest>;
+export type LoadedCaseManifest = ManifestWithLoadedEvidence<
+  LegacyCaseManifest | StagedCaseManifest
+>;
+
+function withLoadedEvidence<
+  TManifest extends LegacyCaseManifest | StagedCaseManifest,
+>(
+  manifest: TManifest,
+  evidence: CaseEvidence[],
+): ManifestWithLoadedEvidence<TManifest> {
+  // TypeScript does not reduce the conditional manifest type across this generic spread,
+  // but the runtime shape is exact once the evidence payloads are loaded.
+  return {
+    ...manifest,
+    evidence,
+  } as unknown as ManifestWithLoadedEvidence<TManifest>;
+}
 
 async function loadManifestData<
   TManifest extends LegacyCaseManifest | StagedCaseManifest,
@@ -32,7 +50,7 @@ async function loadManifestData<
   slug: string,
   options: LoadCaseManifestOptions | undefined,
   parser: (payload: unknown) => TManifest,
-): Promise<Omit<TManifest, "evidence"> & { evidence: CaseEvidence[] }> {
+): Promise<ManifestWithLoadedEvidence<TManifest>> {
   const casesRoot = resolveCasesRoot(options?.casesRoot);
   const { filePath } = resolveCaseFilePath(slug, "manifest.json", {
     casesRoot,
@@ -60,10 +78,7 @@ async function loadManifestData<
     ),
   );
 
-  return {
-    ...manifest,
-    evidence,
-  };
+  return withLoadedEvidence(manifest, evidence);
 }
 
 export async function loadCaseManifest(

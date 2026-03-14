@@ -29,26 +29,29 @@ function payloadMatchesCanonical(
   payload: ObjectiveAnswerPayload,
   canonicalAnswer: CanonicalObjectiveAnswer,
 ) {
-  if (payload.type !== canonicalAnswer.type) {
-    return false;
+  if (payload.type === "single_choice" && canonicalAnswer.type === "single_choice") {
+    return payload.choiceId === canonicalAnswer.choiceId;
   }
 
-  switch (canonicalAnswer.type) {
-    case "single_choice":
-      return payload.choiceId === canonicalAnswer.choiceId;
-    case "multi_choice":
-      return (
-        JSON.stringify(sortedUnique(payload.choiceIds)) ===
-        JSON.stringify(sortedUnique(canonicalAnswer.choiceIds))
-      );
-    case "boolean":
-      return payload.value === canonicalAnswer.value;
-    case "code_entry":
-      return (
-        payload.value.trim().toLowerCase() ===
-        canonicalAnswer.value.trim().toLowerCase()
-      );
+  if (payload.type === "multi_choice" && canonicalAnswer.type === "multi_choice") {
+    return (
+      JSON.stringify(sortedUnique(payload.choiceIds)) ===
+      JSON.stringify(sortedUnique(canonicalAnswer.choiceIds))
+    );
   }
+
+  if (payload.type === "boolean" && canonicalAnswer.type === "boolean") {
+    return payload.value === canonicalAnswer.value;
+  }
+
+  if (payload.type === "code_entry" && canonicalAnswer.type === "code_entry") {
+    return (
+      payload.value.trim().toLowerCase() ===
+      canonicalAnswer.value.trim().toLowerCase()
+    );
+  }
+
+  return false;
 }
 
 export function evaluateObjectiveSubmission(
