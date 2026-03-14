@@ -214,6 +214,17 @@ test("renders continuity-aware vault actions for objectives, notes, and terminal
     "href",
     "/cases/hollow-bishop?evidence=vestry-interview#active-objectives",
   );
+  expect(
+    within(draftCard as HTMLElement).getByText(/stage 1 of 2/i),
+  ).toBeInTheDocument();
+  expect(
+    within(draftCard as HTMLElement).getByText(/ledger review/i),
+  ).toBeInTheDocument();
+  expect(
+    within(draftCard as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon/i,
+    ),
+  ).toBeInTheDocument();
 
   expect(
     within(notesCard as HTMLElement).getByRole("link", {

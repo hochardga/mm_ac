@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { and, eq } from "drizzle-orm";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, test, vi } from "vitest";
 
 const { cookiesMock } = vi.hoisted(() => ({
@@ -80,10 +80,24 @@ test("renders an evidence index, selected viewer, and persistent notes together"
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
   ).toBeInTheDocument();
   expect(
-    screen.getByText(/was the silver chalice actually the murder weapon/i),
-  ).toBeInTheDocument();
+    screen.getAllByText(/was the silver chalice actually the murder weapon/i)
+      .length,
+  ).toBeGreaterThan(0);
   expect(
     screen.getByText(/active evidence: vestry interview transcript/i),
+  ).toBeInTheDocument();
+  const headerSection = screen
+    .getByRole("heading", { name: /the hollow bishop/i })
+    .closest("section");
+  expect(headerSection).not.toBeNull();
+  expect(
+    within(headerSection as HTMLElement).getByText(/stage 1 of 2/i),
+  ).toBeInTheDocument();
+  expect(
+    within(headerSection as HTMLElement).getByText(/ledger review/i),
+  ).toBeInTheDocument();
+  expect(
+    within(headerSection as HTMLElement).getByText(/3 evidence items unlocked/i),
   ).toBeInTheDocument();
 });
 
@@ -622,9 +636,19 @@ test("renders staged objectives with gated evidence and objective continuity lin
   expect(
     screen.getByRole("heading", { name: /active objectives/i }),
   ).toBeInTheDocument();
+  const stagedHeaderSection = screen
+    .getByRole("heading", { name: /hollow bishop \/ staged/i })
+    .closest("section");
+  expect(stagedHeaderSection).not.toBeNull();
   expect(
-    screen.getByText(/who signed the transfer order/i),
+    within(stagedHeaderSection as HTMLElement).getByText(/stage 2 of 3/i),
   ).toBeInTheDocument();
+  expect(
+    within(stagedHeaderSection as HTMLElement).getByText(/pursuit/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.getAllByText(/who signed the transfer order/i).length,
+  ).toBeGreaterThan(0);
   expect(
     screen.queryByText(/sealed archive memorandum/i),
   ).not.toBeInTheDocument();

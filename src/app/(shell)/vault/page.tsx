@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 
 import { formatCaseContinuityTimestamp } from "@/features/cases/case-continuity";
+import { StagedProgressSnapshot } from "@/features/cases/components/staged-progress-snapshot";
 import { listAvailableCases } from "@/features/cases/list-available-cases";
 import { authOptions } from "@/lib/auth";
 
@@ -69,6 +70,13 @@ export default async function VaultPage() {
             <p className="mt-4 flex-1 text-base leading-7 text-stone-700">
               {dossier.summary}
             </p>
+
+            {dossier.progressSnapshot ? (
+              <StagedProgressSnapshot
+                snapshot={dossier.progressSnapshot}
+                variant="vault"
+              />
+            ) : null}
 
             {dossier.availability === "Available" ? (
               <>

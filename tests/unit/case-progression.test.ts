@@ -83,6 +83,20 @@ test("derives visible evidence and active objectives from staged objective rows"
   ]);
   expect(progression.visibleHandlerPrompts).toEqual(["Start with the ledger."]);
   expect(progression.solvedObjectives).toEqual([]);
+  expect(progression.snapshot).toMatchObject({
+    visibleStageCount: 1,
+    totalStageCount: 2,
+    solvedObjectiveCount: 0,
+    totalObjectiveCount: 2,
+    visibleEvidenceCount: 1,
+    nextObjectivePrompt: "Who doctored the books?",
+    focusStage: {
+      id: "briefing",
+      title: "Briefing",
+      summary: "Opening stage.",
+      position: 1,
+    },
+  });
   expect(progression.completed).toBe(false);
 });
 
@@ -105,5 +119,45 @@ test("unlocks the next staged objective after a solved prerequisite", () => {
     "ledger",
     "letter",
   ]);
+  expect(progression.snapshot).toMatchObject({
+    visibleStageCount: 2,
+    totalStageCount: 2,
+    solvedObjectiveCount: 1,
+    totalObjectiveCount: 2,
+    visibleEvidenceCount: 2,
+    nextObjectivePrompt: "Enter the lock code.",
+    focusStage: {
+      id: "confrontation",
+      title: "Confrontation",
+      summary: "Confront the suspect.",
+      position: 2,
+    },
+  });
   expect(progression.completed).toBe(false);
+});
+
+test("falls back to the last visible stage when all staged objectives are solved", () => {
+  const progression = buildCaseProgression({
+    manifest,
+    objectiveStates: [
+      { objectiveId: "pick-suspect", stageId: "briefing", status: "solved" },
+      { objectiveId: "enter-code", stageId: "confrontation", status: "solved" },
+    ],
+  });
+
+  expect(progression.snapshot).toMatchObject({
+    visibleStageCount: 2,
+    totalStageCount: 2,
+    solvedObjectiveCount: 2,
+    totalObjectiveCount: 2,
+    visibleEvidenceCount: 2,
+    nextObjectivePrompt: undefined,
+    focusStage: {
+      id: "confrontation",
+      title: "Confrontation",
+      summary: "Confront the suspect.",
+      position: 2,
+    },
+  });
+  expect(progression.completed).toBe(true);
 });
