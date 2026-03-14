@@ -14,6 +14,10 @@ test("protected loader exposes grading configuration", async () => {
     type: "single_choice",
     choiceId: "bookkeeper",
   });
+  expect(payload.debriefs).toEqual({
+    solved: { title: "Debrief", summary: "Solved summary" },
+    closed_unsolved: { title: "Closed", summary: "Closed summary" },
+  });
 });
 
 test("protected loader rejects case slugs that escape the cases root", async () => {
