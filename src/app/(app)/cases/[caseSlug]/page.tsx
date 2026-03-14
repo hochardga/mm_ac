@@ -5,10 +5,17 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
-import { notes, reportDrafts, reportSubmissions, users } from "@/db/schema";
+import {
+  notes,
+  objectiveSubmissions,
+  playerCaseObjectives,
+  reportDrafts,
+  reportSubmissions,
+  users,
+} from "@/db/schema";
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
-import { loadCaseManifest } from "@/features/cases/load-case-manifest";
+import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
 import { authOptions } from "@/lib/auth";
 import { getDb } from "@/lib/db";
@@ -59,11 +66,13 @@ export default async function CasePage({
 }: CasePageProps) {
   let caseData:
     | {
-        manifest: Awaited<ReturnType<typeof loadCaseManifest>>;
+        manifest: Awaited<ReturnType<typeof loadAnyCaseManifest>>;
         lifecycle: Awaited<ReturnType<typeof openCase>>;
         savedNote: typeof notes.$inferSelect | undefined;
         savedDraft: typeof reportDrafts.$inferSelect | undefined;
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
+        objectiveStates: typeof playerCaseObjectives.$inferSelect[];
+        objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
         submissionToken: string;
       }
     | null = null;
@@ -93,11 +102,17 @@ export default async function CasePage({
 
   try {
     const [manifest, lifecycle] = await Promise.all([
-      loadCaseManifest(caseSlug),
+      loadAnyCaseManifest(caseSlug),
       openCase({ userId, caseSlug }),
     ]);
     const db = await getDb();
-    const [savedNote, savedDraft, latestSubmission] = await Promise.all([
+    const [
+      savedNote,
+      savedDraft,
+      latestSubmission,
+      objectiveStates,
+      objectiveSubmissionRows,
+    ] = await Promise.all([
       db.query.notes.findFirst({
         where: eq(notes.playerCaseId, lifecycle.playerCase.id),
       }),
@@ -108,6 +123,13 @@ export default async function CasePage({
         where: eq(reportSubmissions.playerCaseId, lifecycle.playerCase.id),
         orderBy: [desc(reportSubmissions.attemptNumber)],
       }),
+      db.query.playerCaseObjectives.findMany({
+        where: eq(playerCaseObjectives.playerCaseId, lifecycle.playerCase.id),
+      }),
+      db.query.objectiveSubmissions.findMany({
+        where: eq(objectiveSubmissions.playerCaseId, lifecycle.playerCase.id),
+        orderBy: [desc(objectiveSubmissions.createdAt)],
+      }),
     ]);
     caseData = {
       manifest,
@@ -115,6 +137,8 @@ export default async function CasePage({
       savedNote,
       savedDraft,
       latestSubmission,
+      objectiveStates,
+      objectiveSubmissionRows,
       submissionToken: randomUUID(),
     };
   } catch {
@@ -139,6 +163,8 @@ export default async function CasePage({
           manifest={caseData.manifest}
           playerCaseId={caseData.lifecycle.playerCase.id}
           latestSubmission={caseData.latestSubmission}
+          objectiveStates={caseData.objectiveStates}
+          objectiveSubmissions={caseData.objectiveSubmissionRows}
           resumeTarget={caseData.lifecycle.resumeTarget}
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}

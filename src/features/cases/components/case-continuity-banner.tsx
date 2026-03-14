@@ -3,11 +3,15 @@ import Link from "next/link";
 type CaseContinuityBannerProps = {
   description: string;
   label: string;
+  rightRailHref: string;
+  rightRailLabel: string;
 };
 
 export function CaseContinuityBanner({
   description,
   label,
+  rightRailHref,
+  rightRailLabel,
 }: CaseContinuityBannerProps) {
   return (
     <section className="rounded-[2rem] border border-[#d96c3d]/30 bg-[#d96c3d]/10 px-6 py-5 text-stone-50">
@@ -34,9 +38,9 @@ export function CaseContinuityBanner({
         </Link>
         <Link
           className="inline-flex rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-50"
-          href="#draft-report"
+          href={rightRailHref}
         >
-          Jump to Draft Report
+          {rightRailLabel}
         </Link>
       </div>
     </section>

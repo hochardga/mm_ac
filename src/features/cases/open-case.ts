@@ -7,6 +7,7 @@ import { and, desc, eq } from "drizzle-orm";
 import {
   analyticsEvents,
   notes,
+  objectiveSubmissions,
   playerCaseObjectives,
   playerCases,
   reportDrafts,
@@ -27,7 +28,8 @@ async function buildResumeTarget(
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {
-  const [savedNote, savedDraft, latestSubmission] = await Promise.all([
+  const [savedNote, savedDraft, latestSubmission, objectiveStates, objectiveSubmissionRows] =
+    await Promise.all([
     tx.query.notes.findFirst({
       where: eq(notes.playerCaseId, playerCase.id),
     }),
@@ -37,6 +39,13 @@ async function buildResumeTarget(
     tx.query.reportSubmissions.findFirst({
       where: eq(reportSubmissions.playerCaseId, playerCase.id),
       orderBy: [desc(reportSubmissions.attemptNumber)],
+    }),
+    tx.query.playerCaseObjectives.findMany({
+      where: eq(playerCaseObjectives.playerCaseId, playerCase.id),
+    }),
+    tx.query.objectiveSubmissions.findMany({
+      where: eq(objectiveSubmissions.playerCaseId, playerCase.id),
+      orderBy: [desc(objectiveSubmissions.createdAt)],
     }),
   ]);
   const continuity = buildCaseContinuity({
@@ -49,6 +58,8 @@ async function buildResumeTarget(
     note: savedNote,
     draft: savedDraft,
     latestSubmission,
+    objectiveStates,
+    objectiveSubmissions: objectiveSubmissionRows,
     playerCaseUpdatedAt: playerCase.updatedAt,
   });
 
