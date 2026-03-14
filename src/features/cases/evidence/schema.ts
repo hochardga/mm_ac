@@ -12,7 +12,7 @@ export const evidenceIndexEntrySchema = z
   .object({
     id: z.string(),
     title: z.string(),
-    family: z.enum(["document", "record", "thread"]),
+    family: z.enum(["document", "record", "thread", "photo"]),
     subtype: z.string(),
     summary: z.string(),
     source: z.string().min(1),
@@ -83,6 +83,23 @@ export const threadEvidenceSourceSchema = z
   })
   .strict();
 
+const photoSubtypeSchema = z.enum([
+  "scene_photo",
+  "object_photo",
+  "surveillance_still",
+  "found_photo",
+]);
+
+export const photoEvidenceSourceSchema = z
+  .object({
+    subtype: photoSubtypeSchema,
+    image: z.string().min(1),
+    caption: z.string().min(1),
+    sourceLabel: z.string().min(1),
+    date: z.string().optional(),
+  })
+  .strict();
+
 const normalizedEvidenceBaseSchema = evidenceIndexEntrySchema;
 
 export const documentEvidenceSchema = normalizedEvidenceBaseSchema
@@ -109,17 +126,30 @@ export const threadEvidenceSchema = normalizedEvidenceBaseSchema
   })
   .strict();
 
+export const photoEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("photo"),
+    image: z.string().min(1),
+    caption: z.string().min(1),
+    sourceLabel: z.string().min(1),
+    date: z.string().optional(),
+  })
+  .strict();
+
 export const caseEvidenceSchema = z.discriminatedUnion("family", [
   documentEvidenceSchema,
   recordEvidenceSchema,
   threadEvidenceSchema,
+  photoEvidenceSchema,
 ]);
 
 export type EvidenceIndexEntry = z.infer<typeof evidenceIndexEntrySchema>;
 export type DocumentEvidenceSource = z.infer<typeof documentEvidenceSourceSchema>;
 export type RecordEvidenceSource = z.infer<typeof recordEvidenceSourceSchema>;
 export type ThreadEvidenceSource = z.infer<typeof threadEvidenceSourceSchema>;
+export type PhotoEvidenceSource = z.infer<typeof photoEvidenceSourceSchema>;
 export type DocumentEvidence = z.infer<typeof documentEvidenceSchema>;
 export type RecordEvidence = z.infer<typeof recordEvidenceSchema>;
 export type ThreadEvidence = z.infer<typeof threadEvidenceSchema>;
+export type PhotoEvidence = z.infer<typeof photoEvidenceSchema>;
 export type CaseEvidence = z.infer<typeof caseEvidenceSchema>;
