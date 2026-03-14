@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { afterEach, expect, test, vi } from "vitest";
 
 const { cookiesMock } = vi.hoisted(() => ({
@@ -19,7 +19,13 @@ vi.mock("next-auth", () => ({
 }));
 
 import VaultPage from "@/app/(shell)/vault/page";
-import { caseDefinitions, playerCases, users } from "@/db/schema";
+import {
+  caseDefinitions,
+  notes,
+  playerCases,
+  reportDrafts,
+  users,
+} from "@/db/schema";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -87,4 +93,122 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   expect(screen.getByText("The Briar Ledger")).toBeInTheDocument();
   expect(screen.getByText("In Progress")).toBeInTheDocument();
   expect(screen.getAllByText("New")).toHaveLength(2);
+});
+
+test("renders continuity-aware vault actions for draft, notes, and terminal cases", async () => {
+  const db = await getDb();
+  const agentId = randomUUID();
+  const hollowBishopId = randomUUID();
+  const redHarborId = randomUUID();
+  const briarLedgerId = randomUUID();
+  const hollowBishopPlayerCaseId = randomUUID();
+  const redHarborPlayerCaseId = randomUUID();
+  const briarLedgerPlayerCaseId = randomUUID();
+
+  getServerSessionMock.mockResolvedValue(null);
+  cookiesMock.mockResolvedValue({
+    get: (name: string) =>
+      name === "ashfall-agent-id" ? { value: agentId } : undefined,
+  });
+
+  await db.insert(users).values({
+    id: agentId,
+    email: "continuity-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Continuity",
+  });
+
+  await db.insert(caseDefinitions).values([
+    {
+      id: hollowBishopId,
+      slug: "hollow-bishop",
+      title: "The Hollow Bishop",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: redHarborId,
+      slug: "red-harbor",
+      title: "Signal at Red Harbor",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: briarLedgerId,
+      slug: "briar-ledger",
+      title: "The Briar Ledger",
+      currentPublishedRevision: "rev-1",
+    },
+  ]);
+
+  await db.insert(playerCases).values([
+    {
+      id: hollowBishopPlayerCaseId,
+      userId: agentId,
+      caseDefinitionId: hollowBishopId,
+      caseRevision: "rev-1",
+      status: "in_progress",
+    },
+    {
+      id: redHarborPlayerCaseId,
+      userId: agentId,
+      caseDefinitionId: redHarborId,
+      caseRevision: "rev-1",
+      status: "in_progress",
+    },
+    {
+      id: briarLedgerPlayerCaseId,
+      userId: agentId,
+      caseDefinitionId: briarLedgerId,
+      caseRevision: "rev-1",
+      status: "completed",
+    },
+  ]);
+
+  await db.insert(reportDrafts).values({
+    id: randomUUID(),
+    playerCaseId: hollowBishopPlayerCaseId,
+    suspectId: "bookkeeper",
+    motiveId: "embezzlement",
+    methodId: "poisoned-wine",
+    attemptCount: 1,
+  });
+
+  await db.insert(notes).values({
+    id: randomUUID(),
+    playerCaseId: redHarborPlayerCaseId,
+    body: "Recheck the harbor log.",
+  });
+
+  render(await VaultPage());
+
+  const draftCard = screen
+    .getByRole("heading", { name: /the hollow bishop/i })
+    .closest("article");
+  const notesCard = screen
+    .getByRole("heading", { name: /signal at red harbor/i })
+    .closest("article");
+  const completedCard = screen
+    .getByRole("heading", { name: /the briar ledger/i })
+    .closest("article");
+
+  expect(draftCard).not.toBeNull();
+  expect(notesCard).not.toBeNull();
+  expect(completedCard).not.toBeNull();
+
+  expect(
+    within(draftCard as HTMLElement).getByRole("link", {
+      name: /resume report/i,
+    }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#draft-report");
+
+  expect(
+    within(notesCard as HTMLElement).getByRole("link", {
+      name: /resume notes/i,
+    }),
+  ).toHaveAttribute("href", "/cases/red-harbor#field-notes");
+
+  expect(
+    within(completedCard as HTMLElement).getByRole("link", {
+      name: /review debrief/i,
+    }),
+  ).toHaveAttribute("href", "/cases/briar-ledger/debrief");
 });

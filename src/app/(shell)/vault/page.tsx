@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+import { formatCaseContinuityTimestamp } from "@/features/cases/case-continuity";
 import { listAvailableCases } from "@/features/cases/list-available-cases";
 import { authOptions } from "@/lib/auth";
 
@@ -59,12 +60,32 @@ export default async function VaultPage() {
             </p>
 
             {dossier.availability === "Available" ? (
-              <Link
-                className="mt-6 inline-flex w-fit rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
-                href={`/cases/${dossier.slug}`}
-              >
-                Open Case File
-              </Link>
+              <>
+                {dossier.continuity ? (
+                  <div className="mt-6 rounded-[1.5rem] border border-stone-200 bg-stone-50 px-4 py-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-stone-500">
+                      Continuity
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-stone-700">
+                      {dossier.continuity.description}
+                    </p>
+                    {dossier.continuity.lastActivityAt ? (
+                      <p className="mt-2 text-xs uppercase tracking-[0.18em] text-stone-500">
+                        Last activity{" "}
+                        {formatCaseContinuityTimestamp(
+                          dossier.continuity.lastActivityAt,
+                        )}
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+                <Link
+                  className="mt-6 inline-flex w-fit rounded-full bg-stone-950 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
+                  href={dossier.continuity?.href ?? `/cases/${dossier.slug}`}
+                >
+                  {dossier.continuity?.label ?? "Open Case File"}
+                </Link>
+              </>
             ) : (
               <button
                 className="mt-6 inline-flex w-fit cursor-not-allowed rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-500"
