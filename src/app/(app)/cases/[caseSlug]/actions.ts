@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { normalizeObjectivePayload } from "@/features/cases/objective-payload";
+import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveReportDraft } from "@/features/drafts/save-report-draft";
 import { saveNote } from "@/features/notes/save-note";
 import { submitReport } from "@/features/submissions/submit-report";
@@ -43,6 +45,36 @@ export async function saveReportDraftAction(formData: FormData) {
     suspectId,
     motiveId,
     methodId,
+  });
+
+  if (caseSlug) {
+    if (selectedEvidenceId) {
+      redirect(
+        `/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`,
+      );
+    }
+
+    redirect(`/cases/${caseSlug}`);
+  }
+}
+
+export async function saveObjectiveDraftAction(formData: FormData) {
+  const caseSlug = String(formData.get("caseSlug") ?? "");
+  const playerCaseId = String(formData.get("playerCaseId") ?? "");
+  const objectiveId = String(formData.get("objectiveId") ?? "");
+  const objectiveType = String(formData.get("objectiveType") ?? "");
+  const selectedEvidenceId = String(formData.get("selectedEvidenceId") ?? "");
+
+  if (!playerCaseId || !objectiveId || !objectiveType) {
+    throw new Error("Objective draft context is incomplete");
+  }
+
+  const payload = normalizeObjectivePayload(objectiveType, formData);
+
+  await saveObjectiveDraft({
+    playerCaseId,
+    objectiveId,
+    payload,
   });
 
   if (caseSlug) {

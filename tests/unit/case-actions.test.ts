@@ -8,6 +8,9 @@ const { redirectMock } = vi.hoisted(() => ({
 const { saveReportDraftMock } = vi.hoisted(() => ({
   saveReportDraftMock: vi.fn(),
 }));
+const { saveObjectiveDraftMock } = vi.hoisted(() => ({
+  saveObjectiveDraftMock: vi.fn(),
+}));
 
 vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
@@ -21,6 +24,10 @@ vi.mock("@/features/drafts/save-report-draft", () => ({
   saveReportDraft: saveReportDraftMock,
 }));
 
+vi.mock("@/features/drafts/save-objective-draft", () => ({
+  saveObjectiveDraft: saveObjectiveDraftMock,
+}));
+
 vi.mock("@/features/notes/save-note", () => ({
   saveNote: vi.fn(),
 }));
@@ -29,11 +36,15 @@ vi.mock("@/features/submissions/submit-report", () => ({
   submitReport: vi.fn(),
 }));
 
-import { saveReportDraftAction } from "@/app/(app)/cases/[caseSlug]/actions";
+import {
+  saveObjectiveDraftAction,
+  saveReportDraftAction,
+} from "@/app/(app)/cases/[caseSlug]/actions";
 
 afterEach(() => {
   redirectMock.mockClear();
   saveReportDraftMock.mockReset();
+  saveObjectiveDraftMock.mockReset();
 });
 
 test("encodes the selected evidence id when redirecting after a draft save", async () => {
@@ -52,6 +63,35 @@ test("encodes the selected evidence id when redirecting after a draft save", asy
   await expect(saveReportDraftAction(formData)).rejects.toThrow(
     "NEXT_REDIRECT:/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
   );
+  expect(redirectMock).toHaveBeenCalledWith(
+    "/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
+  );
+});
+
+test("encodes selected evidence id when redirecting after objective draft save", async () => {
+  saveObjectiveDraftMock.mockResolvedValue({
+    id: "objective-1",
+  });
+
+  const formData = new FormData();
+  formData.set("caseSlug", "red-harbor");
+  formData.set("playerCaseId", "player-case-1");
+  formData.set("objectiveId", "pick-suspect");
+  formData.set("objectiveType", "single_choice");
+  formData.set("choiceId", "bookkeeper");
+  formData.set("selectedEvidenceId", "night/watch & thread");
+
+  await expect(saveObjectiveDraftAction(formData)).rejects.toThrow(
+    "NEXT_REDIRECT:/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
+  );
+  expect(saveObjectiveDraftMock).toHaveBeenCalledWith({
+    playerCaseId: "player-case-1",
+    objectiveId: "pick-suspect",
+    payload: {
+      type: "single_choice",
+      choiceId: "bookkeeper",
+    },
+  });
   expect(redirectMock).toHaveBeenCalledWith(
     "/cases/red-harbor?evidence=night%2Fwatch%20%26%20thread",
   );
