@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import Link from "next/link";
 import { cookies } from "next/headers";
 
+import { ServiceRecordPanel } from "@/features/agents/components/service-record-panel";
+import { getServiceRecord } from "@/features/agents/get-service-record";
 import { formatCaseContinuityTimestamp } from "@/features/cases/case-continuity";
 import { StagedProgressSnapshot } from "@/features/cases/components/staged-progress-snapshot";
 import { listAvailableCases } from "@/features/cases/list-available-cases";
@@ -25,9 +27,15 @@ export default async function VaultPage() {
   ]);
   const sessionUserId =
     session?.user && "id" in session.user ? String(session.user.id) : undefined;
+  const userId = sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value;
   const dossiers = await listAvailableCases({
-    userId: sessionUserId ?? cookieStore.get("ashfall-agent-id")?.value,
+    userId,
   });
+  const serviceRecord = userId
+    ? await getServiceRecord({
+        userId,
+      })
+    : null;
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,_#120d0b_0%,_#241916_45%,_#f4ede4_45%,_#f4ede4_100%)] px-6 py-16 text-stone-950">
@@ -42,6 +50,17 @@ export default async function VaultPage() {
           closes the line.
         </p>
       </section>
+
+      {serviceRecord ? (
+        <section className="mx-auto mt-8 max-w-6xl">
+          <ServiceRecordPanel
+            description="Ashfall's cross-case summary keeps your wider field record in view and points you toward the next dossier that deserves attention."
+            eyebrow="Ashfall Collective / service record"
+            serviceRecord={serviceRecord}
+            title="Service Record"
+          />
+        </section>
+      ) : null}
 
       <section className="mx-auto mt-10 grid max-w-6xl gap-6 md:grid-cols-2 xl:grid-cols-3">
         {dossiers.map((dossier) => (
