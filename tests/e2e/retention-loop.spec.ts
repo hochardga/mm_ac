@@ -17,6 +17,21 @@ test("player can return, solve a case, and launch a second case", async ({
   await page.goto("/cases/hollow-bishop");
   await page.getByLabel("Field Notes").fill("Return to the receipts.");
   await page.getByRole("button", { name: /save notes/i }).click();
+
+  await page.goto("/vault");
+  await expect(
+    page.getByRole("link", { name: /resume notes/i }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#field-notes");
+
+  await Promise.all([
+    page.waitForURL("**/cases/hollow-bishop#field-notes"),
+    page.getByRole("link", { name: /resume notes/i }).click(),
+  ]);
+  await expect(page.getByLabel("Field Notes")).toHaveValue(/receipts/i);
+  await expect(
+    page.getByText(/ashfall restored your saved progress/i),
+  ).toBeVisible();
+
   await page.getByLabel("Suspect").selectOption("bookkeeper");
   await page.getByLabel("Motive").selectOption("embezzlement");
   await page.getByLabel("Method").selectOption("poisoned-wine");
@@ -29,9 +44,19 @@ test("player can return, solve a case, and launch a second case", async ({
   await expect(page.getByLabel("Method")).toHaveValue("poisoned-wine");
 
   await page.goto("/vault");
-  await page.goto("/cases/hollow-bishop");
+  await expect(
+    page.getByRole("link", { name: /resume report/i }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#draft-report");
+
+  await Promise.all([
+    page.waitForURL("**/cases/hollow-bishop#draft-report"),
+    page.getByRole("link", { name: /resume report/i }).click(),
+  ]);
   await expect(page.getByLabel("Field Notes")).toHaveValue(/receipts/i);
   await expect(page.getByLabel("Suspect")).toHaveValue("bookkeeper");
+  await expect(
+    page.getByText(/ashfall restored your saved progress/i),
+  ).toBeVisible();
 
   await page.getByRole("button", { name: /submit report/i }).click();
   await page.waitForURL("**/debrief");
