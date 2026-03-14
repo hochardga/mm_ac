@@ -34,7 +34,7 @@ vi.mock("next/navigation", () => ({
 import DebriefPage from "@/app/(app)/cases/[caseSlug]/debrief/page";
 import { users } from "@/db/schema";
 import { openCase } from "@/features/cases/open-case";
-import { submitReport } from "@/features/submissions/submit-report";
+import { submitObjective } from "@/features/submissions/submit-objective";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -75,13 +75,22 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
     caseSlug: "hollow-bishop",
   });
 
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
-    submissionToken: "solved-token",
-    answers: {
-      suspectId: "bookkeeper",
-      motiveId: "embezzlement",
-      methodId: "poisoned-wine",
+    objectiveId: "chalice-relevance",
+    submissionToken: "solved-token-1",
+    payload: {
+      type: "boolean",
+      value: false,
+    },
+  });
+  await submitObjective({
+    playerCaseId: playerCase.id,
+    objectiveId: "identify-poisoner",
+    submissionToken: "solved-token-2",
+    payload: {
+      type: "single_choice",
+      choiceId: "bookkeeper",
     },
   });
 
@@ -110,14 +119,32 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
   expect(
-    within(finalReportSection as HTMLElement).getByText("Bookkeeper Mara Quinn"),
+    within(finalReportSection as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
   ).toBeInTheDocument();
   expect(
-    within(finalReportSection as HTMLElement).getByText("Embezzlement cover-up"),
+    within(finalReportSection as HTMLElement).getByText("No"),
   ).toBeInTheDocument();
   expect(
     within(finalReportSection as HTMLElement).getByText(
-      "Poisoned sacramental wine",
+      /who poisoned the sacramental wine to silence the bishop\?/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(finalReportSection as HTMLElement).getByText("Bookkeeper Mara Quinn"),
+  ).toBeInTheDocument();
+  expect(
+    within(reconstructionSection as HTMLElement).getByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(reconstructionSection as HTMLElement).getByText("No"),
+  ).toBeInTheDocument();
+  expect(
+    within(reconstructionSection as HTMLElement).getByText(
+      /who poisoned the sacramental wine to silence the bishop\?/i,
     ),
   ).toBeInTheDocument();
   expect(
@@ -125,6 +152,30 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
       "Bookkeeper Mara Quinn",
     ),
   ).toBeInTheDocument();
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getAllByText(
+      /was the silver chalice actually the murder weapon\?/i,
+    ),
+  ).toHaveLength(1);
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getByText("Attempt 1"),
+  ).toBeInTheDocument();
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getByText("Attempt 2"),
+  ).toBeInTheDocument();
+  expect(
+    within(screen.getByRole("heading", { name: /attempt history/i }).closest(
+      "section",
+    ) as HTMLElement).getAllByText(
+      /who poisoned the sacramental wine to silence the bishop\?/i,
+    ),
+  ).toHaveLength(1);
 });
 
 test("renders a closed-unsolved debrief dossier with the player's final theory and solution", async () => {
@@ -134,31 +185,31 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
     caseSlug: "red-harbor",
   });
 
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
+    objectiveId: "identify-saboteur",
     submissionToken: "miss-1",
-    answers: {
-      suspectId: "captain",
-      motiveId: "insurance",
-      methodId: "drowned",
+    payload: {
+      type: "single_choice",
+      choiceId: "captain",
     },
   });
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
+    objectiveId: "identify-saboteur",
     submissionToken: "miss-2",
-    answers: {
-      suspectId: "captain",
-      motiveId: "insurance",
-      methodId: "drowned",
+    payload: {
+      type: "single_choice",
+      choiceId: "captain",
     },
   });
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
+    objectiveId: "identify-saboteur",
     submissionToken: "miss-3",
-    answers: {
-      suspectId: "captain",
-      motiveId: "insurance",
-      methodId: "drowned",
+    payload: {
+      type: "single_choice",
+      choiceId: "captain",
     },
   });
 
@@ -188,14 +239,16 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
   expect(
+    within(finalReportSection as HTMLElement).getByText(
+      /who staged the false distress transmission\?/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
     within(finalReportSection as HTMLElement).getByText("Captain Lena Morrow"),
   ).toBeInTheDocument();
   expect(
-    within(finalReportSection as HTMLElement).getByText("Insurance fraud"),
-  ).toBeInTheDocument();
-  expect(
-    within(finalReportSection as HTMLElement).getByText(
-      "Forced overboard drowning",
+    within(reconstructionSection as HTMLElement).getByText(
+      /who staged the false distress transmission\?/i,
     ),
   ).toBeInTheDocument();
   expect(
@@ -204,21 +257,16 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
     ),
   ).toBeInTheDocument();
   expect(
-    within(reconstructionSection as HTMLElement).getByText(
-      "Smuggling protection",
-    ),
-  ).toBeInTheDocument();
-  expect(
-    within(reconstructionSection as HTMLElement).getByText(
-      "Electrocution in the signal room",
-    ),
-  ).toBeInTheDocument();
-  expect(
     within(attemptHistorySection as HTMLElement).getAllByText("In Progress"),
   ).toHaveLength(2);
   expect(
     within(attemptHistorySection as HTMLElement).getByText("Closed Unsolved"),
   ).toBeInTheDocument();
+  expect(
+    within(attemptHistorySection as HTMLElement).getAllByText(
+      /who staged the false distress transmission\?/i,
+    ),
+  ).toHaveLength(3);
   expect(
     screen.getByText(/red harbor is closed without a prosecutable case/i),
   ).toBeInTheDocument();

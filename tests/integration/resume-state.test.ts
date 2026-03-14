@@ -2,16 +2,16 @@ import { randomUUID } from "node:crypto";
 
 import { users } from "@/db/schema";
 import { openCase } from "@/features/cases/open-case";
-import { saveReportDraft } from "@/features/drafts/save-report-draft";
+import { saveObjectiveDraft } from "@/features/drafts/save-objective-draft";
 import { saveNote } from "@/features/notes/save-note";
-import { submitReport } from "@/features/submissions/submit-report";
+import { submitObjective } from "@/features/submissions/submit-objective";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
   await closeDb();
 });
 
-test("returns the latest report context when reopening an in-progress case", async () => {
+test("returns the latest objective context when reopening an in-progress case", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -31,11 +31,13 @@ test("returns the latest report context when reopening an in-progress case", asy
     playerCaseId: playerCase.id,
     body: "Double-check the church ledger.",
   });
-  await saveReportDraft({
+  await saveObjectiveDraft({
     playerCaseId: playerCase.id,
-    suspectId: "bookkeeper",
-    motiveId: "embezzlement",
-    methodId: "poisoned-wine",
+    objectiveId: "chalice-relevance",
+    payload: {
+      type: "boolean",
+      value: false,
+    },
   });
 
   const reopened = await openCase({
@@ -43,12 +45,11 @@ test("returns the latest report context when reopening an in-progress case", asy
     caseSlug: "hollow-bishop",
   });
 
-  expect(reopened.resumeTarget.section).toBe("report");
-  expect(reopened.resumeTarget.draft?.suspectId).toBe("bookkeeper");
+  expect(reopened.resumeTarget.section).toBe("objectives");
   expect(reopened.resumeTarget.noteBody).toContain("ledger");
 });
 
-test("keeps handler feedback in the continuity description when reopening after an incorrect report", async () => {
+test("keeps objective feedback in the continuity description when reopening after an incorrect submission", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -63,15 +64,13 @@ test("keeps handler feedback in the continuity description when reopening after 
     userId,
     caseSlug: "hollow-bishop",
   });
-  const submissionToken = `feedback-${playerCase.id}`;
-
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
-    submissionToken,
-    answers: {
-      suspectId: "groundskeeper",
-      motiveId: "blackmail",
-      methodId: "candlestick",
+    objectiveId: "chalice-relevance",
+    submissionToken: `feedback-${playerCase.id}`,
+    payload: {
+      type: "boolean",
+      value: true,
     },
   });
 
@@ -80,8 +79,8 @@ test("keeps handler feedback in the continuity description when reopening after 
     caseSlug: "hollow-bishop",
   });
 
-  expect(reopened.resumeTarget.section).toBe("report");
-  expect(reopened.resumeTarget.description).toMatch(/handler feedback/i);
+  expect(reopened.resumeTarget.section).toBe("objectives");
+  expect(reopened.resumeTarget.description).toMatch(/objective feedback/i);
 });
 
 test("keeps the debrief section when reopening a solved case", async () => {
@@ -100,13 +99,22 @@ test("keeps the debrief section when reopening a solved case", async () => {
     caseSlug: "hollow-bishop",
   });
 
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
-    submissionToken: `solved-${playerCase.id}`,
-    answers: {
-      suspectId: "bookkeeper",
-      motiveId: "embezzlement",
-      methodId: "poisoned-wine",
+    objectiveId: "chalice-relevance",
+    submissionToken: `solved-${playerCase.id}-1`,
+    payload: {
+      type: "boolean",
+      value: false,
+    },
+  });
+  await submitObjective({
+    playerCaseId: playerCase.id,
+    objectiveId: "identify-poisoner",
+    submissionToken: `solved-${playerCase.id}-2`,
+    payload: {
+      type: "single_choice",
+      choiceId: "bookkeeper",
     },
   });
 

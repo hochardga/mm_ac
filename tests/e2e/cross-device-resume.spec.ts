@@ -19,16 +19,17 @@ test("saved notes and drafts resume across browser contexts", async ({
   await primaryPage.goto("/cases/hollow-bishop");
   await primaryPage.getByLabel("Field Notes").fill("Cross-device proof.");
   await primaryPage.getByRole("button", { name: /save notes/i }).click();
-  await primaryPage.getByLabel("Suspect").selectOption("bookkeeper");
-  await primaryPage.getByLabel("Motive").selectOption("embezzlement");
-  await primaryPage.getByLabel("Method").selectOption("poisoned-wine");
+  await primaryPage.getByLabel("Response").selectOption("false");
+  await primaryPage.getByRole("button", { name: /submit objective/i }).click();
+  await expect(
+    primaryPage.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+  await primaryPage.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
     primaryPage.waitForLoadState("networkidle"),
     primaryPage.getByRole("button", { name: /save draft/i }).click(),
   ]);
-  await expect(primaryPage.getByLabel("Suspect")).toHaveValue("bookkeeper");
-  await expect(primaryPage.getByLabel("Motive")).toHaveValue("embezzlement");
-  await expect(primaryPage.getByLabel("Method")).toHaveValue("poisoned-wine");
+  await expect(primaryPage.getByLabel("Response")).toHaveValue("bookkeeper");
 
   const secondaryContext = await browser.newContext({
     storageState: await primaryContext.storageState(),
@@ -39,9 +40,10 @@ test("saved notes and drafts resume across browser contexts", async ({
   await expect(secondaryPage.getByLabel("Field Notes")).toHaveValue(
     /cross-device proof/i,
   );
-  await expect(secondaryPage.getByLabel("Suspect")).toHaveValue("bookkeeper");
-  await expect(secondaryPage.getByLabel("Motive")).toHaveValue("embezzlement");
-  await expect(secondaryPage.getByLabel("Method")).toHaveValue("poisoned-wine");
+  await expect(
+    secondaryPage.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+  await expect(secondaryPage.getByLabel("Response")).toHaveValue("bookkeeper");
 
   await secondaryContext.close();
   await primaryContext.close();

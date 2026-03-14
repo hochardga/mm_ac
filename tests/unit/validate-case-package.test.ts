@@ -43,3 +43,35 @@ test("rejects photo assets that escape the case directory through symlinks", asy
     }),
   ).rejects.toThrow(/image path/i);
 });
+
+test("rejects staged packages whose unlocks reference an unknown stage", async () => {
+  await expect(
+    validateCasePackage("staged-bad-unlock", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/unknown stage/i);
+});
+
+test("rejects staged packages whose unlock graph contains a cycle", async () => {
+  await expect(
+    validateCasePackage("staged-cycle", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/cycle/i);
+});
+
+test("rejects staged packages with an unreachable locked stage", async () => {
+  await expect(
+    validateCasePackage("staged-orphan", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/unreachable|orphan/i);
+});
+
+test("accepts a staged package when its unlocks are valid", async () => {
+  await expect(
+    validateCasePackage("staged-valid", {
+      casesRoot: fixturesRoot,
+    }),
+  ).resolves.toMatchObject({ slug: "staged-valid", revision: "rev-2" });
+});

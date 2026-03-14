@@ -1,4 +1,10 @@
-import type { notes, reportDrafts, reportSubmissions } from "@/db/schema";
+import type {
+  notes,
+  objectiveSubmissions,
+  playerCaseObjectives,
+  reportDrafts,
+  reportSubmissions,
+} from "@/db/schema";
 import type { PlayerCaseStatus } from "@/features/cases/case-status";
 
 type SavedNote = Pick<typeof notes.$inferSelect, "body" | "updatedAt"> | undefined;
@@ -11,10 +17,19 @@ type SavedDraft =
 type LatestSubmission =
   | Pick<typeof reportSubmissions.$inferSelect, "attemptNumber" | "nextStatus" | "feedback">
   | undefined;
+type ObjectiveState = Pick<
+  typeof playerCaseObjectives.$inferSelect,
+  "objectiveId" | "stageId" | "status" | "draftPayload" | "updatedAt"
+>;
+type ObjectiveSubmission = Pick<
+  typeof objectiveSubmissions.$inferSelect,
+  "objectiveId" | "nextStatus" | "feedback" | "createdAt"
+>;
 
 export type CaseContinuitySection =
   | "evidence"
   | "notes"
+  | "objectives"
   | "report"
   | "debrief";
 
@@ -32,6 +47,8 @@ type BuildCaseContinuityInput = {
   note: SavedNote;
   draft: SavedDraft;
   latestSubmission: LatestSubmission;
+  objectiveStates?: ObjectiveState[];
+  objectiveSubmissions?: ObjectiveSubmission[];
   playerCaseUpdatedAt: Date;
 };
 
@@ -55,6 +72,39 @@ export function buildCaseContinuity(
       description: "Your closed case debrief is ready for review.",
       href: `/cases/${input.caseSlug}/debrief`,
       lastActivityAt: input.playerCaseUpdatedAt,
+    };
+  }
+
+  const latestObjectiveDraft = [...(input.objectiveStates ?? [])]
+    .filter(
+      (objectiveState) =>
+        objectiveState.status === "active" && objectiveState.draftPayload != null,
+    )
+    .sort(
+      (left, right) => right.updatedAt.getTime() - left.updatedAt.getTime(),
+    )[0];
+  const latestObjectiveSubmission = [...(input.objectiveSubmissions ?? [])]
+    .filter((submission) => submission.nextStatus === "in_progress")
+    .sort(
+      (left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
+    )[0];
+
+  if (latestObjectiveDraft || latestObjectiveSubmission) {
+    return {
+      section: "objectives",
+      label: "Resume Objectives",
+      description: latestObjectiveSubmission
+        ? "Objective feedback is waiting in your active objectives."
+        : "Your active objective draft is saved and ready to continue.",
+      href: `/cases/${input.caseSlug}#active-objectives`,
+      lastActivityAt:
+        latestObjectiveDraft && latestObjectiveSubmission
+          ? latestObjectiveDraft.updatedAt > latestObjectiveSubmission.createdAt
+            ? latestObjectiveDraft.updatedAt
+            : latestObjectiveSubmission.createdAt
+          : latestObjectiveSubmission?.createdAt ??
+            latestObjectiveDraft?.updatedAt ??
+            input.playerCaseUpdatedAt,
     };
   }
 

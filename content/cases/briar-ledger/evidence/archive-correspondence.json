@@ -1,0 +1,28 @@
+{
+  "subtype": "handler_message",
+  "thread": {
+    "subject": "Archive relief pull requests",
+    "channel": "Registry relay",
+    "participants": ["Archive Clerk Lio", "Treasurer Dorian Wren", "Archivist Mara Seln"]
+  },
+  "messages": [
+    {
+      "id": "briar-1",
+      "sender": "Archive Clerk Lio",
+      "timestamp": "2026-03-11T08:14:00Z",
+      "body": "Treasurer Wren requested the grain vouchers and widow stipends before the quarterly review. I logged both pulls under the same relief cycle."
+    },
+    {
+      "id": "briar-2",
+      "sender": "Archivist Mara Seln",
+      "timestamp": "2026-03-11T08:19:00Z",
+      "body": "Do not release the ferry repair bond with those files. It belongs to a different account chain."
+    },
+    {
+      "id": "briar-3",
+      "sender": "Treasurer Dorian Wren",
+      "timestamp": "2026-03-11T08:25:00Z",
+      "body": "Understood. Keep the relief-cycle packet sealed until I sign the transfer ledger myself."
+    }
+  ]
+}

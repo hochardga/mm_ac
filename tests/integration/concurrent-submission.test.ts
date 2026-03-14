@@ -2,9 +2,9 @@ import { randomUUID } from "node:crypto";
 
 import { eq } from "drizzle-orm";
 
-import { playerCases, reportSubmissions, users } from "@/db/schema";
+import { objectiveSubmissions, playerCases, users } from "@/db/schema";
 import { openCase } from "@/features/cases/open-case";
-import { submitReport } from "@/features/submissions/submit-report";
+import { submitObjective } from "@/features/submissions/submit-objective";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -24,40 +24,43 @@ test("does not consume an extra attempt when a terminal transition is racing", a
 
   const { playerCase } = await openCase({
     userId,
-    caseSlug: "hollow-bishop",
+    caseSlug: "red-harbor",
   });
 
-  const wrongAnswers = {
-    suspectId: "groundskeeper",
-    motiveId: "blackmail",
-    methodId: "candlestick",
+  const wrongPayload = {
+    type: "single_choice" as const,
+    choiceId: "captain",
   };
 
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
+    objectiveId: "identify-saboteur",
     submissionToken: "tok-1",
-    answers: wrongAnswers,
+    payload: wrongPayload,
   });
-  await submitReport({
+  await submitObjective({
     playerCaseId: playerCase.id,
+    objectiveId: "identify-saboteur",
     submissionToken: "tok-2",
-    answers: wrongAnswers,
+    payload: wrongPayload,
   });
 
   const results = await Promise.allSettled([
-    submitReport({
+    submitObjective({
       playerCaseId: playerCase.id,
+      objectiveId: "identify-saboteur",
       submissionToken: "tok-3a",
-      answers: wrongAnswers,
+      payload: wrongPayload,
     }),
-    submitReport({
+    submitObjective({
       playerCaseId: playerCase.id,
+      objectiveId: "identify-saboteur",
       submissionToken: "tok-3b",
-      answers: wrongAnswers,
+      payload: wrongPayload,
     }),
   ]);
 
-  const submissions = await db.select().from(reportSubmissions);
+  const submissions = await db.select().from(objectiveSubmissions);
   const [savedPlayerCase] = await db
     .select()
     .from(playerCases)

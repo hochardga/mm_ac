@@ -45,6 +45,72 @@ describe("buildCaseContinuity", () => {
     expect(continuity.href).toBe("/cases/red-harbor#field-notes");
   });
 
+  test("returns an objectives resume target when staged objective drafts exist", () => {
+    const continuity = buildCaseContinuity({
+      caseSlug: "staged-harbor",
+      status: "in_progress",
+      note: undefined,
+      draft: undefined,
+      latestSubmission: undefined,
+      objectiveStates: [
+        {
+          objectiveId: "trace-ledger",
+          stageId: "briefing",
+          status: "active",
+          draftPayload: {
+            type: "single_choice",
+            choiceId: "dockmaster",
+          },
+          updatedAt: new Date("2026-03-13T20:30:00.000Z"),
+        },
+      ],
+      objectiveSubmissions: [],
+      playerCaseUpdatedAt: new Date("2026-03-13T20:00:00.000Z"),
+    });
+
+    expect(continuity.section).toBe("objectives");
+    expect(continuity.label).toMatch(/resume objectives/i);
+    expect(continuity.href).toBe("/cases/staged-harbor#active-objectives");
+    expect(continuity.lastActivityAt?.toISOString()).toBe(
+      "2026-03-13T20:30:00.000Z",
+    );
+  });
+
+  test("returns an objectives resume target when staged feedback is present", () => {
+    const continuity = buildCaseContinuity({
+      caseSlug: "staged-harbor",
+      status: "in_progress",
+      note: undefined,
+      draft: undefined,
+      latestSubmission: undefined,
+      objectiveStates: [
+        {
+          objectiveId: "trace-ledger",
+          stageId: "briefing",
+          status: "active",
+          draftPayload: null,
+          updatedAt: new Date("2026-03-13T20:10:00.000Z"),
+        },
+      ],
+      objectiveSubmissions: [
+        {
+          objectiveId: "trace-ledger",
+          nextStatus: "in_progress",
+          feedback: "Not enough corroboration.",
+          createdAt: new Date("2026-03-13T20:30:00.000Z"),
+        },
+      ],
+      playerCaseUpdatedAt: new Date("2026-03-13T20:00:00.000Z"),
+    });
+
+    expect(continuity.section).toBe("objectives");
+    expect(continuity.label).toMatch(/resume objectives/i);
+    expect(continuity.href).toBe("/cases/staged-harbor#active-objectives");
+    expect(continuity.lastActivityAt?.toISOString()).toBe(
+      "2026-03-13T20:30:00.000Z",
+    );
+  });
+
   test("falls back to evidence when an in-progress case has no saved work", () => {
     const continuity = buildCaseContinuity({
       caseSlug: "red-harbor",

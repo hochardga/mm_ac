@@ -1,0 +1,62 @@
+{
+  "slug": "staged-valid",
+  "revision": "rev-2",
+  "title": "Fixture Case",
+  "summary": "Fixture summary",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Ledger Extract",
+      "family": "document",
+      "subtype": "financial_ledger",
+      "summary": "A damaged ledger.",
+      "source": "evidence/ledger.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Review the opening file.",
+      "handlerPrompts": ["Start with the ledger."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who doctored the books?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [{ "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }],
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "pick-evidence",
+          "prompt": "Select all relevant entries.",
+          "type": "multi_choice",
+          "stakes": "advisory",
+          "options": [
+            { "id": "ledger", "label": "Ledger" },
+            { "id": "receipt", "label": "Receipt" }
+          ],
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "confirm-entry",
+          "prompt": "Does the record match?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": false }
+        },
+        {
+          "id": "enter-code",
+          "prompt": "Enter the lock code.",
+          "type": "code_entry",
+          "stakes": "graded",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

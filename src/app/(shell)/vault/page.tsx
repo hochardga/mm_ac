@@ -6,6 +6,17 @@ import { formatCaseContinuityTimestamp } from "@/features/cases/case-continuity"
 import { listAvailableCases } from "@/features/cases/list-available-cases";
 import { authOptions } from "@/lib/auth";
 
+function formatComplexityLabel(complexity: "light" | "standard" | "deep") {
+  switch (complexity) {
+    case "light":
+      return "Light";
+    case "standard":
+      return "Standard";
+    case "deep":
+      return "Deep";
+  }
+}
+
 export default async function VaultPage() {
   const [session, cookieStore] = await Promise.all([
     getServerSession(authOptions),
@@ -50,7 +61,7 @@ export default async function VaultPage() {
               </div>
               {dossier.availability === "Available" ? (
                 <div className="rounded-full border border-stone-300 px-3 py-1 text-xs uppercase tracking-[0.2em] text-stone-600">
-                  {dossier.estimatedMinutes} min
+                  {formatComplexityLabel(dossier.complexity)}
                 </div>
               ) : null}
             </div>

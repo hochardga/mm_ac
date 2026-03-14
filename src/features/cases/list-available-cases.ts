@@ -2,7 +2,13 @@ import "server-only";
 
 import { inArray } from "drizzle-orm";
 
-import { notes, reportDrafts, reportSubmissions } from "@/db/schema";
+import {
+  notes,
+  objectiveSubmissions,
+  playerCaseObjectives,
+  reportDrafts,
+  reportSubmissions,
+} from "@/db/schema";
 import {
   buildCaseContinuity,
   type CaseContinuitySummary,
@@ -12,7 +18,7 @@ import {
   isPlayerCaseStatus,
   type PlayerCaseStatus,
 } from "@/features/cases/case-status";
-import { loadCaseManifest } from "@/features/cases/load-case-manifest";
+import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { syncCaseDefinitions } from "@/features/cases/sync-case-definitions";
 import { getCaseAvailability } from "@/features/maintenance/get-case-availability";
 import { getDb } from "@/lib/db";
@@ -21,7 +27,7 @@ export type VaultCaseRecord = {
   slug: string;
   title: string;
   summary: string;
-  estimatedMinutes: number;
+  complexity: "light" | "standard" | "deep";
   status: PlayerCaseStatus;
   displayStatus: string;
   availability: "Available" | "Maintenance" | "Hidden";
@@ -47,7 +53,13 @@ export async function listAvailableCases(
       })
     : [];
   const playerCaseIds = existingPlayerCases.map((playerCase) => playerCase.id);
-  const [savedNotes, savedDrafts, savedSubmissions] =
+  const [
+    savedNotes,
+    savedDrafts,
+    savedSubmissions,
+    savedObjectiveStates,
+    savedObjectiveSubmissions,
+  ] =
     playerCaseIds.length > 0
       ? await Promise.all([
           db.query.notes.findMany({
@@ -59,8 +71,14 @@ export async function listAvailableCases(
           db.query.reportSubmissions.findMany({
             where: inArray(reportSubmissions.playerCaseId, playerCaseIds),
           }),
+          db.query.playerCaseObjectives.findMany({
+            where: inArray(playerCaseObjectives.playerCaseId, playerCaseIds),
+          }),
+          db.query.objectiveSubmissions.findMany({
+            where: inArray(objectiveSubmissions.playerCaseId, playerCaseIds),
+          }),
         ])
-      : [[], [], []];
+      : [[], [], [], [], []];
   const playerCaseByDefinitionId = new Map(
     existingPlayerCases.map((playerCase) => [
       playerCase.caseDefinitionId,
@@ -73,10 +91,32 @@ export async function listAvailableCases(
   const savedDraftByPlayerCaseId = new Map(
     savedDrafts.map((draft) => [draft.playerCaseId, draft]),
   );
+  const objectiveStatesByPlayerCaseId = new Map<
+    string,
+    typeof savedObjectiveStates
+  >();
+  const objectiveSubmissionsByPlayerCaseId = new Map<
+    string,
+    typeof savedObjectiveSubmissions
+  >();
   const latestSubmissionByPlayerCaseId = new Map<
     string,
     (typeof savedSubmissions)[number]
   >();
+
+  for (const objectiveState of savedObjectiveStates) {
+    const current =
+      objectiveStatesByPlayerCaseId.get(objectiveState.playerCaseId) ?? [];
+    current.push(objectiveState);
+    objectiveStatesByPlayerCaseId.set(objectiveState.playerCaseId, current);
+  }
+
+  for (const submission of savedObjectiveSubmissions) {
+    const current =
+      objectiveSubmissionsByPlayerCaseId.get(submission.playerCaseId) ?? [];
+    current.push(submission);
+    objectiveSubmissionsByPlayerCaseId.set(submission.playerCaseId, current);
+  }
 
   for (const submission of savedSubmissions) {
     const current = latestSubmissionByPlayerCaseId.get(submission.playerCaseId);
@@ -91,10 +131,10 @@ export async function listAvailableCases(
       const playerCase = playerCaseByDefinitionId.get(definition.id);
       const published = definition.currentPublishedRevision.length > 0;
       let broken = false;
-      let manifest: Awaited<ReturnType<typeof loadCaseManifest>> | null = null;
+      let manifest: Awaited<ReturnType<typeof loadAnyCaseManifest>> | null = null;
 
       try {
-        manifest = await loadCaseManifest(definition.slug);
+        manifest = await loadAnyCaseManifest(definition.slug);
       } catch {
         broken = true;
       }
@@ -123,6 +163,10 @@ export async function listAvailableCases(
               latestSubmission: latestSubmissionByPlayerCaseId.get(
                 playerCase.id,
               ),
+              objectiveStates: objectiveStatesByPlayerCaseId.get(playerCase.id),
+              objectiveSubmissions: objectiveSubmissionsByPlayerCaseId.get(
+                playerCase.id,
+              ),
               playerCaseUpdatedAt: playerCase.updatedAt,
             })
           : undefined;
@@ -133,7 +177,7 @@ export async function listAvailableCases(
         summary:
           manifest?.summary ??
           "This dossier is under maintenance while Ashfall repairs the published file.",
-        estimatedMinutes: manifest?.estimatedMinutes ?? 0,
+        complexity: manifest && "complexity" in manifest ? manifest.complexity : "standard",
         status,
         displayStatus: getDisplayStatus(status),
         availability,

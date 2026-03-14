@@ -1,0 +1,54 @@
+{
+  "slug": "staged-cycle",
+  "revision": "rev-1",
+  "title": "Cycle Case",
+  "summary": "An invalid staged package with a circular unlock graph.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "ledger",
+      "title": "Ledger Extract",
+      "family": "document",
+      "subtype": "financial_ledger",
+      "summary": "A damaged ledger.",
+      "source": "evidence/ledger.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Review the ledger and open a new thread.",
+      "handlerPrompts": ["Start with the ledger."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "pick-suspect",
+          "prompt": "Who doctored the books?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [{ "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }],
+          "successUnlocks": { "stageIds": ["followup"], "resolvesCase": false }
+        }
+      ]
+    },
+    {
+      "id": "followup",
+      "startsUnlocked": false,
+      "title": "Follow-up",
+      "summary": "Check the rest of the ledger.",
+      "handlerPrompts": ["Dig into the lock code."],
+      "evidenceIds": ["ledger"],
+      "objectives": [
+        {
+          "id": "verify-code",
+          "prompt": "Does the code look right?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": ["briefing"], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

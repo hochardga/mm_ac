@@ -6,6 +6,10 @@ meta:
 ---
 # Coded Ledger Copy
 
-Three entries are scratched out beside initials matching city officials.
+Three entries are scratched out next to the initials `DW` at the same relief-cycle mark.
 
 The erased lines cluster around one repayment cycle, and each missing name sits next to a notation about emergency relief funds.
+
+One margin note repeats twice:
+
+`DW / relief cycle / hold until transfer clears`

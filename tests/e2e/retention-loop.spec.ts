@@ -32,33 +32,34 @@ test("player can return, solve a case, and launch a second case", async ({
     page.getByText(/ashfall restored your saved progress/i),
   ).toBeVisible();
 
-  await page.getByLabel("Suspect").selectOption("bookkeeper");
-  await page.getByLabel("Motive").selectOption("embezzlement");
-  await page.getByLabel("Method").selectOption("poisoned-wine");
+  await page.getByLabel("Response").selectOption("false");
+  await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(
+    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+  await page.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
-    page.waitForURL(/\/cases\/hollow-bishop\?evidence=/),
+    page.waitForURL("**/cases/hollow-bishop*"),
     page.getByRole("button", { name: /save draft/i }).click(),
   ]);
-  await expect(page.getByLabel("Suspect")).toHaveValue("bookkeeper");
-  await expect(page.getByLabel("Motive")).toHaveValue("embezzlement");
-  await expect(page.getByLabel("Method")).toHaveValue("poisoned-wine");
+  await expect(page.getByLabel("Response")).toHaveValue("bookkeeper");
 
   await page.goto("/vault");
   await expect(
-    page.getByRole("link", { name: /resume report/i }),
-  ).toHaveAttribute("href", "/cases/hollow-bishop#draft-report");
+    page.getByRole("link", { name: /resume objectives/i }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#active-objectives");
 
   await Promise.all([
-    page.waitForURL("**/cases/hollow-bishop#draft-report"),
-    page.getByRole("link", { name: /resume report/i }).click(),
+    page.waitForURL("**/cases/hollow-bishop#active-objectives"),
+    page.getByRole("link", { name: /resume objectives/i }).click(),
   ]);
   await expect(page.getByLabel("Field Notes")).toHaveValue(/receipts/i);
-  await expect(page.getByLabel("Suspect")).toHaveValue("bookkeeper");
+  await expect(page.getByLabel("Response")).toHaveValue("bookkeeper");
   await expect(
     page.getByText(/ashfall restored your saved progress/i),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: /submit report/i }).click();
+  await page.getByRole("button", { name: /submit objective/i }).click();
   await page.waitForURL("**/debrief");
   await expect(
     page.getByRole("heading", { name: /debrief: the hollow bishop/i }),

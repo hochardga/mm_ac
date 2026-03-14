@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { expect, test } from "@playwright/test";
 
-test("solving a case opens a debrief dossier with the final theory and reconstruction", async ({
+test("solving a staged case opens a debrief dossier with objective answers and reconstruction", async ({
   page,
 }) => {
   const email = `agent-${randomUUID()}@example.com`;
@@ -15,10 +15,13 @@ test("solving a case opens a debrief dossier with the final theory and reconstru
   await page.waitForURL("**/vault");
 
   await page.goto("/cases/hollow-bishop");
-  await page.getByLabel("Suspect").selectOption("bookkeeper");
-  await page.getByLabel("Motive").selectOption("embezzlement");
-  await page.getByLabel("Method").selectOption("poisoned-wine");
-  await page.getByRole("button", { name: /submit report/i }).click();
+  await page.getByLabel("Response").selectOption("false");
+  await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(
+    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+  await page.getByLabel("Response").selectOption("bookkeeper");
+  await page.getByRole("button", { name: /submit objective/i }).click();
 
   await page.waitForURL("**/cases/hollow-bishop/debrief");
   await expect(
@@ -30,8 +33,9 @@ test("solving a case opens a debrief dossier with the final theory and reconstru
   await expect(
     page.getByRole("heading", { name: /attempt history/i }),
   ).toBeVisible();
+  await expect(
+    page.getByText(/who poisoned the sacramental wine to silence the bishop/i).first(),
+  ).toBeVisible();
   await expect(page.getByText("Bookkeeper Mara Quinn").first()).toBeVisible();
-  await expect(page.getByText("Embezzlement cover-up").first()).toBeVisible();
-  await expect(page.getByText("Poisoned sacramental wine").first()).toBeVisible();
   await expect(page.getByText(/attempt 1/i).first()).toBeVisible();
 });

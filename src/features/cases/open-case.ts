@@ -7,11 +7,18 @@ import { and, desc, eq } from "drizzle-orm";
 import {
   analyticsEvents,
   notes,
+  objectiveSubmissions,
+  playerCaseObjectives,
   playerCases,
   reportDrafts,
   reportSubmissions,
 } from "@/db/schema";
 import { buildCaseContinuity } from "@/features/cases/case-continuity";
+import {
+  loadAnyCaseManifest,
+  type LoadedCaseManifest,
+  type LoadedStagedCaseManifest,
+} from "@/features/cases/load-case-manifest";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
 import { getDb, type AppTransaction } from "@/lib/db";
@@ -21,7 +28,8 @@ async function buildResumeTarget(
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {
-  const [savedNote, savedDraft, latestSubmission] = await Promise.all([
+  const [savedNote, savedDraft, latestSubmission, objectiveStates, objectiveSubmissionRows] =
+    await Promise.all([
     tx.query.notes.findFirst({
       where: eq(notes.playerCaseId, playerCase.id),
     }),
@@ -31,6 +39,13 @@ async function buildResumeTarget(
     tx.query.reportSubmissions.findFirst({
       where: eq(reportSubmissions.playerCaseId, playerCase.id),
       orderBy: [desc(reportSubmissions.attemptNumber)],
+    }),
+    tx.query.playerCaseObjectives.findMany({
+      where: eq(playerCaseObjectives.playerCaseId, playerCase.id),
+    }),
+    tx.query.objectiveSubmissions.findMany({
+      where: eq(objectiveSubmissions.playerCaseId, playerCase.id),
+      orderBy: [desc(objectiveSubmissions.createdAt)],
     }),
   ]);
   const continuity = buildCaseContinuity({
@@ -43,6 +58,8 @@ async function buildResumeTarget(
     note: savedNote,
     draft: savedDraft,
     latestSubmission,
+    objectiveStates,
+    objectiveSubmissions: objectiveSubmissionRows,
     playerCaseUpdatedAt: playerCase.updatedAt,
   });
 
@@ -62,6 +79,12 @@ async function buildResumeTarget(
       : null,
     lastActivityAt: continuity.lastActivityAt ?? playerCase.updatedAt,
   };
+}
+
+function isStagedManifest(
+  manifest: LoadedCaseManifest,
+): manifest is LoadedStagedCaseManifest {
+  return "stages" in manifest;
 }
 
 export async function openCase(input: { userId: string; caseSlug: string }) {
@@ -124,6 +147,26 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
         status: "in_progress",
       })
       .returning();
+
+    const manifest = await loadAnyCaseManifest(input.caseSlug, {
+      expectedRevision: definition.currentPublishedRevision,
+    });
+
+    if (isStagedManifest(manifest)) {
+      const objectiveRows = manifest.stages.flatMap((stage) =>
+        stage.objectives.map((objective) => ({
+          id: randomUUID(),
+          playerCaseId: createdPlayerCase.id,
+          stageId: stage.id,
+          objectiveId: objective.id,
+          status: stage.startsUnlocked ? "active" : "locked",
+        })),
+      );
+
+      if (objectiveRows.length > 0) {
+        await tx.insert(playerCaseObjectives).values(objectiveRows);
+      }
+    }
 
     const analyticsEvent = await writeAnalyticsEvent(tx, {
       name: "Case started",

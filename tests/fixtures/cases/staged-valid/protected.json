@@ -1,0 +1,17 @@
+{
+  "slug": "staged-valid",
+  "revision": "rev-2",
+  "grading": {
+    "maxGradedFailures": 3
+  },
+  "canonicalAnswers": {
+    "pick-suspect": { "type": "single_choice", "choiceId": "bookkeeper" },
+    "pick-evidence": { "type": "multi_choice", "choiceIds": ["ledger", "receipt"] },
+    "confirm-entry": { "type": "boolean", "value": true },
+    "enter-code": { "type": "code_entry", "value": "VESPER-17" }
+  },
+  "debriefs": {
+    "solved": { "title": "Debrief", "summary": "Solved summary" },
+    "closed_unsolved": { "title": "Closed", "summary": "Closed summary" }
+  }
+}

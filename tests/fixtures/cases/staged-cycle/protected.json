@@ -1,0 +1,15 @@
+{
+  "slug": "staged-cycle",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 2
+  },
+  "canonicalAnswers": {
+    "pick-suspect": { "type": "single_choice", "choiceId": "bookkeeper" },
+    "verify-code": { "type": "boolean", "value": true }
+  },
+  "debriefs": {
+    "solved": { "title": "Debrief", "summary": "Solved summary" },
+    "closed_unsolved": { "title": "Closed", "summary": "Closed summary" }
+  }
+}

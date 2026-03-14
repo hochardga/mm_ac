@@ -5,7 +5,7 @@ import path from "node:path";
 import { eq } from "drizzle-orm";
 
 import { caseDefinitions } from "@/db/schema";
-import { loadCaseManifest } from "@/features/cases/load-case-manifest";
+import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
 import { getDb, type AppDb, type AppTransaction } from "@/lib/db";
 
 type CaseDefinitionWriter = AppDb | AppTransaction;
@@ -24,7 +24,7 @@ export async function ensureCaseDefinition(
   db: CaseDefinitionWriter,
   caseSlug: string,
 ) {
-  const manifest = await loadCaseManifest(caseSlug);
+  const manifest = await loadAnyCaseManifest(caseSlug);
   const existingDefinition = await db.query.caseDefinitions.findFirst({
     where: eq(caseDefinitions.slug, caseSlug),
   });

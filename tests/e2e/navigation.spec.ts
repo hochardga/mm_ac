@@ -95,10 +95,13 @@ test("global primary nav is hidden on case routes after intake", async ({
   await expect(page.getByRole("navigation", { name: /primary/i })).toBeVisible();
 
   await page.goto("/cases/hollow-bishop");
-  await page.getByLabel("Suspect").selectOption("bookkeeper");
-  await page.getByLabel("Motive").selectOption("embezzlement");
-  await page.getByLabel("Method").selectOption("poisoned-wine");
-  await page.getByRole("button", { name: /submit report/i }).click();
+  await page.getByLabel("Response").selectOption("false");
+  await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(
+    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+  await page.getByLabel("Response").selectOption("bookkeeper");
+  await page.getByRole("button", { name: /submit objective/i }).click();
   await page.waitForURL("**/cases/hollow-bishop/debrief");
 
   await expect(
