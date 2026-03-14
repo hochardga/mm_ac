@@ -1,0 +1,31 @@
+{
+  "slug": "photo-missing-asset",
+  "revision": "rev-1",
+  "title": "Missing Photo Asset",
+  "summary": "Fixture case with a missing photo asset.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Check why the image is unavailable."
+  ],
+  "evidence": [
+    {
+      "id": "scene-photo",
+      "title": "Missing Scene Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "The asset path points to a missing image.",
+      "source": "evidence/scene-photo.json"
+    }
+  ]
+}

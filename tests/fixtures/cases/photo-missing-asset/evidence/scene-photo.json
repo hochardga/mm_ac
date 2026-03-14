@@ -1,0 +1,6 @@
+{
+  "subtype": "scene_photo",
+  "image": "evidence/scene-photo.png",
+  "caption": "The missing asset should fail validation.",
+  "sourceLabel": "Fixture archive"
+}

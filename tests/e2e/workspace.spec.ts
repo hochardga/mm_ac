@@ -78,3 +78,28 @@ test("agent can switch evidence types and keep the notebook visible", async ({
   await expect(page.getByLabel("Motive")).toHaveValue("smuggling");
   await expect(page.getByLabel("Method")).toHaveValue("signal-room");
 });
+
+test("agent can open photo evidence and inspect a larger preview", async ({
+  page,
+}) => {
+  const email = `agent-${randomUUID()}@example.com`;
+
+  await page.goto("/apply");
+  await page.getByLabel("Operative Alias").fill("Agent Lens");
+  await page.getByLabel("Agency Email").fill(email);
+  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
+  await page.getByRole("button", { name: /submit application/i }).click();
+  await page.waitForURL("**/vault");
+
+  await page.goto("/cases/hollow-bishop?evidence=vestry-scene-photo");
+
+  await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+  await expect(page.getByText(/date:\s*unknown/i)).toBeVisible();
+
+  await page.getByRole("button", { name: /open larger preview/i }).click();
+  await expect(
+    page.getByRole("dialog", { name: /vestry scene photo/i }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: /close preview/i }).click();
+  await expect(page.getByRole("heading", { name: /draft report/i })).toBeVisible();
+});

@@ -144,7 +144,7 @@ test("report selects require explicit choices before submission", async () => {
   expect(screen.getByLabelText("Method")).toBeRequired();
 });
 
-test("renders document markdown, record tables, and thread metadata in the workspace", async () => {
+test("renders document markdown, record tables, and photo evidence in the workspace", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -190,10 +190,11 @@ test("renders document markdown, record tables, and thread metadata in the works
   render(
     await CasePage({
       params: Promise.resolve({ caseSlug: "hollow-bishop" }),
-      searchParams: Promise.resolve({ evidence: "vestry-interview" }),
+      searchParams: Promise.resolve({ evidence: "vestry-scene-photo" }),
     } as never),
   );
 
-  expect(screen.getAllByText(/groundskeeper bram yates/i).length).toBeGreaterThan(0);
-  expect(screen.getByText(/2026-03-12T07:43:00Z/i)).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
+  expect(screen.getByText(/parish evidence locker/i)).toBeInTheDocument();
+  expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
 });

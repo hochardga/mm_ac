@@ -2,11 +2,12 @@ import {
   caseEvidenceSchema,
   documentEvidenceSourceSchema,
   evidenceIndexEntrySchema,
+  photoEvidenceSourceSchema,
   recordEvidenceSourceSchema,
   threadEvidenceSourceSchema,
 } from "@/features/cases/evidence/schema";
 
-test("accepts document, record, and thread index entries", () => {
+test("accepts document, record, thread, and photo index entries", () => {
   expect(
     evidenceIndexEntrySchema.parse({
       id: "ledger",
@@ -37,6 +38,16 @@ test("accepts document, record, and thread index entries", () => {
       source: "evidence/interview.json",
     }),
   ).toMatchObject({ family: "thread" });
+  expect(
+    evidenceIndexEntrySchema.parse({
+      id: "vestry-scene-photo",
+      title: "Vestry Scene Photo",
+      family: "photo",
+      subtype: "scene_photo",
+      summary: "The chalice rests beside the desk after the alarm.",
+      source: "evidence/vestry-scene-photo.json",
+    }),
+  ).toMatchObject({ family: "photo" });
 });
 
 test("rejects the legacy kind + content shape", () => {
@@ -50,7 +61,7 @@ test("rejects the legacy kind + content shape", () => {
   ).toThrow();
 });
 
-test("parses the three authored payload families", () => {
+test("parses the four authored payload families", () => {
   expect(
     documentEvidenceSourceSchema.parse({ subtype: "memo", body: "# Memo" }),
   ).toMatchObject({
@@ -79,6 +90,30 @@ test("parses the three authored payload families", () => {
     thread: { subject: "night watch" },
     messages: [],
   });
+  expect(
+    photoEvidenceSourceSchema.parse({
+      subtype: "scene_photo",
+      image: "evidence/vestry-scene-photo.png",
+      caption: "The silver chalice lies on the vestry floor.",
+      sourceLabel: "Parish evidence locker",
+    }),
+  ).toMatchObject({
+    subtype: "scene_photo",
+    image: "evidence/vestry-scene-photo.png",
+    caption: "The silver chalice lies on the vestry floor.",
+    sourceLabel: "Parish evidence locker",
+  });
+});
+
+test("rejects unsupported photo subtypes", () => {
+  expect(() =>
+    photoEvidenceSourceSchema.parse({
+      subtype: "crime_scene",
+      image: "evidence/photo.png",
+      caption: "A mislabeled subtype.",
+      sourceLabel: "Archive",
+    }),
+  ).toThrow(/subtype/i);
 });
 
 test("rejects non-ISO thread timestamps", () => {
@@ -109,6 +144,22 @@ test("normalized document evidence keeps the non-empty body constraint", () => {
       source: "evidence/ledger.md",
       body: "",
       meta: {},
+    }),
+  ).toThrow();
+});
+
+test("normalized photo evidence keeps caption and sourceLabel required", () => {
+  expect(() =>
+    caseEvidenceSchema.parse({
+      id: "photo-1",
+      title: "Photo",
+      family: "photo",
+      subtype: "scene_photo",
+      summary: "Summary",
+      source: "evidence/photo.json",
+      image: "evidence/photo.png",
+      caption: "",
+      sourceLabel: "",
     }),
   ).toThrow();
 });

@@ -1,0 +1,31 @@
+{
+  "slug": "photo-traversal-asset",
+  "revision": "rev-1",
+  "title": "Traversal Photo Asset",
+  "summary": "Fixture case with a path traversal photo asset.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Reject image path traversal."
+  ],
+  "evidence": [
+    {
+      "id": "scene-photo",
+      "title": "Traversal Scene Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "The asset path attempts to escape the case root.",
+      "source": "evidence/scene-photo.json"
+    }
+  ]
+}

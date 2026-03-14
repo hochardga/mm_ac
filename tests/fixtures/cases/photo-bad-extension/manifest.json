@@ -1,0 +1,31 @@
+{
+  "slug": "photo-bad-extension",
+  "revision": "rev-1",
+  "title": "Bad Photo Extension",
+  "summary": "Fixture case with an unsupported photo asset extension.",
+  "estimatedMinutes": 30,
+  "reportOptions": {
+    "suspect": [
+      { "id": "suspect-a", "label": "Suspect A" }
+    ],
+    "motive": [
+      { "id": "motive-a", "label": "Motive A" }
+    ],
+    "method": [
+      { "id": "method-a", "label": "Method A" }
+    ]
+  },
+  "handlerPrompts": [
+    "Verify the asset extension is allowed."
+  ],
+  "evidence": [
+    {
+      "id": "scene-photo",
+      "title": "Bad Extension Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "The asset path uses a text file instead of an image.",
+      "source": "evidence/scene-photo.json"
+    }
+  ]
+}

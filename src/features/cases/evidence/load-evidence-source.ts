@@ -7,9 +7,11 @@ import {
   caseEvidenceSchema,
   type EvidenceIndexEntry,
   documentEvidenceSourceSchema,
+  photoEvidenceSourceSchema,
   recordEvidenceSourceSchema,
   threadEvidenceSourceSchema,
 } from "@/features/cases/evidence/schema";
+import { resolvePhotoAsset } from "@/features/cases/evidence/photo-asset";
 import { resolveCaseFilePath } from "@/features/cases/paths";
 
 type LoadEvidenceSourceOptions = {
@@ -78,6 +80,27 @@ export async function loadEvidenceSource({
         ...entry,
         thread: source.thread,
         messages: source.messages,
+      });
+    }
+    case "photo": {
+      const source = photoEvidenceSourceSchema.parse(JSON.parse(raw));
+
+      if (source.subtype !== entry.subtype) {
+        throw new Error(
+          `Photo evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
+        );
+      }
+
+      const resolvedAsset = await resolvePhotoAsset(caseSlug, source.image, {
+        casesRoot,
+      });
+
+      return caseEvidenceSchema.parse({
+        ...entry,
+        image: resolvedAsset.relativePath,
+        caption: source.caption,
+        sourceLabel: source.sourceLabel,
+        date: source.date,
       });
     }
   }
