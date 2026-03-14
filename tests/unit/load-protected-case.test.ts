@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import {
+  loadAnyProtectedCase,
   loadProtectedCase,
   loadStagedProtectedCase,
 } from "@/features/cases/load-protected-case";
@@ -35,17 +36,23 @@ test("protected loader exposes grading configuration", async () => {
   });
 });
 
-test("protected loader supports legacy shipped cases", async () => {
-  const payload = await loadProtectedCase("hollow-bishop");
+test("protected loader supports staged shipped cases", async () => {
+  const payload = await loadAnyProtectedCase("hollow-bishop");
 
-  expect(payload.grading.maxAttempts).toBeGreaterThan(0);
+  if ("feedbackTemplates" in payload) {
+    throw new Error("expected staged shipped payload");
+  }
+
+  expect(payload.grading.maxGradedFailures).toBeGreaterThan(0);
   expect(payload.canonicalAnswers).toMatchObject({
-    suspect: "bookkeeper",
-    motive: "embezzlement",
-    method: "poisoned-wine",
-  });
-  expect(payload.feedbackTemplates).toMatchObject({
-    solved: expect.any(String),
+    "chalice-relevance": {
+      type: "boolean",
+      value: false,
+    },
+    "identify-poisoner": {
+      type: "single_choice",
+      choiceId: "bookkeeper",
+    },
   });
   expect(payload.debriefs.solved.title).toMatch(/hollow bishop/i);
 });

@@ -3,36 +3,113 @@
   "revision": "rev-1",
   "title": "The Briar Ledger",
   "summary": "A dead archivist leaves behind a coded debt ledger and three missing names.",
-  "estimatedMinutes": 80,
-  "reportOptions": {
-    "suspect": [
-      { "id": "archivist-aide", "label": "Archivist Aide Nessa Cole" },
-      { "id": "treasurer", "label": "Treasurer Dorian Wren" },
-      { "id": "judge", "label": "Judge Imogen Thorne" }
-    ],
-    "motive": [
-      { "id": "debt-erasure", "label": "Debt record erasure" },
-      { "id": "political-blackmail", "label": "Political blackmail" },
-      { "id": "inheritance", "label": "Inheritance dispute" }
-    ],
-    "method": [
-      { "id": "letter-opener", "label": "Letter opener stabbing" },
-      { "id": "archive-fire", "label": "Archive fire cover-up" },
-      { "id": "sedative", "label": "Sedative overdose" }
-    ]
-  },
-  "handlerPrompts": [
-    "The coded ledger matters more than the broken cabinet lock.",
-    "Find who profits if three names disappear from the book."
-  ],
+  "complexity": "deep",
   "evidence": [
     {
       "id": "coded-ledger",
       "title": "Coded Ledger Copy",
       "family": "document",
       "subtype": "legal_doc",
-      "summary": "Three scratched-out entries sit beside initials tied to city officials.",
+      "summary": "Three scratched-out entries sit beside initials tied to relief fund transfers.",
       "source": "evidence/coded-ledger.md"
+    },
+    {
+      "id": "archive-correspondence",
+      "title": "Archive Clerk Correspondence",
+      "family": "thread",
+      "subtype": "handler_message",
+      "summary": "Anxious archive messages describe which relief records were pulled before the archivist died.",
+      "source": "evidence/archive-correspondence.json"
+    },
+    {
+      "id": "relief-disbursement",
+      "title": "Relief Disbursement Register",
+      "family": "record",
+      "subtype": "financial_register",
+      "summary": "A relief-fund register shows two payouts disappearing from the same accounting cycle.",
+      "source": "evidence/relief-disbursement.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "ledger-decoding",
+      "startsUnlocked": true,
+      "title": "Ledger Decoding",
+      "summary": "Pull a usable code from the archivist's last ledger copy.",
+      "handlerPrompts": [
+        "The repeating initials matter more than the scratched-out names.",
+        "Start with the relief cycle mark in the ledger margin."
+      ],
+      "evidenceIds": ["coded-ledger"],
+      "objectives": [
+        {
+          "id": "match-initials",
+          "prompt": "Enter the repeating initials beside the erased entries.",
+          "type": "code_entry",
+          "stakes": "advisory",
+          "successUnlocks": {
+            "stageIds": ["relief-trail"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "relief-trail",
+      "startsUnlocked": false,
+      "title": "Relief Trail",
+      "summary": "Cross the decoded initials against the missing relief-fund records.",
+      "handlerPrompts": [
+        "Two missing records disappear in the same relief cycle.",
+        "The clerk correspondence narrows which payouts the treasurer wanted buried."
+      ],
+      "evidenceIds": ["archive-correspondence", "relief-disbursement"],
+      "objectives": [
+        {
+          "id": "select-missing-records",
+          "prompt": "Which two records disappeared in the same relief cycle?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            { "id": "grain-vouchers", "label": "Emergency grain vouchers" },
+            { "id": "widow-stipends", "label": "Widow stipends" },
+            { "id": "ferry-repairs", "label": "Ferry repair bond" },
+            { "id": "court-levy", "label": "Court levy receipts" }
+          ],
+          "successUnlocks": {
+            "stageIds": ["final-attribution"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-attribution",
+      "startsUnlocked": false,
+      "title": "Final Attribution",
+      "summary": "Use the relief trail to identify who orchestrated the erasures.",
+      "handlerPrompts": [
+        "The erased payments protect the person who signed the relief transfers.",
+        "Ask who profits if the archivist's scratched lines stay buried."
+      ],
+      "evidenceIds": ["coded-ledger"],
+      "objectives": [
+        {
+          "id": "identify-architect",
+          "prompt": "Who orchestrated the debt-book erasures?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            { "id": "archivist-aide", "label": "Archivist Aide Nessa Cole" },
+            { "id": "treasurer", "label": "Treasurer Dorian Wren" },
+            { "id": "judge", "label": "Judge Imogen Thorne" }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
     }
   ]
 }

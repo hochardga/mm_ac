@@ -1,0 +1,39 @@
+{
+  "subtype": "financial_register",
+  "columns": [
+    { "id": "cycle", "label": "Cycle", "sortable": true },
+    { "id": "record", "label": "Record", "filterable": true },
+    { "id": "status", "label": "Status" },
+    { "id": "signedBy", "label": "Signed By", "filterable": true }
+  ],
+  "rows": [
+    {
+      "id": "relief-1",
+      "cycle": "Q1-17",
+      "record": "Emergency grain vouchers",
+      "status": "Removed from archive",
+      "signedBy": "Dorian Wren"
+    },
+    {
+      "id": "relief-2",
+      "cycle": "Q1-17",
+      "record": "Widow stipends",
+      "status": "Removed from archive",
+      "signedBy": "Dorian Wren"
+    },
+    {
+      "id": "relief-3",
+      "cycle": "Q1-16",
+      "record": "Ferry repair bond",
+      "status": "Filed",
+      "signedBy": "Imogen Thorne"
+    },
+    {
+      "id": "relief-4",
+      "cycle": "Q1-18",
+      "record": "Court levy receipts",
+      "status": "Filed",
+      "signedBy": "Nessa Cole"
+    }
+  ]
+}

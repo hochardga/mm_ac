@@ -3,28 +3,7 @@
   "revision": "rev-1",
   "title": "Signal at Red Harbor",
   "summary": "A distress transmission points back to a vanished customs officer.",
-  "estimatedMinutes": 75,
-  "reportOptions": {
-    "suspect": [
-      { "id": "radio-chief", "label": "Radio Chief Soren Pike" },
-      { "id": "captain", "label": "Captain Lena Morrow" },
-      { "id": "dispatcher", "label": "Dispatcher Hadi Noor" }
-    ],
-    "motive": [
-      { "id": "smuggling", "label": "Smuggling protection" },
-      { "id": "insurance", "label": "Insurance fraud" },
-      { "id": "jealousy", "label": "Professional jealousy" }
-    ],
-    "method": [
-      { "id": "drowned", "label": "Forced overboard drowning" },
-      { "id": "signal-room", "label": "Electrocution in the signal room" },
-      { "id": "flare-gun", "label": "Flare gun attack" }
-    ]
-  },
-  "handlerPrompts": [
-    "Trace who had access to the midnight dispatch log.",
-    "Check cargo records against harbor camera timestamps."
-  ],
+  "complexity": "light",
   "evidence": [
     {
       "id": "dispatch-log",
@@ -41,6 +20,36 @@
       "subtype": "handler_message",
       "summary": "Night-shift messages tie the vanished customs officer to the signal room before the false distress call.",
       "source": "evidence/night-watch-thread.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "signal-room",
+      "startsUnlocked": true,
+      "title": "Signal Room",
+      "summary": "Reconstruct who could have powered Annex B and staged the distress burst.",
+      "handlerPrompts": [
+        "Trace who had access to the dead Annex B repeater before midnight.",
+        "The distress route points to one harbor operator, not the whole shift."
+      ],
+      "evidenceIds": ["dispatch-log", "night-watch-thread"],
+      "objectives": [
+        {
+          "id": "identify-saboteur",
+          "prompt": "Who staged the false distress transmission?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            { "id": "radio-chief", "label": "Radio Chief Soren Pike" },
+            { "id": "captain", "label": "Captain Lena Morrow" },
+            { "id": "dispatcher", "label": "Dispatcher Hadi Noor" }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
     }
   ]
 }

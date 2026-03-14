@@ -1,15 +1,4 @@
-import type { PlayerCaseStatus } from "@/features/cases/case-status";
-
-type DebriefAttemptStatus = Exclude<PlayerCaseStatus, "new">;
-
-type DebriefAttempt = {
-  attemptNumber: number;
-  nextStatus: DebriefAttemptStatus;
-  suspect: string;
-  motive: string;
-  method: string;
-  feedback: string;
-};
+import type { DebriefAttempt, DebriefAttemptStatus } from "@/features/debrief/get-debrief";
 
 type DebriefAttemptHistoryProps = {
   attempts: DebriefAttempt[];
@@ -48,7 +37,7 @@ export function DebriefAttemptHistory({
       <ol className="mt-6 space-y-4">
         {attempts.map((attempt) => (
           <li
-            key={attempt.attemptNumber}
+            key={`${attempt.entries.map((entry) => entry.label).join("-")}-${attempt.attemptNumber}`}
             className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5"
           >
             <div className="flex flex-wrap items-center justify-between gap-3">
@@ -60,25 +49,17 @@ export function DebriefAttemptHistory({
               </p>
             </div>
 
-            <dl className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-stone-400">
-                  Suspect
-                </dt>
-                <dd className="mt-2 text-sm text-stone-100">{attempt.suspect}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-stone-400">
-                  Motive
-                </dt>
-                <dd className="mt-2 text-sm text-stone-100">{attempt.motive}</dd>
-              </div>
-              <div>
-                <dt className="text-xs uppercase tracking-[0.2em] text-stone-400">
-                  Method
-                </dt>
-                <dd className="mt-2 text-sm text-stone-100">{attempt.method}</dd>
-              </div>
+            <dl className="mt-4 grid gap-3">
+              {attempt.entries.map((entry) => (
+                <div key={`${attempt.attemptNumber}-${entry.label}`}>
+                  <dt className="text-xs uppercase tracking-[0.2em] text-stone-400">
+                    {entry.label}
+                  </dt>
+                  <dd className="mt-2 text-sm text-stone-100">
+                    {entry.playerValue ?? "No answer filed"}
+                  </dd>
+                </div>
+              ))}
             </dl>
 
             <div className="mt-4 rounded-[1.25rem] border border-[#d96c3d]/20 bg-[#d96c3d]/10 p-4">

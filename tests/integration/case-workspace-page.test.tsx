@@ -21,10 +21,8 @@ vi.mock("next-auth", () => ({
 
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
 import { objectiveSubmissions, playerCaseObjectives, users } from "@/db/schema";
-import { ReportPanel } from "@/features/cases/components/report-panel";
 import * as caseManifestLoader from "@/features/cases/load-case-manifest";
 import type { LoadedStagedCaseManifest } from "@/features/cases/load-case-manifest";
-import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
 import { saveNote } from "@/features/notes/save-note";
 import { closeDb, getDb } from "@/lib/db";
@@ -70,28 +68,44 @@ test("renders an evidence index, selected viewer, and persistent notes together"
     screen.getByRole("heading", { name: /field notes/i }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: /draft report/i }),
+    screen.getByRole("heading", { name: /active objectives/i }),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(/was the silver chalice actually the murder weapon/i),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/active evidence: vestry interview transcript/i),
   ).toBeInTheDocument();
 });
 
-test("preserves the selected evidence when saving a draft", async () => {
-  const manifest = await loadCaseManifest("red-harbor");
+test("preserves the selected evidence when saving an objective draft", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "objective-draft-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Objective Draft",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
 
   render(
-    <ReportPanel
-      caseSlug="red-harbor"
-      playerCaseId="player-case-1"
-      selectedEvidenceId="dispatch-log"
-      manifest={manifest}
-      savedDraft={undefined}
-      submissionToken="submission-token"
-    />,
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
   );
 
   expect(screen.getByDisplayValue("dispatch-log")).toBeInTheDocument();
@@ -131,23 +145,34 @@ test("uses the first repeated evidence query value when the case page receives a
   ).toBeInTheDocument();
 });
 
-test("report selects require explicit choices before submission", async () => {
-  const manifest = await loadCaseManifest("red-harbor");
+test("objective responses require explicit choices before submission", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "objective-required-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Objective Required",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
 
   render(
-    <ReportPanel
-      caseSlug="red-harbor"
-      playerCaseId="player-case-1"
-      selectedEvidenceId="dispatch-log"
-      manifest={manifest}
-      savedDraft={undefined}
-      submissionToken="submission-token"
-    />,
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
   );
 
-  expect(screen.getByLabelText("Suspect")).toBeRequired();
-  expect(screen.getByLabelText("Motive")).toBeRequired();
-  expect(screen.getByLabelText("Method")).toBeRequired();
+  expect(screen.getByLabelText("Response")).toBeRequired();
 });
 
 test("renders document markdown, record tables, and photo evidence in the workspace", async () => {
@@ -251,8 +276,8 @@ test("shows restored progress with quick links when reopening a case with saved 
     screen.getByRole("link", { name: /jump to field notes/i }),
   ).toHaveAttribute("href", "#field-notes");
   expect(
-    screen.getByRole("link", { name: /jump to draft report/i }),
-  ).toHaveAttribute("href", "#draft-report");
+    screen.getByRole("link", { name: /jump to active objectives/i }),
+  ).toHaveAttribute("href", "#active-objectives");
 
   expect(
     screen.getByRole("heading", { name: /evidence intake/i }).closest("section"),
@@ -261,14 +286,13 @@ test("shows restored progress with quick links when reopening a case with saved 
     screen.getByRole("heading", { name: /field notes/i }).closest("section"),
   ).toHaveAttribute("id", "field-notes");
   expect(
-    screen.getByRole("heading", { name: /draft report/i }).closest("section"),
-  ).toHaveAttribute("id", "draft-report");
+    screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
+  ).toHaveAttribute("id", "active-objectives");
 });
 
 test("renders staged objectives with gated evidence and objective continuity links", async () => {
   const db = await getDb();
   const userId = randomUUID();
-  const legacyManifest = await loadCaseManifest("hollow-bishop");
 
   await db.insert(users).values({
     id: userId,
@@ -279,7 +303,7 @@ test("renders staged objectives with gated evidence and objective continuity lin
 
   const stagedManifest: LoadedStagedCaseManifest = {
     slug: "hollow-bishop",
-    revision: legacyManifest.revision,
+    revision: "rev-1",
     title: "Hollow Bishop / Staged",
     summary: "A staged progression test case.",
     complexity: "standard",

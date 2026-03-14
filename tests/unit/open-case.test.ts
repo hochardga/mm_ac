@@ -55,7 +55,10 @@ test("pins the latest revision on first open and emits case_started once", async
   expect(second.playerCase.id).toBe(first.playerCase.id);
   expect(second.analyticsEvent.id).toBe(first.analyticsEvent.id);
   expect(openedCases).toHaveLength(1);
-  expect(objectiveRows).toHaveLength(0);
+  expect(objectiveRows.map((row) => `${row.objectiveId}:${row.status}`)).toEqual([
+    "chalice-relevance:active",
+    "identify-poisoner:locked",
+  ]);
   expect(trackedEvents).toHaveLength(1);
 });
 

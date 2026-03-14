@@ -94,12 +94,10 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
             <DebriefReportCard
               title="Your Final Report"
               description="The final theory you filed before Ashfall closed the line."
-              eyebrow={`Attempt ${debrief.finalReport.attemptNumber}`}
-              selection={{
-                suspect: debrief.finalReport.suspect,
-                motive: debrief.finalReport.motive,
-                method: debrief.finalReport.method,
-              }}
+              eyebrow={debrief.finalReport.eyebrow}
+              entries={debrief.finalReport.entries}
+              valueKey="playerValue"
+              valueLabel="Filed answer"
             />
           ) : null}
 
@@ -111,7 +109,9 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
                 ? "Accepted theory"
                 : "Corrected theory"
             }
-            selection={debrief.solution}
+            entries={debrief.solution}
+            valueKey="solutionValue"
+            valueLabel="Ashfall answer"
           />
         </section>
 

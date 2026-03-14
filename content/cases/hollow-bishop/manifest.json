@@ -3,28 +3,7 @@
   "revision": "rev-1",
   "title": "The Hollow Bishop",
   "summary": "A ritual-looking homicide in a locked church office.",
-  "estimatedMinutes": 90,
-  "reportOptions": {
-    "suspect": [
-      { "id": "bishop", "label": "Bishop Elias Vale" },
-      { "id": "groundskeeper", "label": "Groundskeeper Bram Yates" },
-      { "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }
-    ],
-    "motive": [
-      { "id": "blackmail", "label": "Blackmail exposure" },
-      { "id": "embezzlement", "label": "Embezzlement cover-up" },
-      { "id": "revenge", "label": "Personal revenge" }
-    ],
-    "method": [
-      { "id": "poisoned-wine", "label": "Poisoned sacramental wine" },
-      { "id": "candlestick", "label": "Blunt-force candlestick attack" },
-      { "id": "staged-fall", "label": "Staged staircase fall" }
-    ]
-  },
-  "handlerPrompts": [
-    "Review the vestry ledger before filing an accusation.",
-    "The church finances are dirtier than the crime scene."
-  ],
+  "complexity": "standard",
   "evidence": [
     {
       "id": "ledger",
@@ -49,6 +28,59 @@
       "subtype": "interview_transcript",
       "summary": "A groundskeeper describes the silver chalice found beside the victim's desk.",
       "source": "evidence/vestry-interview.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "ledger-review",
+      "startsUnlocked": true,
+      "title": "Ledger Review",
+      "summary": "Break apart the staged ritual scene before filing an accusation.",
+      "handlerPrompts": [
+        "Review the vestry ledger before deciding whether the chalice matters.",
+        "Bram's interview suggests someone wanted your attention off the books."
+      ],
+      "evidenceIds": ["ledger", "vestry-interview", "vestry-scene-photo"],
+      "objectives": [
+        {
+          "id": "chalice-relevance",
+          "prompt": "Was the silver chalice actually the murder weapon?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": {
+            "stageIds": ["poison-proof"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "poison-proof",
+      "startsUnlocked": false,
+      "title": "Poison Proof",
+      "summary": "Use the scene photo to identify who staged the chalice and poisoned the wine.",
+      "handlerPrompts": [
+        "The wax on the chalice and the spill pattern do not tell the same story.",
+        "Only one suspect had both the financial motive and access to the sacramental wine."
+      ],
+      "evidenceIds": ["vestry-scene-photo"],
+      "objectives": [
+        {
+          "id": "identify-poisoner",
+          "prompt": "Who poisoned the sacramental wine to silence the bishop?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            { "id": "bishop", "label": "Bishop Elias Vale" },
+            { "id": "groundskeeper", "label": "Groundskeeper Bram Yates" },
+            { "id": "bookkeeper", "label": "Bookkeeper Mara Quinn" }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
     }
   ]
 }

@@ -22,8 +22,8 @@ import VaultPage from "@/app/(shell)/vault/page";
 import {
   caseDefinitions,
   notes,
+  playerCaseObjectives,
   playerCases,
-  reportDrafts,
   users,
 } from "@/db/schema";
 import { closeDb, getDb } from "@/lib/db";
@@ -93,9 +93,14 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   expect(screen.getByText("The Briar Ledger")).toBeInTheDocument();
   expect(screen.getByText("In Progress")).toBeInTheDocument();
   expect(screen.getAllByText("New")).toHaveLength(2);
+  expect(screen.getByText("Light")).toBeInTheDocument();
+  expect(screen.getByText("Standard")).toBeInTheDocument();
+  expect(screen.getByText("Deep")).toBeInTheDocument();
+  expect(screen.queryByText(/90 min/i)).not.toBeInTheDocument();
+  expect(screen.queryByText(/80 min/i)).not.toBeInTheDocument();
 });
 
-test("renders continuity-aware vault actions for draft, notes, and terminal cases", async () => {
+test("renders continuity-aware vault actions for objectives, notes, and terminal cases", async () => {
   const db = await getDb();
   const agentId = randomUUID();
   const hollowBishopId = randomUUID();
@@ -163,13 +168,16 @@ test("renders continuity-aware vault actions for draft, notes, and terminal case
     },
   ]);
 
-  await db.insert(reportDrafts).values({
+  await db.insert(playerCaseObjectives).values({
     id: randomUUID(),
     playerCaseId: hollowBishopPlayerCaseId,
-    suspectId: "bookkeeper",
-    motiveId: "embezzlement",
-    methodId: "poisoned-wine",
-    attemptCount: 1,
+    stageId: "ledger-review",
+    objectiveId: "chalice-relevance",
+    status: "active",
+    draftPayload: {
+      type: "boolean",
+      value: false,
+    },
   });
 
   await db.insert(notes).values({
@@ -196,9 +204,9 @@ test("renders continuity-aware vault actions for draft, notes, and terminal case
 
   expect(
     within(draftCard as HTMLElement).getByRole("link", {
-      name: /resume report/i,
+      name: /resume objectives/i,
     }),
-  ).toHaveAttribute("href", "/cases/hollow-bishop#draft-report");
+  ).toHaveAttribute("href", "/cases/hollow-bishop#active-objectives");
 
   expect(
     within(notesCard as HTMLElement).getByRole("link", {

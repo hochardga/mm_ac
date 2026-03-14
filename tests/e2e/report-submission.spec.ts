@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { expect, test } from "@playwright/test";
 
-test("incorrect report keeps submitted deductions visible and shows handler feedback", async ({
+test("incorrect graded objective submissions keep the answer visible and show feedback", async ({
   page,
 }) => {
   const email = `agent-${randomUUID()}@example.com`;
@@ -15,18 +15,12 @@ test("incorrect report keeps submitted deductions visible and shows handler feed
   await page.waitForURL("**/vault");
 
   await page.goto("/cases/red-harbor");
-  await page.getByLabel("Suspect").selectOption("captain");
-  await page.getByLabel("Motive").selectOption("insurance");
-  await page.getByLabel("Method").selectOption("drowned");
+  await page.getByLabel("Response").selectOption("captain");
 
-  await page.getByRole("button", { name: /submit report/i }).click();
+  await page.getByRole("button", { name: /submit objective/i }).click();
 
   await expect(
-    page.getByText(
-      /the harbor file remains open\. reconstruct the signal chain again\./i,
-    ),
+    page.getByText(/incorrect graded objective submission\./i),
   ).toBeVisible();
-  await expect(page.getByLabel("Suspect")).toHaveValue("captain");
-  await expect(page.getByLabel("Motive")).toHaveValue("insurance");
-  await expect(page.getByLabel("Method")).toHaveValue("drowned");
+  await expect(page.getByLabel("Response")).toHaveValue("captain");
 });

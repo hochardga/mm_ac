@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { expect, test } from "@playwright/test";
 
-test("agent can review evidence and save notes plus a draft report", async ({
+test("agent can review evidence, unlock the next objective, and save a staged draft", async ({
   page,
 }) => {
   const email = `agent-${randomUUID()}@example.com`;
@@ -23,22 +23,27 @@ test("agent can review evidence and save notes plus a draft report", async ({
     page.getByRole("heading", { name: /evidence intake/i }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /active objectives/i }),
+  ).toBeVisible();
 
   await page.getByLabel("Field Notes").fill("Check the receipts.");
   await page.getByRole("button", { name: /save notes/i }).click();
   await expect(page.getByLabel("Field Notes")).toHaveValue(/receipts/i);
 
-  await page.getByLabel("Suspect").selectOption("bookkeeper");
-  await page.getByLabel("Motive").selectOption("embezzlement");
-  await page.getByLabel("Method").selectOption("poisoned-wine");
+  await page.getByLabel("Response").selectOption("false");
+  await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(
+    page.getByText(/who poisoned the sacramental wine to silence the bishop/i),
+  ).toBeVisible();
+
+  await page.getByLabel("Response").selectOption("bookkeeper");
   await Promise.all([
     page.waitForLoadState("networkidle"),
     page.getByRole("button", { name: /save draft/i }).click(),
   ]);
 
-  await expect(page.getByLabel("Suspect")).toHaveValue("bookkeeper");
-  await expect(page.getByLabel("Motive")).toHaveValue("embezzlement");
-  await expect(page.getByLabel("Method")).toHaveValue("poisoned-wine");
+  await expect(page.getByLabel("Response")).toHaveValue("bookkeeper");
 });
 
 test("agent can switch evidence types and keep the notebook visible", async ({
@@ -67,16 +72,12 @@ test("agent can switch evidence types and keep the notebook visible", async ({
     page.getByText(/active evidence: night watch exchange/i),
   ).toBeVisible();
 
-  await page.getByLabel("Suspect").selectOption("dispatcher");
-  await page.getByLabel("Motive").selectOption("smuggling");
-  await page.getByLabel("Method").selectOption("signal-room");
+  await page.getByLabel("Response").selectOption("dispatcher");
 
   await page.getByRole("button", { name: /save draft/i }).click();
   await page.waitForURL("**/cases/red-harbor?evidence=night-watch-thread");
 
-  await expect(page.getByLabel("Suspect")).toHaveValue("dispatcher");
-  await expect(page.getByLabel("Motive")).toHaveValue("smuggling");
-  await expect(page.getByLabel("Method")).toHaveValue("signal-room");
+  await expect(page.getByLabel("Response")).toHaveValue("dispatcher");
 });
 
 test("agent can open photo evidence and inspect a larger preview", async ({
@@ -101,5 +102,7 @@ test("agent can open photo evidence and inspect a larger preview", async ({
     page.getByRole("dialog", { name: /vestry scene photo/i }),
   ).toBeVisible();
   await page.getByRole("button", { name: /close preview/i }).click();
-  await expect(page.getByRole("heading", { name: /draft report/i })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /active objectives/i }),
+  ).toBeVisible();
 });

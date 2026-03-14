@@ -151,6 +151,7 @@ export async function submitObjective(
       gradedFailureCount: playerCase.gradedFailureCount,
       maxGradedFailures: protectedCase.grading.maxGradedFailures,
     });
+    const now = new Date();
 
     const [savedSubmission] = await tx
       .insert(objectiveSubmissions)
@@ -172,8 +173,9 @@ export async function submitObjective(
         .update(playerCaseObjectives)
         .set({
           status: "solved",
-          solvedAt: new Date(),
-          updatedAt: new Date(),
+          draftPayload: null,
+          solvedAt: now,
+          updatedAt: now,
         })
         .where(eq(playerCaseObjectives.id, objectiveRow.id));
 
@@ -182,7 +184,7 @@ export async function submitObjective(
           .update(playerCaseObjectives)
           .set({
             status: "active",
-            updatedAt: new Date(),
+            updatedAt: now,
           })
           .where(
             and(
@@ -192,6 +194,14 @@ export async function submitObjective(
             ),
           );
       }
+    } else {
+      await tx
+        .update(playerCaseObjectives)
+        .set({
+          draftPayload: input.payload,
+          updatedAt: now,
+        })
+        .where(eq(playerCaseObjectives.id, objectiveRow.id));
     }
 
     const gradedFailureIncrement =
@@ -216,7 +226,7 @@ export async function submitObjective(
             : evaluation.caseStatus === "closed_unsolved"
               ? protectedCase.debriefs.closed_unsolved.summary
               : null,
-        updatedAt: new Date(),
+        updatedAt: now,
       })
       .where(eq(playerCases.id, input.playerCaseId));
 

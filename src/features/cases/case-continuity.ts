@@ -90,22 +90,21 @@ export function buildCaseContinuity(
     )[0];
 
   if (latestObjectiveDraft || latestObjectiveSubmission) {
-    const hasFreshFeedback =
-      latestObjectiveSubmission &&
-      (!latestObjectiveDraft ||
-        latestObjectiveSubmission.createdAt >= latestObjectiveDraft.updatedAt);
-
     return {
       section: "objectives",
       label: "Resume Objectives",
-      description: hasFreshFeedback
+      description: latestObjectiveSubmission
         ? "Objective feedback is waiting in your active objectives."
         : "Your active objective draft is saved and ready to continue.",
       href: `/cases/${input.caseSlug}#active-objectives`,
       lastActivityAt:
-        latestObjectiveSubmission?.createdAt ??
-        latestObjectiveDraft?.updatedAt ??
-        input.playerCaseUpdatedAt,
+        latestObjectiveDraft && latestObjectiveSubmission
+          ? latestObjectiveDraft.updatedAt > latestObjectiveSubmission.createdAt
+            ? latestObjectiveDraft.updatedAt
+            : latestObjectiveSubmission.createdAt
+          : latestObjectiveSubmission?.createdAt ??
+            latestObjectiveDraft?.updatedAt ??
+            input.playerCaseUpdatedAt,
     };
   }
 

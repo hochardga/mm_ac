@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import {
+  loadAnyCaseManifest,
   loadCaseManifest,
   loadStagedCaseManifest,
 } from "@/features/cases/load-case-manifest";
@@ -111,12 +112,15 @@ test("fixture cases load successfully with photo evidence included", async () =>
 
 test("the shipped cases load successfully with photo evidence included", async () => {
   const [briar, bishop, harbor] = await Promise.all([
-    loadCaseManifest("briar-ledger"),
-    loadCaseManifest("hollow-bishop"),
-    loadCaseManifest("red-harbor"),
+    loadAnyCaseManifest("briar-ledger"),
+    loadAnyCaseManifest("hollow-bishop"),
+    loadAnyCaseManifest("red-harbor"),
   ]);
 
   expect(briar.evidence.some((item) => item.family === "document")).toBe(true);
   expect(bishop.evidence.some((item) => item.family === "photo")).toBe(true);
   expect(harbor.evidence.some((item) => item.family === "record")).toBe(true);
+  expect("complexity" in briar && briar.complexity).toBe("deep");
+  expect("complexity" in bishop && bishop.complexity).toBe("standard");
+  expect("complexity" in harbor && harbor.complexity).toBe("light");
 });
