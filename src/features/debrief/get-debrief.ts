@@ -7,10 +7,30 @@ import { loadCaseManifest } from "@/features/cases/load-case-manifest";
 import { loadProtectedCase } from "@/features/cases/load-protected-case";
 import { getDb } from "@/lib/db";
 
+export type DebriefStatus = "completed" | "closed_unsolved";
+export type DebriefAttemptStatus = "in_progress" | DebriefStatus;
+
 type DebriefSelection = {
   suspect: string;
   motive: string;
   method: string;
+};
+
+export type DebriefAttempt = DebriefSelection & {
+  attemptNumber: number;
+  nextStatus: DebriefAttemptStatus;
+  feedback: string;
+};
+
+export type DebriefSummary = {
+  title: string;
+  summary: string;
+  status: DebriefStatus;
+  finalReport?: DebriefSelection & {
+    attemptNumber: number;
+  };
+  solution: DebriefSelection;
+  attempts: DebriefAttempt[];
 };
 
 function buildOptionLabelMap(
@@ -34,7 +54,29 @@ function toSelectionLabels(
   };
 }
 
-export async function getDebrief(input: { playerCaseId: string }) {
+function toDebriefStatus(status: string): DebriefStatus {
+  if (status === "completed" || status === "closed_unsolved") {
+    return status;
+  }
+
+  throw new Error("Debrief is not available");
+}
+
+function toDebriefAttemptStatus(status: string): DebriefAttemptStatus {
+  if (
+    status === "in_progress" ||
+    status === "completed" ||
+    status === "closed_unsolved"
+  ) {
+    return status;
+  }
+
+  throw new Error(`Unsupported debrief attempt status: ${status}`);
+}
+
+export async function getDebrief(
+  input: { playerCaseId: string },
+): Promise<DebriefSummary> {
   const db = await getDb();
   const playerCase = await db.query.playerCases.findFirst({
     where: eq(playerCases.id, input.playerCaseId),
@@ -53,6 +95,7 @@ export async function getDebrief(input: { playerCaseId: string }) {
   ) {
     throw new Error("Debrief is not available");
   }
+  const status = toDebriefStatus(playerCase.status);
 
   const caseDefinition = await db.query.caseDefinitions.findFirst({
     where: eq(caseDefinitions.id, playerCase.caseDefinitionId),
@@ -80,7 +123,7 @@ export async function getDebrief(input: { playerCaseId: string }) {
   return {
     title: playerCase.terminalDebriefTitle,
     summary: playerCase.terminalDebriefSummary,
-    status: playerCase.status,
+    status,
     finalReport: finalAttempt
       ? {
           ...toSelectionLabels(
@@ -104,7 +147,7 @@ export async function getDebrief(input: { playerCaseId: string }) {
     ),
     attempts: attempts.map((attempt) => ({
       attemptNumber: attempt.attemptNumber,
-      nextStatus: attempt.nextStatus,
+      nextStatus: toDebriefAttemptStatus(attempt.nextStatus),
       ...toSelectionLabels(
         {
           suspect: attempt.suspectId,
