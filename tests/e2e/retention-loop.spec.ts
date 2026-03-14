@@ -36,7 +36,7 @@ test("player can return, solve a case, and launch a second case", async ({
   await page.getByLabel("Motive").selectOption("embezzlement");
   await page.getByLabel("Method").selectOption("poisoned-wine");
   await Promise.all([
-    page.waitForLoadState("networkidle"),
+    page.waitForURL(/\/cases\/hollow-bishop\?evidence=/),
     page.getByRole("button", { name: /save draft/i }).click(),
   ]);
   await expect(page.getByLabel("Suspect")).toHaveValue("bookkeeper");

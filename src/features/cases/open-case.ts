@@ -2,9 +2,15 @@ import "server-only";
 
 import { randomUUID } from "node:crypto";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
-import { analyticsEvents, notes, playerCases, reportDrafts } from "@/db/schema";
+import {
+  analyticsEvents,
+  notes,
+  playerCases,
+  reportDrafts,
+  reportSubmissions,
+} from "@/db/schema";
 import { buildCaseContinuity } from "@/features/cases/case-continuity";
 import { ensureCaseDefinition } from "@/features/cases/sync-case-definitions";
 import { writeAnalyticsEvent } from "@/lib/analytics";
@@ -15,12 +21,16 @@ async function buildResumeTarget(
   playerCase: typeof playerCases.$inferSelect,
   caseSlug: string,
 ) {
-  const [savedNote, savedDraft] = await Promise.all([
+  const [savedNote, savedDraft, latestSubmission] = await Promise.all([
     tx.query.notes.findFirst({
       where: eq(notes.playerCaseId, playerCase.id),
     }),
     tx.query.reportDrafts.findFirst({
       where: eq(reportDrafts.playerCaseId, playerCase.id),
+    }),
+    tx.query.reportSubmissions.findFirst({
+      where: eq(reportSubmissions.playerCaseId, playerCase.id),
+      orderBy: [desc(reportSubmissions.attemptNumber)],
     }),
   ]);
   const continuity = buildCaseContinuity({
@@ -32,7 +42,7 @@ async function buildResumeTarget(
       | "closed_unsolved",
     note: savedNote,
     draft: savedDraft,
-    latestSubmission: undefined,
+    latestSubmission,
     playerCaseUpdatedAt: playerCase.updatedAt,
   });
 
@@ -45,8 +55,8 @@ async function buildResumeTarget(
     noteBody: savedNote?.body ?? "",
     draft: savedDraft
       ? {
-        suspectId: savedDraft.suspectId,
-        motiveId: savedDraft.motiveId,
+          suspectId: savedDraft.suspectId,
+          motiveId: savedDraft.motiveId,
           methodId: savedDraft.methodId,
         }
       : null,

@@ -9,7 +9,6 @@ describe("buildCaseContinuity", () => {
       status: "in_progress",
       note: undefined,
       draft: {
-        body: undefined,
         suspectId: "bookkeeper",
         motiveId: "embezzlement",
         methodId: "poisoned-wine",
@@ -65,6 +64,21 @@ describe("buildCaseContinuity", () => {
     const continuity = buildCaseContinuity({
       caseSlug: "briar-ledger",
       status: "completed",
+      note: undefined,
+      draft: undefined,
+      latestSubmission: undefined,
+      playerCaseUpdatedAt: new Date("2026-03-13T17:00:00.000Z"),
+    });
+
+    expect(continuity.section).toBe("debrief");
+    expect(continuity.label).toMatch(/review debrief/i);
+    expect(continuity.href).toBe("/cases/briar-ledger/debrief");
+  });
+
+  test("prefers the debrief destination for closed unsolved cases", () => {
+    const continuity = buildCaseContinuity({
+      caseSlug: "briar-ledger",
+      status: "closed_unsolved",
       note: undefined,
       draft: undefined,
       latestSubmission: undefined,

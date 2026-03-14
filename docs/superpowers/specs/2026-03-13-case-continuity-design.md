@@ -121,9 +121,9 @@ Each dossier card should keep the existing status chip and summary, then add a s
 Expected behavior:
 
 - New case with no prior progress: keep a neutral `Open Case File` CTA.
-- In-progress case with only saved notes: CTA becomes `Resume Notes` and links to `#field-notes`.
-- In-progress case with a saved draft or pending handler feedback: CTA becomes `Resume Report` and links to `#draft-report`.
-- In-progress case with no saved notes or draft but existing history: CTA becomes `Return to Evidence` and links to `#evidence-intake`.
+- If only saved notes exist, the CTA becomes `Resume Notes` and links to `#field-notes`.
+- When a saved draft or pending handler feedback exists, the CTA becomes `Resume Report` and links to `#draft-report`.
+- When there are no notes or drafts but prior history exists, the CTA becomes `Return to Evidence` and links to `#evidence-intake`.
 - Completed or closed case: CTA becomes `Review Debrief` and links to `/cases/[caseSlug]/debrief`.
 
 The continuity block should also show:

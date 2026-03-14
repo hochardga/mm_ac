@@ -57,6 +57,16 @@ export default async function CasePage({
   params,
   searchParams,
 }: CasePageProps) {
+  let caseData:
+    | {
+        manifest: Awaited<ReturnType<typeof loadCaseManifest>>;
+        lifecycle: Awaited<ReturnType<typeof openCase>>;
+        savedNote: typeof notes.$inferSelect | undefined;
+        savedDraft: typeof reportDrafts.$inferSelect | undefined;
+        latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
+        submissionToken: string;
+      }
+    | null = null;
   const [{ caseSlug }, session, cookieStore, resolvedSearchParams] =
     await Promise.all([
       params,
@@ -99,32 +109,43 @@ export default async function CasePage({
         orderBy: [desc(reportSubmissions.attemptNumber)],
       }),
     ]);
-    const submissionToken = randomUUID();
-
-    return (
-      <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
-        <div className="mx-auto max-w-5xl space-y-10">
-          <CaseReturnHeader
-            eyebrow={`Handler channel / ${lifecycle.playerCase.caseRevision}`}
-            summary={manifest.summary}
-            title={manifest.title}
-          />
-
-        <CaseWorkspace
-          caseSlug={caseSlug}
-          manifest={manifest}
-          playerCaseId={lifecycle.playerCase.id}
-          latestSubmission={latestSubmission}
-          resumeTarget={lifecycle.resumeTarget}
-          savedDraft={savedDraft}
-          savedNote={savedNote}
-          selectedEvidenceId={selectedEvidenceIds[0]}
-            submissionToken={submissionToken}
-          />
-        </div>
-      </main>
-    );
+    caseData = {
+      manifest,
+      lifecycle,
+      savedNote,
+      savedDraft,
+      latestSubmission,
+      submissionToken: randomUUID(),
+    };
   } catch {
     notFound();
   }
+
+  if (!caseData) {
+    notFound();
+  }
+
+  return (
+    <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
+      <div className="mx-auto max-w-5xl space-y-10">
+        <CaseReturnHeader
+          eyebrow={`Handler channel / ${caseData.lifecycle.playerCase.caseRevision}`}
+          summary={caseData.manifest.summary}
+          title={caseData.manifest.title}
+        />
+
+        <CaseWorkspace
+          caseSlug={caseSlug}
+          manifest={caseData.manifest}
+          playerCaseId={caseData.lifecycle.playerCase.id}
+          latestSubmission={caseData.latestSubmission}
+          resumeTarget={caseData.lifecycle.resumeTarget}
+          savedDraft={caseData.savedDraft}
+          savedNote={caseData.savedNote}
+          selectedEvidenceId={selectedEvidenceIds[0]}
+          submissionToken={caseData.submissionToken}
+        />
+      </div>
+    </main>
+  );
 }
