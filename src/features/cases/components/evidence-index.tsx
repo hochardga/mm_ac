@@ -33,7 +33,8 @@ export function EvidenceIndex({
                 isSelected
                   ? "border-[#d96c3d] bg-[#d96c3d]/10"
                   : "border-white/10 bg-black/20"
-              }`}
+              } scroll-mt-6`}
+              id={`evidence-${item.id}`}
             >
               <p className="text-xs uppercase tracking-[0.25em] text-[#d96c3d]">
                 {item.family} / {item.subtype}

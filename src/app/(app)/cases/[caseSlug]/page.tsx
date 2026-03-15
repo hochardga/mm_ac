@@ -53,7 +53,6 @@ export default async function CasePage({
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
         objectiveStates: typeof playerCaseObjectives.$inferSelect[];
         objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
-        contextEvidenceId: string | undefined;
         selectedEvidenceId: string | undefined;
         viewedEvidenceIds: string[];
         submissionToken: string;
@@ -122,12 +121,6 @@ export default async function CasePage({
       ? visibleEvidence.find((item) => item.id === requestedEvidenceId)
       : undefined;
     let viewedEvidenceIds = lifecycle.playerCase.viewedEvidenceIds ?? [];
-    const contextEvidence =
-      openedEvidence ??
-      visibleEvidence.find(
-        (item) => item.id === lifecycle.playerCase.lastViewedEvidenceId,
-      ) ??
-      visibleEvidence[0];
 
     if (openedEvidence) {
       try {
@@ -151,7 +144,6 @@ export default async function CasePage({
       objectiveStates,
       objectiveSubmissionRows,
       selectedEvidenceId: openedEvidence?.id,
-      contextEvidenceId: contextEvidence?.id,
       viewedEvidenceIds,
       submissionToken: randomUUID(),
     };
@@ -191,10 +183,8 @@ export default async function CasePage({
           latestSubmission={caseData.latestSubmission}
           objectiveStates={caseData.objectiveStates}
           objectiveSubmissions={caseData.objectiveSubmissionRows}
-          resumeTarget={caseData.lifecycle.resumeTarget}
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}
-          contextEvidenceId={caseData.contextEvidenceId}
           selectedEvidenceId={caseData.selectedEvidenceId}
           viewedEvidenceIds={caseData.viewedEvidenceIds}
           submissionToken={caseData.submissionToken}

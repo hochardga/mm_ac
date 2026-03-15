@@ -75,9 +75,14 @@ test("agent can switch evidence types and keep the notebook visible", async ({
   ]);
 
   await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+  await expect(page.getByText(/active evidence:/i)).toHaveCount(0);
   await expect(
-    page.getByText(/active evidence: night watch exchange/i),
+    page.getByRole("dialog", { name: /night watch exchange/i }),
   ).toBeVisible();
+  await Promise.all([
+    page.waitForURL("**/cases/red-harbor#evidence-night-watch-thread"),
+    page.getByRole("link", { name: /close evidence/i }).click(),
+  ]);
 
   await page.getByLabel("Response").selectOption("dispatcher");
 
@@ -90,7 +95,7 @@ test("agent can switch evidence types and keep the notebook visible", async ({
   await expect(page.getByLabel("Response")).toHaveValue("dispatcher");
 });
 
-test("agent can open photo evidence and inspect a larger preview", async ({
+test("agent can open photo evidence and return to its evidence card", async ({
   page,
 }) => {
   const email = `agent-${randomUUID()}@example.com`;
@@ -106,13 +111,14 @@ test("agent can open photo evidence and inspect a larger preview", async ({
 
   await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
   await expect(page.getByText(/date:\s*unknown/i)).toBeVisible();
-
-  await page.getByRole("button", { name: /open larger preview/i }).click();
   await expect(
     page.getByRole("dialog", { name: /vestry scene photo/i }),
   ).toBeVisible();
-  await page.getByRole("button", { name: /close preview/i }).click();
+  await Promise.all([
+    page.waitForURL("**/cases/hollow-bishop#evidence-vestry-scene-photo"),
+    page.getByRole("link", { name: /close evidence/i }).click(),
+  ]);
   await expect(
-    page.getByRole("heading", { name: /active objectives/i }),
+    page.locator("#evidence-vestry-scene-photo"),
   ).toBeVisible();
 });

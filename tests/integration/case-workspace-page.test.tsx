@@ -84,11 +84,14 @@ test("renders an evidence index, evidence modal, and persistent notes together",
       .length,
   ).toBeGreaterThan(0);
   expect(
-    screen.getByText(/active evidence: vestry interview transcript/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
   expect(
     screen.getByRole("dialog", { name: /vestry interview transcript/i }),
   ).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: /close evidence/i }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#evidence-vestry-interview");
   const headerSection = screen
     .getByRole("heading", { name: /the hollow bishop/i })
     .closest("section");
@@ -204,7 +207,10 @@ test("uses the first repeated evidence query value when the case page receives a
   );
 
   expect(
-    screen.getByText(/active evidence: night watch exchange/i),
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /night watch exchange/i }),
   ).toBeInTheDocument();
 });
 
@@ -343,7 +349,7 @@ test("does not render the progress restored banner when reopening a case with sa
   ).not.toBeInTheDocument();
 });
 
-test("uses remembered evidence as note context without auto-opening a modal", async () => {
+test("keeps field notes visible without showing active-evidence copy when no modal is open", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -379,9 +385,10 @@ test("uses remembered evidence as note context without auto-opening a modal", as
     } as never),
   );
 
+  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
   expect(
-    screen.getByText(/active evidence: night watch exchange/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
@@ -428,9 +435,10 @@ test("falls back to the first visible evidence without silently repairing stale 
     where: eq(playerCases.id, playerCase.id),
   });
 
+  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
   expect(
-    screen.getByText(/active evidence: dispatch log/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("missing-evidence");
 });
