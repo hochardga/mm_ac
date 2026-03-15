@@ -14,11 +14,13 @@ import { CaseReturnHeader } from "@/components/case-return-header";
 import { getCurrentAgentId } from "@/features/auth/current-agent";
 import { buildCaseProgression } from "@/features/cases/case-progression";
 import { CaseWorkspace } from "@/features/cases/components/case-workspace";
+import { buildObjectiveReviewState } from "@/features/cases/objective-review-state";
 import {
   loadAnyCaseManifest,
   type LoadedCaseManifest,
   type LoadedStagedCaseManifest,
 } from "@/features/cases/load-case-manifest";
+import { loadStagedProtectedCase } from "@/features/cases/load-protected-case";
 import { openCase } from "@/features/cases/open-case";
 import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { getDb } from "@/lib/db";
@@ -53,6 +55,9 @@ export default async function CasePage({
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
         objectiveStates: typeof playerCaseObjectives.$inferSelect[];
         objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
+        stagedReviewState:
+          | ReturnType<typeof buildObjectiveReviewState>
+          | undefined;
         selectedEvidenceId: string | undefined;
         submissionToken: string;
       }
@@ -114,6 +119,11 @@ export default async function CasePage({
           })),
         })
       : null;
+    const stagedProtectedCase = isStagedManifest(manifest)
+      ? await loadStagedProtectedCase(caseSlug, {
+          expectedRevision: lifecycle.playerCase.caseRevision,
+        })
+      : null;
     const visibleEvidence = stagedProgression?.visibleEvidence ?? manifest.evidence;
     const requestedEvidenceId =
       selectedEvidenceIds[0] ?? lifecycle.playerCase.lastViewedEvidenceId ?? undefined;
@@ -141,6 +151,15 @@ export default async function CasePage({
       latestSubmission,
       objectiveStates,
       objectiveSubmissionRows,
+      stagedReviewState:
+        stagedProtectedCase && isStagedManifest(manifest)
+          ? buildObjectiveReviewState({
+              manifest,
+              objectiveSubmissions: objectiveSubmissionRows,
+              gradedFailureCount: lifecycle.playerCase.gradedFailureCount,
+              maxGradedFailures: stagedProtectedCase.grading.maxGradedFailures,
+            })
+          : undefined,
       selectedEvidenceId: selectedEvidence?.id,
       submissionToken: randomUUID(),
     };
@@ -184,6 +203,7 @@ export default async function CasePage({
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}
           selectedEvidenceId={caseData.selectedEvidenceId}
+          stagedReviewState={caseData.stagedReviewState}
           submissionToken={caseData.submissionToken}
         />
       </div>

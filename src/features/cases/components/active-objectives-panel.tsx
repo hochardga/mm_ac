@@ -4,6 +4,7 @@ import {
   submitObjectiveAction,
 } from "@/app/(app)/cases/[caseSlug]/actions";
 import { ObjectiveFormFields } from "@/features/cases/components/objective-form-fields";
+import type { ObjectiveReviewState } from "@/features/cases/objective-review-state";
 import { ReportActionButton } from "@/features/cases/components/report-action-button";
 import type { LoadedStagedCaseManifest } from "@/features/cases/load-case-manifest";
 import type { ObjectiveAnswerPayload } from "@/features/cases/objective-payload";
@@ -22,6 +23,7 @@ type ActiveObjectivesPanelProps = {
   solvedObjectives: ProgressObjective[];
   objectiveRows: ObjectiveRow[];
   objectiveSubmissions: ObjectiveSubmissionRow[];
+  reviewState?: ObjectiveReviewState;
   submissionToken: string;
 };
 
@@ -53,6 +55,7 @@ export function ActiveObjectivesPanel({
   solvedObjectives,
   objectiveRows,
   objectiveSubmissions,
+  reviewState,
   submissionToken,
 }: ActiveObjectivesPanelProps) {
   const objectiveRowById = new Map(
@@ -68,6 +71,30 @@ export function ActiveObjectivesPanel({
         id="active-objectives"
       >
         <h2 className="text-2xl font-semibold">Active Objectives</h2>
+        {reviewState ? (
+          <div className="mt-6 rounded-[1.5rem] border border-[#d96c3d]/40 bg-[#d96c3d]/10 p-5">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#f0b48f]">
+              Failure Pressure
+            </p>
+            <h3 className="mt-3 text-xl font-semibold text-stone-50">
+              {reviewState.failureBudget.summaryLabel}
+            </h3>
+            <p className="mt-2 text-sm leading-7 text-stone-100">
+              {reviewState.failureBudget.spent} of {reviewState.failureBudget.max}{" "}
+              graded failures spent
+            </p>
+            {reviewState.latestGradedFeedback ? (
+              <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-black/20 p-4">
+                <p className="text-xs uppercase tracking-[0.2em] text-[#f0b48f]">
+                  Latest Graded Feedback
+                </p>
+                <p className="mt-3 text-sm leading-7 text-stone-100">
+                  {reviewState.latestGradedFeedback.feedback}
+                </p>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
         <div className="mt-6 space-y-5">
           {activeObjectives.length === 0 ? (
             <p className="text-sm leading-7 text-stone-300">
@@ -77,6 +104,7 @@ export function ActiveObjectivesPanel({
             activeObjectives.map((objective) => {
               const objectiveRow = objectiveRowById.get(objective.id);
               const latestSubmission = latestSubmissionByObjective.get(objective.id);
+              const attemptHistory = reviewState?.attemptsByObjective.get(objective.id) ?? [];
 
               return (
                 <article
@@ -98,6 +126,32 @@ export function ActiveObjectivesPanel({
                       <p className="mt-3 text-sm leading-7 text-stone-100">
                         {latestSubmission.feedback}
                       </p>
+                    </div>
+                  ) : null}
+                  {attemptHistory.length > 0 ? (
+                    <div className="mt-4 rounded-[1.25rem] border border-white/10 bg-white/5 p-4">
+                      <p className="text-xs uppercase tracking-[0.2em] text-stone-300">
+                        Attempt Ledger
+                      </p>
+                      <div className="mt-3 space-y-3">
+                        {attemptHistory.map((attempt) => (
+                          <article
+                            key={`${objective.id}-attempt-${attempt.attemptNumber}`}
+                            className="rounded-[1rem] border border-white/10 bg-black/20 p-4"
+                          >
+                            <div className="flex flex-wrap items-center justify-between gap-2 text-xs uppercase tracking-[0.2em] text-stone-400">
+                              <span>Attempt {attempt.attemptNumber}</span>
+                              <span>{attempt.statusLabel}</span>
+                            </div>
+                            <p className="mt-3 text-sm leading-7 text-stone-100">
+                              Filed answer: {attempt.answerLabel}
+                            </p>
+                            <p className="mt-2 text-sm leading-7 text-stone-300">
+                              {attempt.feedback}
+                            </p>
+                          </article>
+                        ))}
+                      </div>
                     </div>
                   ) : null}
                   <form action={saveObjectiveDraftAction} className="mt-5 grid gap-4">
@@ -146,6 +200,7 @@ export function ActiveObjectivesPanel({
           <div className="mt-6 space-y-4">
             {solvedObjectives.map((objective) => {
               const latestSubmission = latestSubmissionByObjective.get(objective.id);
+              const latestAttempt = reviewState?.attemptsByObjective.get(objective.id)?.at(-1);
 
               return (
                 <article
@@ -156,7 +211,19 @@ export function ActiveObjectivesPanel({
                     Solved / {objective.stageId}
                   </p>
                   <h3 className="mt-3 text-xl font-semibold">{objective.prompt}</h3>
-                  {latestSubmission ? (
+                  {latestAttempt ? (
+                    <div className="mt-3 rounded-[1.25rem] border border-white/10 bg-black/20 p-4">
+                      <p className="text-xs uppercase tracking-[0.2em] text-stone-400">
+                        Solved on Attempt {latestAttempt.attemptNumber}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-stone-100">
+                        Filed answer: {latestAttempt.answerLabel}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 text-stone-300">
+                        {latestAttempt.statusLabel}. {latestAttempt.feedback}
+                      </p>
+                    </div>
+                  ) : latestSubmission ? (
                     <p className="mt-3 text-sm leading-7 text-stone-100">
                       {latestSubmission.feedback}
                     </p>
