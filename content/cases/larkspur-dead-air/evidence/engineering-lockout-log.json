@@ -1,0 +1,34 @@
+{
+  "subtype": "station_log",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "location", "label": "Location", "filterable": true },
+    { "id": "note", "label": "Note" }
+  ],
+  "rows": [
+    {
+      "id": "lockout-1",
+      "timestamp": "2013-09-18T21:46:00Z",
+      "location": "Studio B",
+      "note": "Main console powered down for scheduled patch-bay replacement. Booth breaker tagged OUT OF SERVICE."
+    },
+    {
+      "id": "lockout-2",
+      "timestamp": "2013-09-18T21:49:00Z",
+      "location": "Archive Alcove",
+      "note": "Portable work lamp issued for late catalog review. Request logged under Mara Venn."
+    },
+    {
+      "id": "lockout-3",
+      "timestamp": "2013-09-18T22:18:00Z",
+      "location": "Studio B",
+      "note": "No power restoration authorized. Red lockout tag remains in place pending morning inspection."
+    },
+    {
+      "id": "lockout-4",
+      "timestamp": "2013-09-18T22:31:00Z",
+      "location": "Studio B",
+      "note": "Security opened booth after welfare check request. Console and desk lamps still dark on entry."
+    }
+  ]
+}
