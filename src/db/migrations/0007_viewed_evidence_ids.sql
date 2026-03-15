@@ -1,0 +1,1 @@
+ALTER TABLE "player_cases" ADD COLUMN "viewed_evidence_ids" jsonb DEFAULT '[]'::jsonb NOT NULL;

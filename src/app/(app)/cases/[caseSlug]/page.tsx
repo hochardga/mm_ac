@@ -53,7 +53,9 @@ export default async function CasePage({
         latestSubmission: typeof reportSubmissions.$inferSelect | undefined;
         objectiveStates: typeof playerCaseObjectives.$inferSelect[];
         objectiveSubmissionRows: typeof objectiveSubmissions.$inferSelect[];
+        contextEvidenceId: string | undefined;
         selectedEvidenceId: string | undefined;
+        viewedEvidenceIds: string[];
         submissionToken: string;
       }
     | null = null;
@@ -115,18 +117,25 @@ export default async function CasePage({
         })
       : null;
     const visibleEvidence = stagedProgression?.visibleEvidence ?? manifest.evidence;
-    const requestedEvidenceId =
-      selectedEvidenceIds[0] ?? lifecycle.playerCase.lastViewedEvidenceId ?? undefined;
-    const selectedEvidence =
-      visibleEvidence.find((item) => item.id === requestedEvidenceId) ??
+    const requestedEvidenceId = selectedEvidenceIds[0];
+    const openedEvidence = requestedEvidenceId
+      ? visibleEvidence.find((item) => item.id === requestedEvidenceId)
+      : undefined;
+    let viewedEvidenceIds = lifecycle.playerCase.viewedEvidenceIds ?? [];
+    const contextEvidence =
+      openedEvidence ??
+      visibleEvidence.find(
+        (item) => item.id === lifecycle.playerCase.lastViewedEvidenceId,
+      ) ??
       visibleEvidence[0];
 
-    if (selectedEvidence) {
+    if (openedEvidence) {
       try {
-        await rememberViewedEvidence({
+        const updatedPlayerCase = await rememberViewedEvidence({
           playerCaseId: lifecycle.playerCase.id,
-          evidenceId: selectedEvidence.id,
+          evidenceId: openedEvidence.id,
         });
+        viewedEvidenceIds = updatedPlayerCase.viewedEvidenceIds ?? viewedEvidenceIds;
       } catch {
         // Rendering the case should not fail purely because refreshing remembered
         // evidence context did not persist.
@@ -141,7 +150,9 @@ export default async function CasePage({
       latestSubmission,
       objectiveStates,
       objectiveSubmissionRows,
-      selectedEvidenceId: selectedEvidence?.id,
+      selectedEvidenceId: openedEvidence?.id,
+      contextEvidenceId: contextEvidence?.id,
+      viewedEvidenceIds,
       submissionToken: randomUUID(),
     };
   } catch {
@@ -165,7 +176,7 @@ export default async function CasePage({
 
   return (
     <main className="min-h-screen bg-stone-950 px-6 py-16 text-stone-50">
-      <div className="mx-auto max-w-5xl space-y-10">
+      <div className="mx-auto max-w-7xl space-y-10">
         <CaseReturnHeader
           eyebrow={`Handler channel / ${caseData.lifecycle.playerCase.caseRevision}`}
           progressSnapshot={progressSnapshot}
@@ -183,7 +194,9 @@ export default async function CasePage({
           resumeTarget={caseData.lifecycle.resumeTarget}
           savedDraft={caseData.savedDraft}
           savedNote={caseData.savedNote}
+          contextEvidenceId={caseData.contextEvidenceId}
           selectedEvidenceId={caseData.selectedEvidenceId}
+          viewedEvidenceIds={caseData.viewedEvidenceIds}
           submissionToken={caseData.submissionToken}
         />
       </div>

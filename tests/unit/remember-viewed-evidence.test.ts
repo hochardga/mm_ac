@@ -8,7 +8,7 @@ afterEach(async () => {
   await closeDb();
 });
 
-async function createPlayerCase() {
+async function createPlayerCase(viewedEvidenceIds: string[] = []) {
   const db = await getDb();
   const userId = randomUUID();
   const caseDefinitionId = randomUUID();
@@ -32,6 +32,7 @@ async function createPlayerCase() {
     caseDefinitionId,
     caseRevision: "rev-1",
     status: "in_progress",
+    viewedEvidenceIds,
   });
 
   return {
@@ -39,9 +40,9 @@ async function createPlayerCase() {
   };
 }
 
-test("stores remembered evidence on the player case", async () => {
+test("stores remembered evidence on the player case without losing prior viewed ids", async () => {
   const db = await getDb();
-  const { playerCaseId } = await createPlayerCase();
+  const { playerCaseId } = await createPlayerCase(["ledger"]);
 
   const remembered = await rememberViewedEvidence({
     playerCaseId,
@@ -54,8 +55,10 @@ test("stores remembered evidence on the player case", async () => {
 
   expect(remembered.lastViewedEvidenceId).toBe("dispatch-log");
   expect(remembered.lastViewedEvidenceAt).toBeInstanceOf(Date);
+  expect(remembered.viewedEvidenceIds).toEqual(["ledger", "dispatch-log"]);
   expect(savedPlayerCase?.lastViewedEvidenceId).toBe("dispatch-log");
   expect(savedPlayerCase?.lastViewedEvidenceAt).toBeInstanceOf(Date);
+  expect(savedPlayerCase?.viewedEvidenceIds).toEqual(["ledger", "dispatch-log"]);
 });
 
 test("throws when the player case does not exist", async () => {

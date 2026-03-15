@@ -40,7 +40,7 @@ afterEach(async () => {
   await closeDb();
 });
 
-test("renders an evidence index, selected viewer, and persistent notes together", async () => {
+test("renders an evidence index, evidence modal, and persistent notes together", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -85,6 +85,9 @@ test("renders an evidence index, selected viewer, and persistent notes together"
   ).toBeGreaterThan(0);
   expect(
     screen.getByText(/active evidence: vestry interview transcript/i),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /vestry interview transcript/i }),
   ).toBeInTheDocument();
   const headerSection = screen
     .getByRole("heading", { name: /the hollow bishop/i })
@@ -290,7 +293,7 @@ test("renders document markdown, record tables, and photo evidence in the worksp
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
 });
 
-test("shows restored progress with quick links when reopening a case with saved notes", async () => {
+test("does not render the progress restored banner when reopening a case with saved notes", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -327,30 +330,20 @@ test("shows restored progress with quick links when reopening a case with saved 
   );
 
   expect(
-    screen.getByText(/ashfall restored your saved progress/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/ashfall restored your saved progress/i),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to evidence intake/i }),
-  ).toHaveAttribute("href", "#evidence-intake");
+    screen.queryByRole("link", { name: /jump to evidence intake/i }),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to field notes/i }),
-  ).toHaveAttribute("href", "#field-notes");
+    screen.queryByRole("link", { name: /jump to field notes/i }),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to active objectives/i }),
-  ).toHaveAttribute("href", "#active-objectives");
-
-  expect(
-    screen.getByRole("heading", { name: /evidence intake/i }).closest("section"),
-  ).toHaveAttribute("id", "evidence-intake");
-  expect(
-    screen.getByRole("heading", { name: /field notes/i }).closest("section"),
-  ).toHaveAttribute("id", "field-notes");
-  expect(
-    screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
-  ).toHaveAttribute("id", "active-objectives");
+    screen.queryByRole("link", { name: /jump to active objectives/i }),
+  ).not.toBeInTheDocument();
 });
 
-test("reopens on the remembered evidence when no evidence query is present", async () => {
+test("uses remembered evidence as note context without auto-opening a modal", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -389,9 +382,10 @@ test("reopens on the remembered evidence when no evidence query is present", asy
   expect(
     screen.getByText(/active evidence: night watch exchange/i),
   ).toBeInTheDocument();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
-test("falls back to the first visible evidence and repairs stale remembered evidence ids", async () => {
+test("falls back to the first visible evidence without silently repairing stale remembered evidence ids", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -437,7 +431,8 @@ test("falls back to the first visible evidence and repairs stale remembered evid
   expect(
     screen.getByText(/active evidence: dispatch log/i),
   ).toBeInTheDocument();
-  expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("dispatch-log");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("missing-evidence");
 });
 
 test("renders staged objectives with gated evidence and objective continuity links", async () => {
@@ -625,11 +620,24 @@ test("renders staged objectives with gated evidence and objective continuity lin
     nextStatus: "in_progress",
     attemptNumber: 1,
   });
+  await db.insert(objectiveSubmissions).values({
+    id: randomUUID(),
+    playerCaseId: playerCase.id,
+    objectiveId: "choose-transfer-signer",
+    submissionToken: `submission-${randomUUID()}`,
+    answerPayload: {
+      type: "single_choice",
+      choiceId: "captain",
+    },
+    isCorrect: false,
+    feedback: "Incorrect graded objective submission.",
+    nextStatus: "in_progress",
+    attemptNumber: 1,
+  });
 
   render(
     await CasePage({
       params: Promise.resolve({ caseSlug: "hollow-bishop" }),
-      searchParams: Promise.resolve({ evidence: "sealed-archive" }),
     } as never),
   );
 
@@ -652,14 +660,75 @@ test("renders staged objectives with gated evidence and objective continuity lin
   expect(
     screen.queryByText(/sealed archive memorandum/i),
   ).not.toBeInTheDocument();
+  const ledgerArticle = screen
+    .getByRole("heading", { name: /ledger brief/i })
+    .closest("article");
+  const transferArticle = screen
+    .getByRole("heading", { name: /harbor transfer record/i })
+    .closest("article");
+  expect(ledgerArticle).not.toBeNull();
+  expect(transferArticle).not.toBeNull();
+  expect(
+    within(ledgerArticle as HTMLElement).queryByText("New"),
+  ).not.toBeInTheDocument();
+  expect(
+    within(transferArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
   expect(
     screen.getByRole("heading", { name: /completed objectives/i }),
   ).toBeInTheDocument();
-  expect(screen.getAllByText(/objective solved\./i).length).toBeGreaterThan(0);
+  const completedSection = screen
+    .getByRole("heading", { name: /completed objectives/i })
+    .closest("section");
+  const activeSection = screen
+    .getByRole("heading", { name: /active objectives/i })
+    .closest("section");
+  expect(completedSection).not.toBeNull();
+  expect(activeSection).not.toBeNull();
   expect(
-    screen.getByRole("link", { name: /jump to active objectives/i }),
-  ).toHaveAttribute("href", "#active-objectives");
+    Boolean(
+      (completedSection as HTMLElement).compareDocumentPosition(
+        activeSection as HTMLElement,
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ),
+  ).toBe(true);
+  expect(
+    within(completedSection as HTMLElement).getByText(/correct \/ attempt 1/i),
+  ).toBeInTheDocument();
+  expect(
+    within(activeSection as HTMLElement).getByText(/incorrect \/ attempt 1/i),
+  ).toBeInTheDocument();
+  expect(
+    within(activeSection as HTMLElement)
+      .getAllByRole("button")
+      .map((button) => button.textContent?.trim()),
+  ).toEqual(["Submit Objective", "Save Draft"]);
   expect(
     screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
   ).toHaveAttribute("id", "active-objectives");
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({ evidence: "harbor-transfer" }),
+    } as never),
+  );
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  const revisitedTransferArticle = screen
+    .getByRole("heading", { name: /harbor transfer record/i })
+    .closest("article");
+  expect(revisitedTransferArticle).not.toBeNull();
+  expect(
+    within(revisitedTransferArticle as HTMLElement).queryByText("New"),
+  ).not.toBeInTheDocument();
 });

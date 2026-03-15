@@ -30,6 +30,7 @@ test("marks the selected evidence link as the current page", () => {
           messages: [],
         },
       ]}
+      newEvidenceIds={["dispatch-log"]}
       selectedEvidenceId="night-watch-thread"
     />,
   );
@@ -40,4 +41,5 @@ test("marks the selected evidence link as the current page", () => {
   expect(
     screen.getByRole("link", { name: /open dispatch log/i }),
   ).not.toHaveAttribute("aria-current");
+  expect(screen.getByText("New")).toBeInTheDocument();
 });

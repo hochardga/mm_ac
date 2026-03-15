@@ -89,6 +89,20 @@ function isStagedManifest(
   return "stages" in manifest;
 }
 
+function getInitialViewedEvidenceIds(manifest: LoadedCaseManifest) {
+  if (isStagedManifest(manifest)) {
+    return [
+      ...new Set(
+        manifest.stages
+          .filter((stage) => stage.startsUnlocked)
+          .flatMap((stage) => stage.evidenceIds),
+      ),
+    ];
+  }
+
+  return manifest.evidence.map((entry) => entry.id);
+}
+
 export async function openCase(input: { userId: string; caseSlug: string }) {
   const db = await getDb();
 
@@ -139,6 +153,9 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
       };
     }
 
+    const manifest = await loadAnyCaseManifest(input.caseSlug, {
+      expectedRevision: definition.currentPublishedRevision,
+    });
     const [createdPlayerCase] = await tx
       .insert(playerCases)
       .values({
@@ -147,12 +164,9 @@ export async function openCase(input: { userId: string; caseSlug: string }) {
         caseDefinitionId: definition.id,
         caseRevision: definition.currentPublishedRevision,
         status: "in_progress",
+        viewedEvidenceIds: getInitialViewedEvidenceIds(manifest),
       })
       .returning();
-
-    const manifest = await loadAnyCaseManifest(input.caseSlug, {
-      expectedRevision: definition.currentPublishedRevision,
-    });
 
     if (isStagedManifest(manifest)) {
       const objectiveRows = manifest.stages.flatMap((stage) =>
