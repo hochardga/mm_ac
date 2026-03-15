@@ -1,0 +1,44 @@
+{
+  "subtype": "archive_log",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "item", "label": "Item", "filterable": true },
+    { "id": "action", "label": "Action" },
+    { "id": "staff", "label": "Staff" },
+    { "id": "note", "label": "Note" }
+  ],
+  "rows": [
+    {
+      "id": "archive-1",
+      "timestamp": "2013-09-18T20:42:00Z",
+      "item": "Founder Interview / Halden / Reel F-19",
+      "action": "Checked out",
+      "staff": "Mara Venn",
+      "note": "Anniversary segment review"
+    },
+    {
+      "id": "archive-2",
+      "timestamp": "2013-09-18T21:58:00Z",
+      "item": "Cold shelf cart",
+      "action": "Moved to archive alcove",
+      "staff": "Dax Pell",
+      "note": "Per Mara Venn request"
+    },
+    {
+      "id": "archive-3",
+      "timestamp": "2013-09-18T22:26:00Z",
+      "item": "Unlabeled archival sleeve",
+      "action": "Recovered",
+      "staff": "Ivo Mercer",
+      "note": "Empty sleeve found in sorting cart. Torn strip reads '...lden Interview / Sale...'"
+    },
+    {
+      "id": "archive-4",
+      "timestamp": "2013-09-18T22:33:00Z",
+      "item": "Founder Interview / Halden / Reel F-19",
+      "action": "Not located",
+      "staff": "Security sweep",
+      "note": "Original reel absent from alcove and booth."
+    }
+  ]
+}

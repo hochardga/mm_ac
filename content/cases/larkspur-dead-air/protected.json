@@ -1,0 +1,31 @@
+{
+  "slug": "larkspur-dead-air",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 3
+  },
+  "canonicalAnswers": {
+    "determine-scene-staged": {
+      "type": "single_choice",
+      "choiceId": "staged-booth-scene"
+    },
+    "identify-missing-item": {
+      "type": "single_choice",
+      "choiceId": "founder-reel"
+    },
+    "identify-killer": {
+      "type": "single_choice",
+      "choiceId": "jonas-hart"
+    }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: Dead Air at Larkspur House",
+      "summary": "Mara Venn discovered that station manager Jonas Hart had pushed a sale of Larkspur House while hiding the founder's recorded trust clause from the board. When Mara recovered the original interview reel and planned to play it before the vote, Hart intercepted her in the archive alcove, killed her, removed the reel, and staged Studio B as an electrocution scene. The lockout log, Mara's tote, her annotated gala notes, and the intern's sighting prove both the false scene and Hart's motive to silence her before the sale collapsed."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: Dead Air at Larkspur House",
+      "summary": "Ashfall was able to show that Mara Venn did not die in the booth accident described by the local ruling. The missing archive reel and the pending sale of Larkspur House point to a deliberate cover-up tied to the board vote, but without a confirmed accusation the station's history remains disputed and the founder recording stays lost."
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "subtype": "interview_transcript",
+  "thread": {
+    "subject": "Production intern interview",
+    "channel": "Ashfall intake room",
+    "participants": ["Handler Rowan", "Lio Sorn"]
+  },
+  "messages": [
+    {
+      "id": "intern-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T10:11:00Z",
+      "body": "Where were you just before the alarm went up?"
+    },
+    {
+      "id": "intern-2",
+      "sender": "Lio Sorn",
+      "timestamp": "2013-09-19T10:12:00Z",
+      "body": "Outside the board room, hanging programs. It was maybe 22:19 or 22:20. Jonas Hart came out of the archive corridor with Mara's paper folder in one hand and a gray reel tin tucked under it."
+    },
+    {
+      "id": "intern-3",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T10:13:00Z",
+      "body": "Did he say anything to you?"
+    },
+    {
+      "id": "intern-4",
+      "sender": "Lio Sorn",
+      "timestamp": "2013-09-19T10:14:00Z",
+      "body": "He told me Mara had changed her mind about the presentation and said I should fetch the board chair after he checked on something downstairs."
+    },
+    {
+      "id": "intern-5",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T10:15:00Z",
+      "body": "Did you see the reel again after that?"
+    },
+    {
+      "id": "intern-6",
+      "sender": "Lio Sorn",
+      "timestamp": "2013-09-19T10:16:00Z",
+      "body": "No. Security was shouting about Studio B a few minutes later, and the tin was gone."
+    }
+  ]
+}

@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 
 test("protected routes allow cookie-backed identity only when agent id is present", async () => {
-  await import("@/middleware");
+  await import("@/proxy");
   const authConfig = withAuthMock.mock.calls[0]?.[0];
 
   expect(authConfig).toBeTruthy();

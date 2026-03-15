@@ -1,0 +1,46 @@
+{
+  "subtype": "interview_transcript",
+  "thread": {
+    "subject": "Night porter interview",
+    "channel": "Ashfall intake room",
+    "participants": ["Handler Rowan", "Dax Pell"]
+  },
+  "messages": [
+    {
+      "id": "porter-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T09:02:00Z",
+      "body": "When did you last see Mara Venn alive?"
+    },
+    {
+      "id": "porter-2",
+      "sender": "Dax Pell",
+      "timestamp": "2013-09-19T09:03:00Z",
+      "body": "About 22:17. She asked me to unlatch the archive alcove because she wanted one more look at something before going upstairs to the board room. She was carrying her recorder tote and a paper folder."
+    },
+    {
+      "id": "porter-3",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T09:04:00Z",
+      "body": "What state was Studio B in at that point?"
+    },
+    {
+      "id": "porter-4",
+      "sender": "Dax Pell",
+      "timestamp": "2013-09-19T09:05:00Z",
+      "body": "Dark. Engineering had already killed the booth power. I noticed because the red breaker tag was still hanging in the corridor and nobody was allowed to use the room."
+    },
+    {
+      "id": "porter-5",
+      "sender": "Handler Rowan",
+      "timestamp": "2013-09-19T09:06:00Z",
+      "body": "Did you see Mara again?"
+    },
+    {
+      "id": "porter-6",
+      "sender": "Dax Pell",
+      "timestamp": "2013-09-19T09:07:00Z",
+      "body": "No. I came back with a step stool a few minutes later and the alcove lamp was still on, but Mara was gone. Her tote wasn't there either."
+    }
+  ]
+}

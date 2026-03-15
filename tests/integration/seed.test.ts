@@ -14,8 +14,8 @@ async function countPublishedCases() {
     .length;
 }
 
-test("seeds three published cases", async () => {
+test("seeds four published cases", async () => {
   await seedDatabase();
 
-  await expect(countPublishedCases()).resolves.toBe(3);
+  await expect(countPublishedCases()).resolves.toBe(4);
 });
