@@ -1,0 +1,40 @@
+{
+  "subtype": "message_thread",
+  "thread": {
+    "subject": "Anniversary rundown — last-minute inserts",
+    "channel": "Internal email",
+    "participants": ["Mara Venn", "Jonas Hart", "Tamsin Reed", "Celine Wren"]
+  },
+  "messages": [
+    {
+      "id": "anniv-1",
+      "sender": "Mara Venn",
+      "timestamp": "2013-09-18T21:02:00Z",
+      "body": "I found the founder interview reel in the cold shelves. I'm bringing the original upstairs after the late segment instead of the clipped transcript."
+    },
+    {
+      "id": "anniv-2",
+      "sender": "Jonas Hart",
+      "timestamp": "2013-09-18T21:05:00Z",
+      "body": "Do not carry original archive media into the board room. We only need the written summary for the sale vote."
+    },
+    {
+      "id": "anniv-3",
+      "sender": "Tamsin Reed",
+      "timestamp": "2013-09-18T21:07:00Z",
+      "body": "If the board doesn't hear Halden tonight, do I still cue the toast after the vote?"
+    },
+    {
+      "id": "anniv-4",
+      "sender": "Mara Venn",
+      "timestamp": "2013-09-18T21:09:00Z",
+      "body": "Not until they hear his own words. The summary Jonas circulated leaves out the trust clause."
+    },
+    {
+      "id": "anniv-5",
+      "sender": "Celine Wren",
+      "timestamp": "2013-09-18T21:11:00Z",
+      "body": "This was supposed to be a celebration, not a boardroom ambush."
+    }
+  ]
+}

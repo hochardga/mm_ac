@@ -1,0 +1,227 @@
+{
+  "slug": "larkspur-dead-air",
+  "revision": "rev-1",
+  "title": "Dead Air at Larkspur House",
+  "summary": "A radio archivist dies in a darkened booth during a station anniversary gala, but the official accident ruling frays as the timing, the scene, and a missing archive item stop lining up.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "opening-brief",
+      "title": "Opening Brief",
+      "family": "document",
+      "subtype": "case_brief",
+      "summary": "Ashfall's intake summary of Mara Venn's death and the initial points of concern.",
+      "source": "evidence/opening-brief.md"
+    },
+    {
+      "id": "engineering-lockout-log",
+      "title": "Engineering Lockout Log",
+      "family": "record",
+      "subtype": "station_log",
+      "summary": "A short facilities log covering the studio maintenance window on the night of the incident.",
+      "source": "evidence/engineering-lockout-log.json"
+    },
+    {
+      "id": "porter-interview",
+      "title": "Night Porter Interview",
+      "family": "thread",
+      "subtype": "interview_transcript",
+      "summary": "A porter describes Mara's last confirmed movements before the alarm was raised.",
+      "source": "evidence/porter-interview.json"
+    },
+    {
+      "id": "studio-b-scene",
+      "title": "Studio B Scene Photo",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "A field image of Studio B as security found it after the alleged electrocution.",
+      "source": "evidence/studio-b-scene.json"
+    },
+    {
+      "id": "anniversary-thread",
+      "title": "Anniversary Rundown Thread",
+      "family": "thread",
+      "subtype": "message_thread",
+      "summary": "Staff messages about a last-minute change to the anniversary broadcast and board presentation.",
+      "source": "evidence/anniversary-thread.json"
+    },
+    {
+      "id": "archive-checkout-log",
+      "title": "Archive Checkout Log",
+      "family": "record",
+      "subtype": "archive_log",
+      "summary": "Archive handling entries tied to Mara's review work that evening.",
+      "source": "evidence/archive-checkout-log.json"
+    },
+    {
+      "id": "archive-tote-photo",
+      "title": "Archive Tote Photo",
+      "family": "photo",
+      "subtype": "object_photo",
+      "summary": "A close photograph of Mara's recorder tote after it was recovered from the archive alcove.",
+      "source": "evidence/archive-tote-photo.json"
+    },
+    {
+      "id": "gala-remarks-draft",
+      "title": "Draft Gala Remarks",
+      "family": "document",
+      "subtype": "internal_memo",
+      "summary": "Mara's annotated draft for the anniversary program and the board vote that followed.",
+      "source": "evidence/gala-remarks-draft.md"
+    },
+    {
+      "id": "intern-interview",
+      "title": "Production Intern Interview",
+      "family": "thread",
+      "subtype": "interview_transcript",
+      "summary": "An intern recounts who he saw leaving the archive corridor moments before the body was found.",
+      "source": "evidence/intern-interview.json"
+    },
+    {
+      "id": "sale-briefing-memo",
+      "title": "Sale Briefing Memo",
+      "family": "document",
+      "subtype": "internal_memo",
+      "summary": "A draft board memo outlining the pending sale of Larkspur House and the documents required to approve it.",
+      "source": "evidence/sale-briefing-memo.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "signal-break",
+      "startsUnlocked": true,
+      "title": "Signal Break",
+      "summary": "Test the official accident story against the station's own timeline.",
+      "handlerPrompts": [
+        "Start with the maintenance window and Mara's last confirmed movements.",
+        "Ask which parts of the official story require a powered booth."
+      ],
+      "evidenceIds": [
+        "opening-brief",
+        "engineering-lockout-log",
+        "porter-interview",
+        "studio-b-scene"
+      ],
+      "objectives": [
+        {
+          "id": "determine-scene-staged",
+          "prompt": "What best explains the evidence around Mara Venn's death?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "accidental-electrocution",
+              "label": "Mara Venn was accidentally electrocuted in Studio B after spilling coffee."
+            },
+            {
+              "id": "staged-booth-scene",
+              "label": "Mara Venn died elsewhere, and Studio B was staged to resemble an electrocution."
+            },
+            {
+              "id": "intentional-self-harm",
+              "label": "Mara Venn deliberately used the disabled console to harm herself."
+            },
+            {
+              "id": "repair-fumes",
+              "label": "Mara Venn collapsed from repair fumes after entering the booth alone."
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": ["missing-reel"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "missing-reel",
+      "startsUnlocked": false,
+      "title": "The Missing Reel",
+      "summary": "Figure out what vanished from Mara's tote before the booth scene was arranged.",
+      "handlerPrompts": [
+        "Follow what Mara intended to carry to the board room.",
+        "Compare the checkout entries with the physical state of the tote."
+      ],
+      "evidenceIds": [
+        "anniversary-thread",
+        "archive-checkout-log",
+        "archive-tote-photo"
+      ],
+      "objectives": [
+        {
+          "id": "identify-missing-item",
+          "prompt": "Which item was removed from Mara Venn's tote before the scene was staged?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "founder-reel",
+              "label": "The founder interview reel concerning the station sale."
+            },
+            {
+              "id": "sponsorship-contract",
+              "label": "The anniversary sponsorship contract."
+            },
+            {
+              "id": "master-booth-key",
+              "label": "The Studio B master key."
+            },
+            {
+              "id": "cash-envelope",
+              "label": "A donor cash envelope from the gala desk."
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": ["final-broadcast"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-broadcast",
+      "startsUnlocked": false,
+      "title": "Final Broadcast",
+      "summary": "Use motive and opportunity together to identify who silenced Mara Venn.",
+      "handlerPrompts": [
+        "Separate who could reach the archive from who needed the reel gone.",
+        "Look for who stood to gain if the board voted without hearing the full recording."
+      ],
+      "evidenceIds": [
+        "gala-remarks-draft",
+        "intern-interview",
+        "sale-briefing-memo"
+      ],
+      "objectives": [
+        {
+          "id": "identify-killer",
+          "prompt": "Who killed Mara Venn?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "jonas-hart",
+              "label": "Jonas Hart, station manager"
+            },
+            {
+              "id": "ivo-mercer",
+              "label": "Ivo Mercer, chief engineer"
+            },
+            {
+              "id": "celine-wren",
+              "label": "Celine Wren, morning host"
+            },
+            {
+              "id": "tamsin-reed",
+              "label": "Tamsin Reed, development officer"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
+    }
+  ]
+}
