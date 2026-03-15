@@ -184,6 +184,7 @@ test("seeds staged objective rows on first open with active and locked statuses"
   expect(loadAnyCaseManifestSpy).toHaveBeenCalledWith("hollow-bishop", {
     expectedRevision: "rev-1",
   });
+  expect(first.playerCase.viewedEvidenceIds).toEqual(["ledger"]);
   expect(seededRows).toHaveLength(2);
   expect(seededRows.map((row) => `${row.objectiveId}:${row.status}`)).toEqual([
     "enter-code:locked",

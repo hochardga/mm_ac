@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 import { PhotoEvidenceView } from "@/features/cases/components/photo-evidence-view";
 
@@ -21,37 +21,12 @@ function renderPhotoEvidenceView() {
   );
 }
 
-test("shows Source, Date: Unknown, opens a larger preview, and closes it", () => {
+test("shows Source and Date without a nested preview control", () => {
   renderPhotoEvidenceView();
 
   expect(screen.getByText(/source:\s*parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: /open larger preview/i }));
-
   expect(
-    screen.getByRole("dialog", { name: /vestry scene photo/i }),
-  ).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: /close preview/i }));
-
-  expect(
-    screen.queryByRole("dialog", { name: /vestry scene photo/i }),
-  ).not.toBeInTheDocument();
-});
-
-test("closes the larger preview when Escape is pressed", () => {
-  renderPhotoEvidenceView();
-
-  fireEvent.click(screen.getByRole("button", { name: /open larger preview/i }));
-
-  expect(
-    screen.getByRole("dialog", { name: /vestry scene photo/i }),
-  ).toBeInTheDocument();
-
-  fireEvent.keyDown(document, { key: "Escape" });
-
-  expect(
-    screen.queryByRole("dialog", { name: /vestry scene photo/i }),
+    screen.queryByRole("button", { name: /open larger preview/i }),
   ).not.toBeInTheDocument();
 });

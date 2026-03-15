@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -40,6 +40,10 @@ export const playerCases = pgTable("player_cases", {
   startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   lastViewedEvidenceId: text("last_viewed_evidence_id"),
+  viewedEvidenceIds: jsonb("viewed_evidence_ids")
+    .$type<string[]>()
+    .notNull()
+    .default(sql`'[]'::jsonb`),
   lastViewedEvidenceAt: timestamp("last_viewed_evidence_at", {
     withTimezone: true,
   }),

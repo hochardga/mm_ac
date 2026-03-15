@@ -10,6 +10,15 @@ const { cookiesMock } = vi.hoisted(() => ({
 const { getServerSessionMock } = vi.hoisted(() => ({
   getServerSessionMock: vi.fn(),
 }));
+const { routerPushMock, redirectMock, notFoundMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+  redirectMock: vi.fn((target: string) => {
+    throw new Error(`NEXT_REDIRECT:${target}`);
+  }),
+  notFoundMock: vi.fn(() => {
+    throw new Error("NEXT_NOT_FOUND");
+  }),
+}));
 
 vi.mock("next/headers", () => ({
   cookies: cookiesMock,
@@ -17,6 +26,14 @@ vi.mock("next/headers", () => ({
 
 vi.mock("next-auth", () => ({
   getServerSession: getServerSessionMock,
+}));
+
+vi.mock("next/navigation", () => ({
+  notFound: notFoundMock,
+  redirect: redirectMock,
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
 }));
 
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
@@ -37,10 +54,13 @@ afterEach(async () => {
   vi.restoreAllMocks();
   cookiesMock.mockReset();
   getServerSessionMock.mockReset();
+  routerPushMock.mockReset();
+  redirectMock.mockClear();
+  notFoundMock.mockClear();
   await closeDb();
 });
 
-test("renders an evidence index, selected viewer, and persistent notes together", async () => {
+test("renders an evidence index, evidence modal, and persistent notes together", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -68,13 +88,13 @@ test("renders an evidence index, selected viewer, and persistent notes together"
   );
 
   expect(
-    screen.getByRole("heading", { name: /evidence intake/i }),
+    screen.getByRole("heading", { name: /evidence intake/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: /field notes/i }),
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: /active objectives/i }),
+    screen.getByRole("heading", { name: /active objectives/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
@@ -84,10 +104,16 @@ test("renders an evidence index, selected viewer, and persistent notes together"
       .length,
   ).toBeGreaterThan(0);
   expect(
-    screen.getByText(/active evidence: vestry interview transcript/i),
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /vestry interview transcript/i }),
   ).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: /close evidence/i }),
+  ).toHaveAttribute("href", "/cases/hollow-bishop#evidence-vestry-interview");
   const headerSection = screen
-    .getByRole("heading", { name: /the hollow bishop/i })
+    .getByRole("heading", { name: /the hollow bishop/i, hidden: true })
     .closest("section");
   expect(headerSection).not.toBeNull();
   expect(
@@ -201,7 +227,10 @@ test("uses the first repeated evidence query value when the case page receives a
   );
 
   expect(
-    screen.getByText(/active evidence: night watch exchange/i),
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /night watch exchange/i }),
   ).toBeInTheDocument();
 });
 
@@ -285,12 +314,14 @@ test("renders document markdown, record tables, and photo evidence in the worksp
     } as never),
   );
 
-  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
+  ).toBeInTheDocument();
   expect(screen.getByText(/parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
 });
 
-test("shows restored progress with quick links when reopening a case with saved notes", async () => {
+test("does not render the progress restored banner when reopening a case with saved notes", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -327,30 +358,20 @@ test("shows restored progress with quick links when reopening a case with saved 
   );
 
   expect(
-    screen.getByText(/ashfall restored your saved progress/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/ashfall restored your saved progress/i),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to evidence intake/i }),
-  ).toHaveAttribute("href", "#evidence-intake");
+    screen.queryByRole("link", { name: /jump to evidence intake/i }),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to field notes/i }),
-  ).toHaveAttribute("href", "#field-notes");
+    screen.queryByRole("link", { name: /jump to field notes/i }),
+  ).not.toBeInTheDocument();
   expect(
-    screen.getByRole("link", { name: /jump to active objectives/i }),
-  ).toHaveAttribute("href", "#active-objectives");
-
-  expect(
-    screen.getByRole("heading", { name: /evidence intake/i }).closest("section"),
-  ).toHaveAttribute("id", "evidence-intake");
-  expect(
-    screen.getByRole("heading", { name: /field notes/i }).closest("section"),
-  ).toHaveAttribute("id", "field-notes");
-  expect(
-    screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
-  ).toHaveAttribute("id", "active-objectives");
+    screen.queryByRole("link", { name: /jump to active objectives/i }),
+  ).not.toBeInTheDocument();
 });
 
-test("reopens on the remembered evidence when no evidence query is present", async () => {
+test("keeps field notes visible without showing active-evidence copy when no modal is open", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -386,12 +407,14 @@ test("reopens on the remembered evidence when no evidence query is present", asy
     } as never),
   );
 
+  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
   expect(
-    screen.getByText(/active evidence: night watch exchange/i),
-  ).toBeInTheDocument();
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 });
 
-test("falls back to the first visible evidence and repairs stale remembered evidence ids", async () => {
+test("falls back to the first visible evidence without silently repairing stale remembered evidence ids", async () => {
   const db = await getDb();
   const userId = randomUUID();
 
@@ -434,10 +457,12 @@ test("falls back to the first visible evidence and repairs stale remembered evid
     where: eq(playerCases.id, playerCase.id),
   });
 
+  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
   expect(
-    screen.getByText(/active evidence: dispatch log/i),
-  ).toBeInTheDocument();
-  expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("dispatch-log");
+    screen.queryByText(/active evidence:/i),
+  ).not.toBeInTheDocument();
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(refreshedPlayerCase?.lastViewedEvidenceId).toBe("missing-evidence");
 });
 
 test("renders staged objectives with gated evidence and objective continuity links", async () => {
@@ -625,11 +650,24 @@ test("renders staged objectives with gated evidence and objective continuity lin
     nextStatus: "in_progress",
     attemptNumber: 1,
   });
+  await db.insert(objectiveSubmissions).values({
+    id: randomUUID(),
+    playerCaseId: playerCase.id,
+    objectiveId: "choose-transfer-signer",
+    submissionToken: `submission-${randomUUID()}`,
+    answerPayload: {
+      type: "single_choice",
+      choiceId: "captain",
+    },
+    isCorrect: false,
+    feedback: "Incorrect graded objective submission.",
+    nextStatus: "in_progress",
+    attemptNumber: 1,
+  });
 
   render(
     await CasePage({
       params: Promise.resolve({ caseSlug: "hollow-bishop" }),
-      searchParams: Promise.resolve({ evidence: "sealed-archive" }),
     } as never),
   );
 
@@ -652,14 +690,75 @@ test("renders staged objectives with gated evidence and objective continuity lin
   expect(
     screen.queryByText(/sealed archive memorandum/i),
   ).not.toBeInTheDocument();
+  const ledgerArticle = screen
+    .getByRole("heading", { name: /ledger brief/i })
+    .closest("article");
+  const transferArticle = screen
+    .getByRole("heading", { name: /harbor transfer record/i })
+    .closest("article");
+  expect(ledgerArticle).not.toBeNull();
+  expect(transferArticle).not.toBeNull();
+  expect(
+    within(ledgerArticle as HTMLElement).queryByText("New"),
+  ).not.toBeInTheDocument();
+  expect(
+    within(transferArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
   expect(
     screen.getByRole("heading", { name: /completed objectives/i }),
   ).toBeInTheDocument();
-  expect(screen.getAllByText(/objective solved\./i).length).toBeGreaterThan(0);
+  const completedSection = screen
+    .getByRole("heading", { name: /completed objectives/i })
+    .closest("section");
+  const activeSection = screen
+    .getByRole("heading", { name: /active objectives/i })
+    .closest("section");
+  expect(completedSection).not.toBeNull();
+  expect(activeSection).not.toBeNull();
   expect(
-    screen.getByRole("link", { name: /jump to active objectives/i }),
-  ).toHaveAttribute("href", "#active-objectives");
+    Boolean(
+      (completedSection as HTMLElement).compareDocumentPosition(
+        activeSection as HTMLElement,
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ),
+  ).toBe(true);
+  expect(
+    within(completedSection as HTMLElement).getByText(/correct \/ attempt 1/i),
+  ).toBeInTheDocument();
+  expect(
+    within(activeSection as HTMLElement).getByText(/incorrect \/ attempt 1/i),
+  ).toBeInTheDocument();
+  expect(
+    within(activeSection as HTMLElement)
+      .getAllByRole("button")
+      .map((button) => button.textContent?.trim()),
+  ).toEqual(["Submit Objective", "Save Draft"]);
   expect(
     screen.getByRole("heading", { name: /active objectives/i }).closest("section"),
   ).toHaveAttribute("id", "active-objectives");
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({ evidence: "harbor-transfer" }),
+    } as never),
+  );
+
+  cleanup();
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  const revisitedTransferArticle = screen
+    .getByRole("heading", { name: /harbor transfer record/i })
+    .closest("article");
+  expect(revisitedTransferArticle).not.toBeNull();
+  expect(
+    within(revisitedTransferArticle as HTMLElement).queryByText("New"),
+  ).not.toBeInTheDocument();
 });

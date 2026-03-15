@@ -20,7 +20,7 @@ export function ObjectiveFormFields({
             Response
           </span>
           <select
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={
               draftPayload?.type === "single_choice" ? draftPayload.choiceId : ""
             }
@@ -71,7 +71,7 @@ export function ObjectiveFormFields({
             Response
           </span>
           <select
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={
               draftPayload?.type === "boolean"
                 ? String(draftPayload.value)
@@ -93,7 +93,7 @@ export function ObjectiveFormFields({
             Code Entry
           </span>
           <input
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={
               draftPayload?.type === "code_entry" ? draftPayload.value : ""
             }

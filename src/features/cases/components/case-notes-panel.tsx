@@ -7,14 +7,12 @@ type CaseNotesPanelProps = {
   caseSlug: string;
   playerCaseId: string;
   savedNote: SavedNote;
-  selectedEvidenceTitle: string;
 };
 
 export function CaseNotesPanel({
   caseSlug,
   playerCaseId,
   savedNote,
-  selectedEvidenceTitle,
 }: CaseNotesPanelProps) {
   return (
     <section
@@ -22,9 +20,6 @@ export function CaseNotesPanel({
       id="field-notes"
     >
       <h2 className="text-2xl font-semibold">Field Notes</h2>
-      <p className="mt-3 text-xs uppercase tracking-[0.2em] text-stone-400">
-        Active evidence: {selectedEvidenceTitle}
-      </p>
       <form action={saveNoteAction} className="mt-6 grid gap-4">
         <input name="caseSlug" type="hidden" value={caseSlug} />
         <input name="playerCaseId" type="hidden" value={playerCaseId} />

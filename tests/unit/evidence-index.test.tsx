@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 
@@ -30,6 +30,7 @@ test("marks the selected evidence link as the current page", () => {
           messages: [],
         },
       ]}
+      newEvidenceIds={["dispatch-log"]}
       selectedEvidenceId="night-watch-thread"
     />,
   );
@@ -40,4 +41,8 @@ test("marks the selected evidence link as the current page", () => {
   expect(
     screen.getByRole("link", { name: /open dispatch log/i }),
   ).not.toHaveAttribute("aria-current");
+  expect(
+    within(screen.getByRole("link", { name: /open dispatch log/i }).closest("article")!)
+      .getByText("New"),
+  ).toBeInTheDocument();
 });

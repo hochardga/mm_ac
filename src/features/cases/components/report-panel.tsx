@@ -26,6 +26,11 @@ export function ReportPanel({
   latestSubmission,
   submissionToken,
 }: ReportPanelProps) {
+  const reportStatusLabel =
+    latestSubmission?.nextStatus === "in_progress"
+      ? `Incorrect Report / Attempt ${latestSubmission.attemptNumber}`
+      : null;
+
   return (
     <section
       className="rounded-[2rem] border border-white/10 bg-white/5 p-6"
@@ -35,7 +40,7 @@ export function ReportPanel({
       {latestSubmission?.nextStatus === "in_progress" ? (
         <div className="mt-6 rounded-[1.5rem] border border-[#d96c3d]/40 bg-[#d96c3d]/10 p-4">
           <p className="text-xs uppercase tracking-[0.2em] text-[#f0b48f]">
-            Handler Feedback / Attempt {latestSubmission.attemptNumber}
+            {reportStatusLabel}
           </p>
           <p className="mt-3 text-sm leading-7 text-stone-100">
             {latestSubmission.feedback}
@@ -57,7 +62,7 @@ export function ReportPanel({
             Suspect
           </span>
           <select
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.suspectId ?? ""}
             name="suspectId"
             required
@@ -76,7 +81,7 @@ export function ReportPanel({
             Motive
           </span>
           <select
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.motiveId ?? ""}
             name="motiveId"
             required
@@ -95,7 +100,7 @@ export function ReportPanel({
             Method
           </span>
           <select
-            className="rounded-full border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
+            className="w-full rounded-3xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-stone-100"
             defaultValue={savedDraft?.methodId ?? ""}
             name="methodId"
             required
@@ -112,14 +117,14 @@ export function ReportPanel({
         <div className="flex flex-wrap gap-3">
           <ReportActionButton
             className="w-fit rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-950"
-            idleLabel="Save Draft"
-            pendingLabel="Saving Draft..."
+            formAction={submitReportAction}
+            idleLabel="Submit Report"
+            pendingLabel="Submitting Report..."
           />
           <ReportActionButton
             className="w-fit rounded-full border border-white/20 px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-stone-50"
-            idleLabel="Submit Report"
-            pendingLabel="Submitting Report..."
-            formAction={submitReportAction}
+            idleLabel="Save Draft"
+            pendingLabel="Saving Draft..."
           />
         </div>
       </form>

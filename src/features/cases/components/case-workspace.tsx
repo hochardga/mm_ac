@@ -6,13 +6,12 @@ import type {
   reportSubmissions,
 } from "@/db/schema";
 import { ActiveObjectivesPanel } from "@/features/cases/components/active-objectives-panel";
-import { CaseContinuityBanner } from "@/features/cases/components/case-continuity-banner";
 import { CaseNotesPanel } from "@/features/cases/components/case-notes-panel";
+import { EvidenceDialog } from "@/features/cases/components/evidence-dialog";
 import { EvidenceIndex } from "@/features/cases/components/evidence-index";
 import { EvidenceViewer } from "@/features/cases/components/evidence-viewer";
 import { ReportPanel } from "@/features/cases/components/report-panel";
 import { buildCaseProgression } from "@/features/cases/case-progression";
-import type { openCase } from "@/features/cases/open-case";
 import type {
   LoadedCaseManifest,
   LoadedLegacyCaseManifest,
@@ -24,7 +23,6 @@ type SavedDraft = typeof reportDrafts.$inferSelect | undefined;
 type LatestSubmission = typeof reportSubmissions.$inferSelect | undefined;
 type ObjectiveState = typeof playerCaseObjectives.$inferSelect[];
 type ObjectiveSubmissionRows = typeof objectiveSubmissions.$inferSelect[];
-type ResumeTarget = Awaited<ReturnType<typeof openCase>>["resumeTarget"];
 
 type CaseWorkspaceProps = {
   caseSlug: string;
@@ -37,7 +35,7 @@ type CaseWorkspaceProps = {
   objectiveSubmissions: ObjectiveSubmissionRows;
   submissionToken: string;
   selectedEvidenceId?: string;
-  resumeTarget: ResumeTarget;
+  viewedEvidenceIds: string[];
 };
 
 function isStagedManifest(
@@ -63,7 +61,7 @@ export function CaseWorkspace({
   objectiveSubmissions,
   submissionToken,
   selectedEvidenceId,
-  resumeTarget,
+  viewedEvidenceIds,
 }: CaseWorkspaceProps) {
   const stagedProgression = isStagedManifest(manifest)
     ? buildCaseProgression({
@@ -76,40 +74,27 @@ export function CaseWorkspace({
       })
     : null;
   const visibleEvidence = stagedProgression?.visibleEvidence ?? manifest.evidence;
-  const selectedEvidence =
-    visibleEvidence.find((item) => item.id === selectedEvidenceId) ??
-    visibleEvidence[0];
+  const defaultEvidence = visibleEvidence[0];
+  const newEvidenceIds = visibleEvidence
+    .map((item) => item.id)
+    .filter((evidenceId) => !viewedEvidenceIds.includes(evidenceId));
+  const selectedEvidence = selectedEvidenceId
+    ? visibleEvidence.find((item) => item.id === selectedEvidenceId)
+    : undefined;
 
-  if (!selectedEvidence) {
+  if (!defaultEvidence) {
     return null;
   }
 
-  const rightRailHref = stagedProgression ? "#active-objectives" : "#draft-report";
-  const rightRailLabel = stagedProgression
-    ? "Jump to Active Objectives"
-    : "Jump to Draft Report";
-
   return (
     <div className="space-y-6">
-      {resumeTarget.section === "notes" ||
-      resumeTarget.section === "report" ||
-      resumeTarget.section === "objectives" ? (
-        <CaseContinuityBanner
-          description={resumeTarget.description}
-          label={resumeTarget.label}
-          rightRailHref={rightRailHref}
-          rightRailLabel={rightRailLabel}
-        />
-      ) : null}
-
-      <section className="grid gap-6 xl:grid-cols-[18rem_minmax(0,1fr)_24rem]">
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
         <EvidenceIndex
           caseSlug={caseSlug}
           evidence={visibleEvidence}
-          selectedEvidenceId={selectedEvidence.id}
+          newEvidenceIds={newEvidenceIds}
+          selectedEvidenceId={selectedEvidence?.id}
         />
-
-        <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
 
         <aside className="space-y-6">
           <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
@@ -127,7 +112,6 @@ export function CaseWorkspace({
             caseSlug={caseSlug}
             playerCaseId={playerCaseId}
             savedNote={savedNote}
-            selectedEvidenceTitle={selectedEvidence.title}
           />
 
           {stagedProgression ? (
@@ -137,7 +121,7 @@ export function CaseWorkspace({
               objectiveRows={objectiveStates}
               objectiveSubmissions={objectiveSubmissions}
               playerCaseId={playerCaseId}
-              selectedEvidenceId={selectedEvidence.id}
+              selectedEvidenceId={selectedEvidence?.id}
               solvedObjectives={stagedProgression.solvedObjectives}
               submissionToken={submissionToken}
             />
@@ -145,7 +129,7 @@ export function CaseWorkspace({
             <ReportPanel
               caseSlug={caseSlug}
               playerCaseId={playerCaseId}
-              selectedEvidenceId={selectedEvidence.id}
+              selectedEvidenceId={selectedEvidence?.id}
               manifest={manifest}
               savedDraft={savedDraft}
               latestSubmission={latestSubmission}
@@ -154,6 +138,15 @@ export function CaseWorkspace({
           ) : null}
         </aside>
       </section>
+
+      {selectedEvidence ? (
+        <EvidenceDialog
+          closeHref={`/cases/${caseSlug}#evidence-${selectedEvidence.id}`}
+          title={selectedEvidence.title}
+        >
+          <EvidenceViewer caseSlug={caseSlug} evidence={selectedEvidence} />
+        </EvidenceDialog>
+      ) : null}
     </div>
   );
 }
