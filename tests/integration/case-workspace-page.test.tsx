@@ -10,6 +10,15 @@ const { cookiesMock } = vi.hoisted(() => ({
 const { getServerSessionMock } = vi.hoisted(() => ({
   getServerSessionMock: vi.fn(),
 }));
+const { routerPushMock, redirectMock, notFoundMock } = vi.hoisted(() => ({
+  routerPushMock: vi.fn(),
+  redirectMock: vi.fn((target: string) => {
+    throw new Error(`NEXT_REDIRECT:${target}`);
+  }),
+  notFoundMock: vi.fn(() => {
+    throw new Error("NEXT_NOT_FOUND");
+  }),
+}));
 
 vi.mock("next/headers", () => ({
   cookies: cookiesMock,
@@ -17,6 +26,14 @@ vi.mock("next/headers", () => ({
 
 vi.mock("next-auth", () => ({
   getServerSession: getServerSessionMock,
+}));
+
+vi.mock("next/navigation", () => ({
+  notFound: notFoundMock,
+  redirect: redirectMock,
+  useRouter: () => ({
+    push: routerPushMock,
+  }),
 }));
 
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
@@ -37,6 +54,9 @@ afterEach(async () => {
   vi.restoreAllMocks();
   cookiesMock.mockReset();
   getServerSessionMock.mockReset();
+  routerPushMock.mockReset();
+  redirectMock.mockClear();
+  notFoundMock.mockClear();
   await closeDb();
 });
 
@@ -68,13 +88,13 @@ test("renders an evidence index, evidence modal, and persistent notes together",
   );
 
   expect(
-    screen.getByRole("heading", { name: /evidence intake/i }),
+    screen.getByRole("heading", { name: /evidence intake/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: /field notes/i }),
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("heading", { name: /active objectives/i }),
+    screen.getByRole("heading", { name: /active objectives/i, hidden: true }),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/the silver chalice was on the floor beside the desk/i),
@@ -93,7 +113,7 @@ test("renders an evidence index, evidence modal, and persistent notes together",
     screen.getByRole("link", { name: /close evidence/i }),
   ).toHaveAttribute("href", "/cases/hollow-bishop#evidence-vestry-interview");
   const headerSection = screen
-    .getByRole("heading", { name: /the hollow bishop/i })
+    .getByRole("heading", { name: /the hollow bishop/i, hidden: true })
     .closest("section");
   expect(headerSection).not.toBeNull();
   expect(
@@ -294,7 +314,9 @@ test("renders document markdown, record tables, and photo evidence in the worksp
     } as never),
   );
 
-  expect(screen.getByRole("heading", { name: /field notes/i })).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
+  ).toBeInTheDocument();
   expect(screen.getByText(/parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
 });

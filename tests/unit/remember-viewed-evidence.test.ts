@@ -61,6 +61,35 @@ test("stores remembered evidence on the player case without losing prior viewed 
   expect(savedPlayerCase?.viewedEvidenceIds).toEqual(["ledger", "dispatch-log"]);
 });
 
+test("preserves both evidence ids when two remember operations happen concurrently", async () => {
+  const db = await getDb();
+  const { playerCaseId } = await createPlayerCase(["ledger"]);
+
+  await Promise.all([
+    rememberViewedEvidence({
+      playerCaseId,
+      evidenceId: "dispatch-log",
+    }),
+    rememberViewedEvidence({
+      playerCaseId,
+      evidenceId: "receipt",
+    }),
+  ]);
+
+  const savedPlayerCase = await db.query.playerCases.findFirst({
+    where: (playerCase, { eq }) => eq(playerCase.id, playerCaseId),
+  });
+
+  expect(savedPlayerCase?.viewedEvidenceIds).toEqual(
+    expect.arrayContaining(["ledger", "dispatch-log", "receipt"]),
+  );
+  expect(savedPlayerCase?.viewedEvidenceIds).toHaveLength(3);
+  expect(["dispatch-log", "receipt"]).toContain(
+    savedPlayerCase?.lastViewedEvidenceId,
+  );
+  expect(savedPlayerCase?.lastViewedEvidenceAt).toBeInstanceOf(Date);
+});
+
 test("throws when the player case does not exist", async () => {
   await expect(
     rememberViewedEvidence({

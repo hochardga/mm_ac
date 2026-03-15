@@ -157,7 +157,7 @@ Add a new `viewedEvidenceIds` JSON-backed column on `player_cases`.
 
 Behavior:
 
-- New player cases start with an empty viewed-evidence list.
+- New player cases seed `viewedEvidenceIds` from the case manifest's initially visible evidence, so evidence that starts visible is treated as already viewed on first open.
 - Opening a case with a selected evidence item records that evidence as viewed.
 - New evidence badges are derived from `visibleEvidence - viewedEvidenceIds`.
 

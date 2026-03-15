@@ -70,13 +70,12 @@ Create `src/features/cases/components/evidence-dialog.tsx` with a client-side mo
 ```tsx
 type EvidenceDialogProps = {
   title: string;
-  subtitle: string;
-  onCloseHref: string;
+  closeHref: string;
   children: React.ReactNode;
 };
 ```
 
-The dialog should provide consistent overlay, close button, escape handling, and scroll behavior.
+The dialog should provide consistent overlay, close button, and scroll behavior.
 
 - [ ] **Step 3: Refactor evidence viewers so they can render inside the shared dialog**
 
