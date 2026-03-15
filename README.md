@@ -37,6 +37,10 @@ The app runs at [http://127.0.0.1:3000](http://127.0.0.1:3000).
 - Returning-agent auth uses NextAuth credentials. Signup also sets the local Ashfall agent cookie so the MVP flow works before a full session-management pass.
 - Run `pnpm validate:cases` after changing any authored evidence or manifest entry so missing files and malformed payloads fail fast.
 
+## Documentation
+
+- [Create a New Case](docs/create-a-new-case.md) - starter guide for authoring a staged case package in this repo
+
 ## Vercel Deployment
 
 Hosted Vercel deployments must use a shared Postgres database. Embedded
