@@ -100,6 +100,170 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   expect(screen.queryByText(/80 min/i)).not.toBeInTheDocument();
 });
 
+test("renders a service record for a new agent and recommends a fresh dossier", async () => {
+  const db = await getDb();
+  const agentId = randomUUID();
+
+  getServerSessionMock.mockResolvedValue(null);
+  cookiesMock.mockResolvedValue({
+    get: (name: string) =>
+      name === "ashfall-agent-id" ? { value: agentId } : undefined,
+  });
+
+  await db.insert(users).values({
+    id: agentId,
+    email: "new-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent New",
+  });
+
+  await db.insert(caseDefinitions).values([
+    {
+      id: randomUUID(),
+      slug: "hollow-bishop",
+      title: "The Hollow Bishop",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: randomUUID(),
+      slug: "red-harbor",
+      title: "Signal at Red Harbor",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: randomUUID(),
+      slug: "briar-ledger",
+      title: "The Briar Ledger",
+      currentPublishedRevision: "rev-1",
+    },
+  ]);
+
+  render(await VaultPage());
+
+  const serviceRecord = screen
+    .getByRole("heading", { name: /service record/i })
+    .closest("section");
+
+  expect(serviceRecord).not.toBeNull();
+  expect(
+    within(serviceRecord as HTMLElement).getByText(/0 of 3 dossiers cleared/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecord as HTMLElement).getByText(/0 active investigations/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecord as HTMLElement).getByText(/0 unresolved closures/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecord as HTMLElement).getByRole("link", {
+      name: /open case file/i,
+    }),
+  ).toHaveAttribute("href", "/cases/red-harbor");
+  expect(
+    within(serviceRecord as HTMLElement).getByText(
+      /a fresh dossier is ready for field review/i,
+    ),
+  ).toBeInTheDocument();
+});
+
+test("prefers the most recently active dossier in the service record recommendation", async () => {
+  const db = await getDb();
+  const agentId = randomUUID();
+  const hollowBishopId = randomUUID();
+  const redHarborId = randomUUID();
+  const briarLedgerId = randomUUID();
+  const hollowBishopPlayerCaseId = randomUUID();
+  const redHarborPlayerCaseId = randomUUID();
+
+  getServerSessionMock.mockResolvedValue(null);
+  cookiesMock.mockResolvedValue({
+    get: (name: string) =>
+      name === "ashfall-agent-id" ? { value: agentId } : undefined,
+  });
+
+  await db.insert(users).values({
+    id: agentId,
+    email: "service-record-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Service Record",
+  });
+
+  await db.insert(caseDefinitions).values([
+    {
+      id: hollowBishopId,
+      slug: "hollow-bishop",
+      title: "The Hollow Bishop",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: redHarborId,
+      slug: "red-harbor",
+      title: "Signal at Red Harbor",
+      currentPublishedRevision: "rev-1",
+    },
+    {
+      id: briarLedgerId,
+      slug: "briar-ledger",
+      title: "The Briar Ledger",
+      currentPublishedRevision: "rev-1",
+    },
+  ]);
+
+  await db.insert(playerCases).values([
+    {
+      id: hollowBishopPlayerCaseId,
+      userId: agentId,
+      caseDefinitionId: hollowBishopId,
+      caseRevision: "rev-1",
+      status: "in_progress",
+      lastViewedEvidenceId: "vestry-interview",
+      lastViewedEvidenceAt: new Date("2026-03-14T09:00:00.000Z"),
+      updatedAt: new Date("2026-03-14T09:00:00.000Z"),
+    },
+    {
+      id: redHarborPlayerCaseId,
+      userId: agentId,
+      caseDefinitionId: redHarborId,
+      caseRevision: "rev-1",
+      status: "in_progress",
+      lastViewedEvidenceId: "dispatch-log",
+      lastViewedEvidenceAt: new Date("2026-03-14T10:00:00.000Z"),
+      updatedAt: new Date("2026-03-14T10:00:00.000Z"),
+    },
+  ]);
+
+  await db.insert(notes).values({
+    id: randomUUID(),
+    playerCaseId: redHarborPlayerCaseId,
+    body: "Recheck the harbor log.",
+    updatedAt: new Date("2026-03-14T10:05:00.000Z"),
+  });
+
+  render(await VaultPage());
+
+  const serviceRecord = screen
+    .getByRole("heading", { name: /service record/i })
+    .closest("section");
+
+  expect(serviceRecord).not.toBeNull();
+  expect(
+    within(serviceRecord as HTMLElement).getByText(/0 of 3 dossiers cleared/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecord as HTMLElement).getByText(/2 active investigations/i),
+  ).toBeInTheDocument();
+  expect(
+    within(serviceRecord as HTMLElement).getByRole("link", {
+      name: /resume notes/i,
+    }),
+  ).toHaveAttribute("href", "/cases/red-harbor?evidence=dispatch-log#field-notes");
+  expect(
+    within(serviceRecord as HTMLElement).getByText(
+      /your most recent active dossier still has saved work waiting/i,
+    ),
+  ).toBeInTheDocument();
+});
+
 test("renders continuity-aware vault actions for objectives, notes, and terminal cases", async () => {
   const db = await getDb();
   const agentId = randomUUID();
