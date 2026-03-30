@@ -370,7 +370,187 @@ Good fit when:
 Watch out for:
 
 - forgetting to add the image asset itself
-- using a photo `subtype` outside the allowed set: `scene_photo`, `object_photo`, `surveillance_still`, `found_photo`
+- using a photo `subtype` outside the allowed set: `scene_photo`, `object_photo`, `surveillance_still`, `found_photo`, `portrait_mugshot`, `portrait_staff_directory`, `portrait_social`
+
+Portrait-style artifacts still belong to the `photo` family. Use portrait subtypes when the evidence should read like a mugshot, staff directory portrait, or social-profile image rather than a scene still.
+
+### JSON audio evidence
+
+Use audio evidence when the artifact should be heard as well as read and you want the transcript to remain authoritative in the viewer.
+
+Path example: `evidence/dispatch-voicemail.json`
+
+```json
+{
+  "subtype": "voicemail",
+  "audio": "evidence/dispatch-voicemail.wav",
+  "transcript": "Check pier locker seven.",
+  "sourceLabel": "Harbor dispatch archive",
+  "date": "2026-03-20T05:42:00Z",
+  "durationSeconds": 34
+}
+```
+
+Required pieces:
+
+- `subtype`
+- `audio`
+- `transcript`
+- `sourceLabel`
+
+Optional pieces:
+
+- `date`
+- `durationSeconds`
+
+Good fit when:
+
+- the voice delivery or pacing matters to the artifact
+- the player should be able to listen and also quote the transcript
+
+Watch out for:
+
+- using an audio asset outside the allowed extensions: `.mp3`, `.wav`, `.m4a`
+- treating the transcript as optional support text instead of the authoritative text record
+- a `subtype` mismatch between the JSON file and manifest entry
+
+### JSON diagram evidence
+
+Use diagram evidence for maps, floorplans, site diagrams, and route sketches that should stay crisp and structured instead of becoming image screenshots.
+
+Path example: `evidence/archive-floorplan.json`
+
+```json
+{
+  "subtype": "floorplan",
+  "viewport": { "width": 1200, "height": 800 },
+  "elements": [
+    {
+      "id": "room-a",
+      "type": "area",
+      "x": 80,
+      "y": 90,
+      "width": 260,
+      "height": 180,
+      "label": "Records Room"
+    },
+    {
+      "id": "route-1",
+      "type": "line",
+      "points": [[340, 180], [620, 180]]
+    },
+    {
+      "id": "cam-1",
+      "type": "marker",
+      "x": 660,
+      "y": 180,
+      "label": "Camera"
+    },
+    {
+      "id": "note-1",
+      "type": "label",
+      "x": 700,
+      "y": 220,
+      "text": "Power loss reported here"
+    }
+  ],
+  "legend": [
+    { "id": "camera", "label": "Camera" }
+  ]
+}
+```
+
+Required pieces:
+
+- `subtype`
+- `viewport.width`
+- `viewport.height`
+- `elements`
+
+Allowed element types:
+
+- `area`
+- `line`
+- `marker`
+- `label`
+
+Good fit when:
+
+- the clue is spatial or positional
+- the player needs a clean schematic rather than a photo
+
+Watch out for:
+
+- inventing element types outside the allowed set
+- using raw SVG strings or screenshot images instead of structured diagram data
+- a `subtype` mismatch between the JSON file and manifest entry
+
+### JSON webpage evidence
+
+Use webpage evidence for in-world sites, portal screens, cached intranet pages, listings, ads, or schedule pages that should feel like a controlled snapshot instead of arbitrary HTML.
+
+Path example: `evidence/directory-snapshot.json`
+
+```json
+{
+  "subtype": "directory_listing",
+  "page": {
+    "title": "Harbor Service Directory",
+    "urlLabel": "harbor.local/services",
+    "sourceLabel": "Cached port intranet"
+  },
+  "blocks": [
+    {
+      "id": "intro",
+      "type": "hero",
+      "heading": "Night Services",
+      "body": "Verified services available after the third bell."
+    },
+    {
+      "id": "vendors",
+      "type": "directory",
+      "items": [
+        {
+          "title": "Pier Locker Rentals",
+          "meta": "Warehouse Row",
+          "body": "After-hours access by coded key."
+        }
+      ]
+    }
+  ]
+}
+```
+
+Required pieces:
+
+- `subtype`
+- `page.title`
+- `blocks`
+
+Optional page metadata:
+
+- `page.urlLabel`
+- `page.sourceLabel`
+
+Allowed block types:
+
+- `hero`
+- `notice`
+- `list`
+- `table`
+- `posts`
+- `directory`
+
+Good fit when:
+
+- the clue comes from browsing a structured in-world page
+- a listing, notice, or table should feel more like a website than a document
+
+Watch out for:
+
+- using raw arbitrary HTML or external page embeds
+- inventing block types outside the allowed set
+- a `subtype` mismatch between the JSON file and manifest entry
 
 ## Authoring Tips
 
@@ -408,9 +588,12 @@ Keep stages small. If one stage contains every piece of evidence and three unrel
 - `document`: use for text artifacts the player reads straight through
 - `record`: use for tables, rosters, and logs the player compares row by row
 - `thread`: use for conversations, interviews, and message chains
-- `photo`: use when the image itself carries the clue
+- `photo`: use when the image itself carries the clue, including portrait-style artifacts
+- `audio`: use when the spoken delivery matters but the transcript still needs to be searchable and authoritative
+- `diagram`: use for maps, floorplans, route sketches, and other structured spatial artifacts
+- `webpage`: use for in-world sites, listings, portal screens, and cached page snapshots
 
-If the clue lives in prose flow, choose `document`. If the clue lives in comparison, choose `record`. If the clue lives in timing and responses, choose `thread`. If the clue lives in what the player sees, choose `photo`.
+If the clue lives in prose flow, choose `document`. If the clue lives in comparison, choose `record`. If the clue lives in timing and responses, choose `thread`. If the clue lives in what the player sees, choose `photo`. If the clue lives in how something is said, choose `audio`. If the clue lives in layout or position, choose `diagram`. If the clue lives in browsing a structured page, choose `webpage`.
 
 ### Write spoiler-light summaries and prompts
 
@@ -448,6 +631,7 @@ When in doubt, compare against:
 - [`content/cases/red-harbor`](../content/cases/red-harbor) for a simple one-stage case
 - [`content/cases/hollow-bishop`](../content/cases/hollow-bishop) for a staged case with photo and thread evidence
 - [`content/cases/briar-ledger`](../content/cases/briar-ledger) for a deeper staged case with `code_entry`, `multi_choice`, and `single_choice` objectives
+- [`content/cases/evidence-variety-showcase`](../content/cases/evidence-variety-showcase) as the canonical example package once the full evidence-variety rollout lands
 
 ## Final Checklist
 
