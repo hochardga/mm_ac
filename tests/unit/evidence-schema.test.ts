@@ -119,6 +119,20 @@ test("rejects unsupported photo subtypes", () => {
   ).toThrow(/subtype/i);
 });
 
+test("accepts portrait photo subtypes", () => {
+  expect(
+    photoEvidenceSourceSchema.parse({
+      subtype: "portrait_staff_directory",
+      image: "evidence/portrait-card.png",
+      caption: "A clipped staff portrait from the archive directory.",
+      sourceLabel: "Ashfall staff directory",
+    }),
+  ).toMatchObject({
+    subtype: "portrait_staff_directory",
+    image: "evidence/portrait-card.png",
+  });
+});
+
 test("rejects non-ISO thread timestamps", () => {
   expect(() =>
     threadEvidenceSourceSchema.parse({

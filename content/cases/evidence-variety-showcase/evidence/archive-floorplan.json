@@ -1,0 +1,37 @@
+{
+  "subtype": "floorplan",
+  "viewport": { "width": 1200, "height": 800 },
+  "elements": [
+    {
+      "id": "room-a",
+      "type": "area",
+      "x": 80,
+      "y": 90,
+      "width": 260,
+      "height": 180,
+      "label": "Core Archive"
+    },
+    {
+      "id": "hall-1",
+      "type": "line",
+      "points": [[340, 180], [620, 180]]
+    },
+    {
+      "id": "marker-1",
+      "type": "marker",
+      "x": 660,
+      "y": 180,
+      "label": "Locker 7"
+    },
+    {
+      "id": "note-1",
+      "type": "label",
+      "x": 700,
+      "y": 220,
+      "text": "Mixed-Media Annex"
+    }
+  ],
+  "legend": [
+    { "id": "locker", "label": "Locker" }
+  ]
+}

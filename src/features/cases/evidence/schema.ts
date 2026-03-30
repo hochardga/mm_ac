@@ -96,6 +96,9 @@ const photoSubtypeSchema = z.enum([
   "object_photo",
   "surveillance_still",
   "found_photo",
+  "portrait_mugshot",
+  "portrait_staff_directory",
+  "portrait_social",
 ]);
 
 export const photoEvidenceSourceSchema = z

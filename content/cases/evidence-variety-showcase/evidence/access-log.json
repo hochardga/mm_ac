@@ -1,0 +1,32 @@
+{
+  "subtype": "badge_swipes",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "holder", "label": "Holder", "filterable": true },
+    { "id": "zone", "label": "Zone", "filterable": true },
+    { "id": "note", "label": "Note" }
+  ],
+  "rows": [
+    {
+      "id": "access-1",
+      "timestamp": "2026-03-20T05:12:00Z",
+      "holder": "Handler Rowan",
+      "zone": "Archive Intake",
+      "note": "Collected the briefing packet."
+    },
+    {
+      "id": "access-2",
+      "timestamp": "2026-03-20T05:18:00Z",
+      "holder": "Archivist Mira Sol",
+      "zone": "Training Floor",
+      "note": "Moved the portrait and scene still into the core archive."
+    },
+    {
+      "id": "access-3",
+      "timestamp": "2026-03-20T05:26:00Z",
+      "holder": "Archivist Mira Sol",
+      "zone": "Mixed-Media Annex",
+      "note": "Unlocked the voicemail, floorplan, and directory snapshot."
+    }
+  ]
+}

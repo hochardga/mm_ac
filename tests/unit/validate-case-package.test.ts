@@ -91,3 +91,11 @@ test("accepts a staged package when its unlocks are valid", async () => {
     }),
   ).resolves.toMatchObject({ slug: "staged-valid", revision: "rev-2" });
 });
+
+test("accepts the evidence variety showcase package", async () => {
+  await expect(
+    validateCasePackage("evidence-variety-showcase"),
+  ).resolves.toMatchObject({
+    slug: "evidence-variety-showcase",
+  });
+});
