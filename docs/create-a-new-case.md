@@ -398,6 +398,14 @@ Required pieces:
 - `transcript`
 - `sourceLabel`
 
+Allowed `subtype` values:
+
+- `voicemail`
+- `interview_audio`
+- `dispatch_audio`
+- `radio_call`
+- `confession_audio`
+
 Optional pieces:
 
 - `date`
@@ -466,6 +474,13 @@ Required pieces:
 - `viewport.width`
 - `viewport.height`
 - `elements`
+
+Allowed `subtype` values:
+
+- `map`
+- `floorplan`
+- `site_diagram`
+- `route_sketch`
 
 Allowed element types:
 
@@ -623,7 +638,7 @@ Common mistakes:
 - referencing a stage id in `successUnlocks.stageIds` that does not exist
 - creating an unlock graph with unreachable or cyclic stages
 - pointing `source` at a file that is missing
-- using a document, record, thread, or photo `subtype` that does not match the manifest entry
+- using a document, record, thread, photo, audio, diagram, or webpage `subtype` that does not match the manifest entry
 - giving `protected.json` an answer shape that does not match the objective type
 
 When in doubt, compare against:

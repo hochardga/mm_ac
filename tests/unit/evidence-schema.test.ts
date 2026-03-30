@@ -234,6 +234,23 @@ test("rejects invalid diagram element and webpage block types", () => {
   ).toThrow(/type/i);
 });
 
+test("rejects webpage table rows that do not match the declared columns", () => {
+  expect(() =>
+    webpageEvidenceSourceSchema.parse({
+      subtype: "directory_listing",
+      page: { title: "Directory" },
+      blocks: [
+        {
+          id: "hours",
+          type: "table",
+          columns: ["Service", "Hours"],
+          rows: [["Pier desk"]],
+        },
+      ],
+    }),
+  ).toThrow(/row/i);
+});
+
 test("normalized audio evidence keeps transcript required", () => {
   expect(() =>
     caseEvidenceSchema.parse({

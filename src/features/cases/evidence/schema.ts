@@ -268,6 +268,17 @@ const webpageTableBlockSchema = z
     columns: z.array(z.string()).min(1),
     rows: z.array(z.array(z.string())).min(1),
   })
+  .superRefine((block, ctx) => {
+    for (const [rowIndex, row] of block.rows.entries()) {
+      if (row.length !== block.columns.length) {
+        ctx.addIssue({
+          code: "custom",
+          message: `table row ${rowIndex} must match the declared column count`,
+          path: ["rows", rowIndex],
+        });
+      }
+    }
+  })
   .strict();
 
 const webpagePostsBlockSchema = z

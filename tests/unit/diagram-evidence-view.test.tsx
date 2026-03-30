@@ -38,4 +38,6 @@ test("diagram viewer renders labels from the structured geometry model", () => {
 
   expect(screen.getByText(/records room/i)).toBeInTheDocument();
   expect(screen.getByText(/power loss reported here/i)).toBeInTheDocument();
+  expect(screen.getByText(/legend/i)).toBeInTheDocument();
+  expect(screen.getAllByText(/camera/i).length).toBeGreaterThan(0);
 });
