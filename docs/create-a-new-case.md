@@ -593,7 +593,7 @@ Keep stages small. If one stage contains every piece of evidence and three unrel
 - `diagram`: use for maps, floorplans, route sketches, and other structured spatial artifacts
 - `webpage`: use for in-world sites, listings, portal screens, and cached page snapshots
 
-If the clue lives in prose flow, choose `document`. If the clue lives in comparison, choose `record`. If the clue lives in timing and responses, choose `thread`. If the clue lives in what the player sees, choose `photo`. If the clue lives in how something is said, choose `audio`. If the clue lives in layout or position, choose `diagram`. If the clue lives in browsing a structured page, choose `webpage`.
+For prose flow, choose `document`; for comparison, choose `record`; when timing and responses matter, choose `thread`; when the clue is visual, choose `photo`; when spoken delivery matters, choose `audio`; when layout or position matters, choose `diagram`; and when the clue lives in browsing a structured page, choose `webpage`.
 
 ### Write spoiler-light summaries and prompts
 

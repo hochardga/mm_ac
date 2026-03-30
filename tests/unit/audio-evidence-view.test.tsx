@@ -16,6 +16,7 @@ test("audio viewer shows source metadata, player, and transcript", () => {
         audio: "evidence/dispatch-voicemail.wav",
         transcript: "Check pier locker seven.",
         sourceLabel: "Harbor dispatch archive",
+        durationSeconds: 65,
       }}
     />,
   );
@@ -23,6 +24,7 @@ test("audio viewer shows source metadata, player, and transcript", () => {
   expect(
     screen.getByText(/source:\s*harbor dispatch archive/i),
   ).toBeInTheDocument();
+  expect(screen.getByText(/duration:\s*1m 5s/i)).toBeInTheDocument();
   expect(screen.getByLabelText(/audio playback/i)).toBeInTheDocument();
   expect(screen.getByText(/check pier locker seven/i)).toBeInTheDocument();
 });

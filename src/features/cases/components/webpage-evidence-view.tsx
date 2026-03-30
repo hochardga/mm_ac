@@ -62,8 +62,8 @@ function WebpageBlockView({ block }: { block: WebpageBlock }) {
             <h3 className="text-lg font-semibold text-stone-50">{block.heading}</h3>
           ) : null}
           <ul className="mt-3 space-y-2 text-sm leading-7 text-stone-200">
-            {block.items.map((item) => (
-              <li key={item}>{item}</li>
+            {block.items.map((item, index) => (
+              <li key={`${block.id}-${item}-${index}`}>{item}</li>
             ))}
           </ul>
         </section>
@@ -99,9 +99,9 @@ function WebpageBlockView({ block }: { block: WebpageBlock }) {
     case "directory":
       return (
         <section className="grid gap-3">
-          {block.items.map((item) => (
+          {block.items.map((item, index) => (
             <article
-              key={`${block.id}-${item.title}`}
+              key={`${block.id}-${item.title}-${index}`}
               className="rounded-2xl border border-white/10 bg-white/5 p-4"
             >
               <h3 className="text-lg font-semibold text-stone-50">{item.title}</h3>

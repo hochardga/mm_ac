@@ -93,6 +93,8 @@ test("accepts a staged package when its unlocks are valid", async () => {
 });
 
 test("accepts the evidence variety showcase package", async () => {
+  // Deliberately omit validateCasePackage's casesRoot/fixturesRoot override here
+  // so the real evidence-variety-showcase package under content/cases is validated.
   await expect(
     validateCasePackage("evidence-variety-showcase"),
   ).resolves.toMatchObject({

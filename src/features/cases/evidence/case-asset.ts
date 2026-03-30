@@ -28,6 +28,12 @@ export type CaseAssetKind = keyof typeof CASE_ASSET_CONTENT_TYPES;
 export type SupportedPhotoExtension = keyof typeof PHOTO_CONTENT_TYPES;
 export type SupportedAudioExtension = keyof typeof AUDIO_CONTENT_TYPES;
 
+export function isAudioAssetPath(assetPath: string) {
+  const ext = path.extname(assetPath).toLowerCase();
+
+  return ext in AUDIO_CONTENT_TYPES;
+}
+
 export async function resolveCaseAsset(
   caseSlug: string,
   assetPath: string,
@@ -42,9 +48,10 @@ export async function resolveCaseAsset(
     label: options.label,
   });
   const ext = path.extname(resolved.filePath).toLowerCase();
-  const contentType = CASE_ASSET_CONTENT_TYPES[options.kind][
-    ext as keyof (typeof CASE_ASSET_CONTENT_TYPES)[typeof options.kind]
-  ];
+  const contentType =
+    options.kind === "audio"
+      ? AUDIO_CONTENT_TYPES[ext as SupportedAudioExtension]
+      : PHOTO_CONTENT_TYPES[ext as SupportedPhotoExtension];
 
   if (!contentType) {
     throw new Error(

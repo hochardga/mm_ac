@@ -24,6 +24,18 @@ type LoadEvidenceSourceOptions = {
   entry: EvidenceIndexEntry;
 };
 
+function assertSubtypeMatch(
+  caseSlug: string,
+  entry: EvidenceIndexEntry,
+  source: { subtype: string },
+) {
+  if (source.subtype !== entry.subtype) {
+    throw new Error(
+      `${entry.family[0].toUpperCase()}${entry.family.slice(1)} evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
+    );
+  }
+}
+
 export async function loadEvidenceSource({
   caseSlug,
   casesRoot,
@@ -44,11 +56,7 @@ export async function loadEvidenceSource({
         meta: parsed.data.meta ?? {},
       });
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Document evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       return caseEvidenceSchema.parse({
         ...entry,
@@ -59,11 +67,7 @@ export async function loadEvidenceSource({
     case "record": {
       const source = recordEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Record evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       return caseEvidenceSchema.parse({
         ...entry,
@@ -74,11 +78,7 @@ export async function loadEvidenceSource({
     case "thread": {
       const source = threadEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Thread evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       return caseEvidenceSchema.parse({
         ...entry,
@@ -89,11 +89,7 @@ export async function loadEvidenceSource({
     case "photo": {
       const source = photoEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Photo evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       const resolvedAsset = await resolvePhotoAsset(caseSlug, source.image, {
         casesRoot,
@@ -110,11 +106,7 @@ export async function loadEvidenceSource({
     case "audio": {
       const source = audioEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Audio evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       const resolvedAsset = await resolveAudioAsset(caseSlug, source.audio, {
         casesRoot,
@@ -132,11 +124,7 @@ export async function loadEvidenceSource({
     case "diagram": {
       const source = diagramEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Diagram evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       return caseEvidenceSchema.parse({
         ...entry,
@@ -148,11 +136,7 @@ export async function loadEvidenceSource({
     case "webpage": {
       const source = webpageEvidenceSourceSchema.parse(JSON.parse(raw));
 
-      if (source.subtype !== entry.subtype) {
-        throw new Error(
-          `Webpage evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
-        );
-      }
+      assertSubtypeMatch(caseSlug, entry, source);
 
       return caseEvidenceSchema.parse({
         ...entry,

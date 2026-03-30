@@ -1,7 +1,7 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
 
 import { resolveAudioAsset } from "@/features/cases/evidence/audio-asset";
+import { isAudioAssetPath } from "@/features/cases/evidence/case-asset";
 import { resolvePhotoAsset } from "@/features/cases/evidence/photo-asset";
 
 type CaseAssetRouteContext = {
@@ -18,11 +18,9 @@ export async function GET(
   try {
     const { caseSlug, assetPath } = await context.params;
     const relativeAssetPath = assetPath.join("/");
-    const ext = path.extname(relativeAssetPath).toLowerCase();
-    const resolver =
-      ext === ".mp3" || ext === ".wav" || ext === ".m4a"
-        ? resolveAudioAsset
-        : resolvePhotoAsset;
+    const resolver = isAudioAssetPath(relativeAssetPath)
+      ? resolveAudioAsset
+      : resolvePhotoAsset;
     const { contentType, filePath } = await resolver(caseSlug, relativeAssetPath);
     const body = await readFile(filePath);
 

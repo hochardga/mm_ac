@@ -7,6 +7,25 @@ type AudioEvidenceViewProps = {
   evidence: AudioEvidence;
 };
 
+function formatDuration(seconds: number) {
+  if (seconds < 60) {
+    return `${seconds}s`;
+  }
+
+  if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+
+    return `${minutes}m ${remainingSeconds}s`;
+  }
+
+  const hours = Math.floor(seconds / 3600);
+  const remainingMinutes = Math.floor((seconds % 3600) / 60);
+  const remainingSeconds = seconds % 60;
+
+  return `${hours}h ${remainingMinutes}m ${remainingSeconds}s`;
+}
+
 export function AudioEvidenceView({
   caseSlug,
   evidence,
@@ -16,7 +35,7 @@ export function AudioEvidenceView({
   const durationLabel =
     evidence.durationSeconds === undefined
       ? null
-      : `${evidence.durationSeconds}s`;
+      : formatDuration(evidence.durationSeconds);
 
   return (
     <EvidencePanelShell
