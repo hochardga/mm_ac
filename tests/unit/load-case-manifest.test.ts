@@ -162,3 +162,19 @@ test("the shipped cases load successfully with photo evidence included", async (
   expect("complexity" in bishop && bishop.complexity).toBe("standard");
   expect("complexity" in harbor && harbor.complexity).toBe("light");
 });
+
+test("the shipped showcase case loads every supported evidence family", async () => {
+  const manifest = await loadAnyCaseManifest("evidence-variety-showcase");
+
+  expect(new Set(manifest.evidence.map((entry) => entry.family))).toEqual(
+    new Set([
+      "document",
+      "record",
+      "thread",
+      "photo",
+      "audio",
+      "diagram",
+      "webpage",
+    ]),
+  );
+});
