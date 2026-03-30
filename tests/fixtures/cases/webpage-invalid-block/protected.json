@@ -1,0 +1,23 @@
+{
+  "slug": "webpage-invalid-block",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 1
+  },
+  "canonicalAnswers": {
+    "verify-media": {
+      "type": "boolean",
+      "value": false
+    }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Solved",
+      "summary": "You solved the fixture case."
+    },
+    "closed_unsolved": {
+      "title": "Closed",
+      "summary": "The fixture case closed unsolved."
+    }
+  }
+}

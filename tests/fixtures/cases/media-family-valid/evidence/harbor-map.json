@@ -1,0 +1,40 @@
+{
+  "subtype": "map",
+  "viewport": { "width": 1200, "height": 800 },
+  "elements": [
+    {
+      "id": "room-a",
+      "type": "area",
+      "x": 80,
+      "y": 90,
+      "width": 260,
+      "height": 180,
+      "label": "Records Room"
+    },
+    {
+      "id": "route-1",
+      "type": "line",
+      "points": [[340, 180], [620, 180]]
+    },
+    {
+      "id": "cam-1",
+      "type": "marker",
+      "x": 660,
+      "y": 180,
+      "label": "Camera"
+    },
+    {
+      "id": "note-1",
+      "type": "label",
+      "x": 700,
+      "y": 220,
+      "text": "Power loss reported here"
+    }
+  ],
+  "legend": [
+    {
+      "id": "camera",
+      "label": "Camera"
+    }
+  ]
+}

@@ -4,13 +4,17 @@ import path from "node:path";
 import matter from "gray-matter";
 
 import {
+  audioEvidenceSourceSchema,
   caseEvidenceSchema,
+  diagramEvidenceSourceSchema,
   type EvidenceIndexEntry,
   documentEvidenceSourceSchema,
   photoEvidenceSourceSchema,
   recordEvidenceSourceSchema,
   threadEvidenceSourceSchema,
+  webpageEvidenceSourceSchema,
 } from "@/features/cases/evidence/schema";
+import { resolveAudioAsset } from "@/features/cases/evidence/audio-asset";
 import { resolvePhotoAsset } from "@/features/cases/evidence/photo-asset";
 import { resolveCaseFilePath } from "@/features/cases/paths";
 
@@ -101,6 +105,59 @@ export async function loadEvidenceSource({
         caption: source.caption,
         sourceLabel: source.sourceLabel,
         date: source.date,
+      });
+    }
+    case "audio": {
+      const source = audioEvidenceSourceSchema.parse(JSON.parse(raw));
+
+      if (source.subtype !== entry.subtype) {
+        throw new Error(
+          `Audio evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
+        );
+      }
+
+      const resolvedAsset = await resolveAudioAsset(caseSlug, source.audio, {
+        casesRoot,
+      });
+
+      return caseEvidenceSchema.parse({
+        ...entry,
+        audio: resolvedAsset.relativePath,
+        transcript: source.transcript,
+        sourceLabel: source.sourceLabel,
+        date: source.date,
+        durationSeconds: source.durationSeconds,
+      });
+    }
+    case "diagram": {
+      const source = diagramEvidenceSourceSchema.parse(JSON.parse(raw));
+
+      if (source.subtype !== entry.subtype) {
+        throw new Error(
+          `Diagram evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
+        );
+      }
+
+      return caseEvidenceSchema.parse({
+        ...entry,
+        viewport: source.viewport,
+        elements: source.elements,
+        legend: source.legend,
+      });
+    }
+    case "webpage": {
+      const source = webpageEvidenceSourceSchema.parse(JSON.parse(raw));
+
+      if (source.subtype !== entry.subtype) {
+        throw new Error(
+          `Webpage evidence subtype mismatch for ${caseSlug}/${entry.id}: expected ${entry.subtype}, received ${source.subtype}`,
+        );
+      }
+
+      return caseEvidenceSchema.parse({
+        ...entry,
+        page: source.page,
+        blocks: source.blocks,
       });
     }
   }

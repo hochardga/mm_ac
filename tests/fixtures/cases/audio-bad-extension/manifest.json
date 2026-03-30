@@ -1,0 +1,36 @@
+{
+  "slug": "audio-bad-extension",
+  "revision": "rev-1",
+  "title": "Audio Bad Extension Fixture",
+  "summary": "Fixture case for unsupported audio extension handling.",
+  "complexity": "light",
+  "evidence": [
+    {
+      "id": "dispatch-voicemail",
+      "title": "Dispatch Voicemail",
+      "family": "audio",
+      "subtype": "voicemail",
+      "summary": "An audio payload with an unsupported asset extension.",
+      "source": "evidence/dispatch-voicemail.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Inspect the unsupported audio payload.",
+      "handlerPrompts": ["Check the audio asset reference."],
+      "evidenceIds": ["dispatch-voicemail"],
+      "objectives": [
+        {
+          "id": "verify-media",
+          "prompt": "Does the audio load?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

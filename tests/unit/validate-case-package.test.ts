@@ -44,6 +44,22 @@ test("rejects photo assets that escape the case directory through symlinks", asy
   ).rejects.toThrow(/image path/i);
 });
 
+test("accepts a valid mixed media case package", async () => {
+  await expect(
+    validateCasePackage("media-family-valid", {
+      casesRoot: fixturesRoot,
+    }),
+  ).resolves.toMatchObject({ slug: "media-family-valid" });
+});
+
+test("rejects audio assets with unsupported extensions", async () => {
+  await expect(
+    validateCasePackage("audio-bad-extension", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/extension/i);
+});
+
 test("rejects staged packages whose unlocks reference an unknown stage", async () => {
   await expect(
     validateCasePackage("staged-bad-unlock", {
