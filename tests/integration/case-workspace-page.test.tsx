@@ -127,6 +127,46 @@ test("renders an evidence index, evidence modal, and persistent notes together",
   ).toBeInTheDocument();
 });
 
+test("thread evidence surfaces participant metadata while keeping notes visible", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "thread-meta-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Thread Meta",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({ evidence: "vestry-interview" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /vestry interview transcript/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /participants:\s*handler rowan,\s*groundskeeper bram yates/i,
+    ),
+  ).toBeInTheDocument();
+});
+
 test("preserves the selected evidence when saving an objective draft", async () => {
   const db = await getDb();
   const userId = randomUUID();
