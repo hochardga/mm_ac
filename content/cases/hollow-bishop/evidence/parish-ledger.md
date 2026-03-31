@@ -1,11 +1,6 @@
----
-subtype: "financial_ledger"
-meta:
-  account: "Parish discretionary fund"
-  approvedBy: "Bishop Elias Vale"
----
-# Parish Ledger Extract
+The ledger page was torn from the vestry book and pinned back together with
+archive tape.
 
-A torn ledger page shows an off-books transfer approved by Bishop Vale.
-
-The torn margin hides the destination account, but the remaining entries align with a private repair budget no one in the parish can explain.
+- 14 Oct: transfer of 240 credits to the chapel maintenance fund
+- Approved by Bishop Elias Vale
+- Countersigned after hours, outside the parish audit window

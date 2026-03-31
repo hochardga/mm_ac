@@ -1,6 +1,6 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -35,6 +35,32 @@ async function requireOwnedPlayerCase(playerCaseId: string) {
   }
 
   return playerCase;
+}
+
+export async function markIntroductionSeenAction(formData: FormData) {
+  const playerCaseId = String(formData.get("playerCaseId") ?? "");
+
+  if (!playerCaseId) {
+    throw new Error("playerCaseId is required");
+  }
+
+  const playerCase = await requireOwnedPlayerCase(playerCaseId);
+
+  if (playerCase.introductionSeenAt) {
+    return;
+  }
+
+  const db = await getDb();
+  await db
+    .update(playerCases)
+    .set({ introductionSeenAt: new Date() })
+    .where(
+      and(
+        eq(playerCases.id, playerCaseId),
+        eq(playerCases.userId, playerCase.userId),
+        isNull(playerCases.introductionSeenAt),
+      ),
+    );
 }
 
 export async function saveNoteAction(formData: FormData) {

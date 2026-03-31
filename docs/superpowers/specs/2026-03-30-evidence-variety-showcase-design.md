@@ -168,7 +168,7 @@ The phase-one diagram payload should be a JSON object with:
 - `width`
 - `height`
 
-`elements` should be a list of structured render primitives using a small allowed set:
+The `elements` field should be a list of structured render primitives using a small allowed set:
 
 - `area`
 - `line`

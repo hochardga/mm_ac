@@ -34,6 +34,7 @@ vi.mock("next/navigation", () => ({
 import CasePage from "@/app/(app)/cases/[caseSlug]/page";
 import DebriefPage from "@/app/(app)/cases/[caseSlug]/debrief/page";
 import { caseDefinitions, playerCases, users } from "@/db/schema";
+import * as caseIntroductionLoader from "@/features/cases/load-case-introduction";
 import { closeDb, getDb } from "@/lib/db";
 
 afterEach(async () => {
@@ -220,4 +221,24 @@ test("DebriefPage without playerCase keeps notFound semantics", async () => {
     }),
   ).rejects.toThrow("NEXT_NOT_FOUND");
   expect(notFoundMock).toHaveBeenCalledTimes(1);
+});
+
+test("stale intro replay links redirect back to the case page when no intro exists", async () => {
+  const agentId = randomUUID();
+  await seedUser(agentId);
+  setAuthenticatedSession(agentId);
+
+  vi.spyOn(caseIntroductionLoader, "loadCaseIntroduction").mockResolvedValue(null);
+
+  await expect(
+    CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({
+        intro: "1",
+        evidence: "vestry-interview",
+      } as never),
+    }),
+  ).rejects.toThrow(
+    "NEXT_REDIRECT:/cases/hollow-bishop?evidence=vestry-interview",
+  );
 });

@@ -6,11 +6,12 @@ It is written for new work only. If you are adding a case today, use the staged 
 
 ## What You Are Creating
 
-Each case lives in its own folder under `content/cases/<slug>/` and has three authored layers:
+Each case lives in its own folder under `content/cases/<slug>/` and has three core authored layers plus an optional opening introduction:
 
 - `manifest.json`: player-safe metadata, evidence index, stages, and objectives
 - `protected.json`: canonical answers, grading limits, and debrief copy
 - `evidence/`: the actual artifact files referenced by the manifest
+- `introduction/`: optional opening narration transcript and audio, kept separate from evidence
 
 These layers have to stay aligned:
 
@@ -24,7 +25,7 @@ These layers have to stay aligned:
 1. Create a new folder at `content/cases/<slug>/`.
 2. Add `manifest.json` with top-level metadata, evidence entries, and at least one stage.
 3. Add `protected.json` with `maxGradedFailures`, canonical answers, and both debrief outcomes.
-4. Add the files referenced from `manifest.json` under `evidence/`.
+4. Add the files referenced from `manifest.json` under `evidence/`. If the case has an opening introduction, add `introduction/transcript.md` and optional `introduction/audio.mp3`.
 5. Run `pnpm validate:cases`.
 6. Run `pnpm build`.
 
@@ -40,6 +41,9 @@ content/
     your-case-slug/
       manifest.json
       protected.json
+      introduction/
+        transcript.md
+        audio.mp3
       evidence/
         opening-brief.md
         witness-thread.json
@@ -53,6 +57,23 @@ Notes:
 - The folder name should match `slug` in both `manifest.json` and `protected.json`.
 - `source` paths in the manifest are relative to the case folder, not the repo root.
 - Photo evidence usually uses two files: a JSON metadata file plus the referenced image asset.
+
+## Optional Introduction Folder
+
+Use `content/cases/<slug>/introduction/` for a case-opening narration that should feel like part of the case opener instead of evidence.
+
+The folder is separate from the manifest and evidence index:
+
+- `transcript.md` is required for the introduction to count as present
+- `audio.mp3` is optional, but when present the case page will try to autoplay it and fall back to a visible `Play Introduction` button if the browser blocks playback
+- the case header gets a `Replay Introduction` action only when the loader finds a valid introduction bundle
+- replay uses `intro=1` in the case URL; it does not change the evidence index or stage flow
+
+Keep in mind:
+
+- do not add the introduction transcript or audio to the evidence index
+- do not create manifest entries, stage unlocks, or protected answers for the introduction
+- if `transcript.md` is missing, empty, or unreadable, the introduction is treated as absent
 
 ## Starter Templates
 
@@ -640,6 +661,8 @@ Common mistakes:
 - pointing `source` at a file that is missing
 - using a document, record, thread, photo, audio, diagram, or webpage `subtype` that does not match the manifest entry
 - giving `protected.json` an answer shape that does not match the objective type
+- putting the opening introduction into the evidence index instead of `introduction/`
+- forgetting that `introduction/transcript.md` must exist and contain real text for the intro to count as present
 
 When in doubt, compare against:
 
@@ -657,6 +680,7 @@ Before opening a PR:
 - every evidence, stage, and objective id is unique
 - every objective in the manifest has a matching answer in `protected.json`
 - every referenced evidence file exists under `evidence/`
+- any optional introduction lives under `introduction/` and is not duplicated in `evidence/`
 - stage unlocks point at real stage ids and still form a reachable graph
 - both debrief outcomes are written
 - `pnpm validate:cases` passes

@@ -1,7 +1,4 @@
-import {
-  resolveCaseAsset,
-  type SupportedPhotoExtension,
-} from "@/features/cases/evidence/case-asset";
+import { resolveCaseAsset } from "@/features/cases/evidence/case-asset";
 
 export async function resolvePhotoAsset(
   caseSlug: string,
@@ -15,4 +12,4 @@ export async function resolvePhotoAsset(
   });
 }
 
-export type { SupportedPhotoExtension };
+export type { SupportedPhotoExtension } from "@/features/cases/evidence/case-asset";

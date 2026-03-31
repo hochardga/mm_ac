@@ -8,6 +8,7 @@ type CaseReturnHeaderProps = {
   title: string;
   summary: string;
   progressSnapshot?: CaseProgressSnapshot;
+  replayIntroductionHref?: string;
 };
 
 export function CaseReturnHeader({
@@ -15,6 +16,7 @@ export function CaseReturnHeader({
   title,
   summary,
   progressSnapshot,
+  replayIntroductionHref,
 }: CaseReturnHeaderProps) {
   return (
     <section className="rounded-[2rem] border border-white/10 bg-white/5 p-8">
@@ -31,6 +33,14 @@ export function CaseReturnHeader({
         >
           Home
         </Link>
+        {replayIntroductionHref ? (
+          <Link
+            className="rounded-full border border-white/15 px-3 py-1 text-xs font-semibold tracking-[0.2em] text-stone-100"
+            href={replayIntroductionHref}
+          >
+            Replay Introduction
+          </Link>
+        ) : null}
       </div>
       <p className="mt-6 text-sm uppercase tracking-[0.3em] text-[#d96c3d]">
         {eyebrow}

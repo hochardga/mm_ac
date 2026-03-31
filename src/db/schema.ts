@@ -47,6 +47,7 @@ export const playerCases = pgTable("player_cases", {
   lastViewedEvidenceAt: timestamp("last_viewed_evidence_at", {
     withTimezone: true,
   }),
+  introductionSeenAt: timestamp("introduction_seen_at", { withTimezone: true }),
   gradedFailureCount: integer("graded_failure_count").notNull().default(0),
 });
 
