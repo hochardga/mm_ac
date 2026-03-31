@@ -21,5 +21,10 @@ export default withAuth({
 });
 
 export const config = {
-  matcher: ["/vault/:path*", "/cases/:path*"],
+  matcher: [
+    "/vault/:path*",
+    "/cases/:path*",
+    "/the-system-into/:path*",
+    "/api/the-system-into/audio/:path*",
+  ],
 };
