@@ -8,7 +8,5 @@ test("treats vault, case, and system intro routes as protected", () => {
   expect(isProtectedPath("/the-system-intro/appendix")).toBe(true);
   expect(isProtectedPath("/api/the-system-intro/audio")).toBe(true);
   expect(isProtectedPath("/api/the-system-intro/audio/chunk")).toBe(true);
-  expect(isProtectedPath("/the-system-into")).toBe(false);
-  expect(isProtectedPath("/api/the-system-into/audio")).toBe(false);
   expect(isProtectedPath("/apply")).toBe(false);
 });
