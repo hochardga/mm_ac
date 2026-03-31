@@ -1,0 +1,36 @@
+{
+  "slug": "webpage-invalid-block",
+  "revision": "rev-1",
+  "title": "Webpage Invalid Block Fixture",
+  "summary": "Fixture case for invalid webpage block handling.",
+  "complexity": "light",
+  "evidence": [
+    {
+      "id": "service-directory",
+      "title": "Service Directory",
+      "family": "webpage",
+      "subtype": "directory_listing",
+      "summary": "A webpage payload with an unsupported block type.",
+      "source": "evidence/service-directory.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Inspect the invalid webpage payload.",
+      "handlerPrompts": ["Check the block types carefully."],
+      "evidenceIds": ["service-directory"],
+      "objectives": [
+        {
+          "id": "verify-media",
+          "prompt": "Does the webpage load?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

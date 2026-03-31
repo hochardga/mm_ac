@@ -2,7 +2,10 @@ import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
 
-import { parseCaseAssetRange, resolveCaseAsset } from "@/features/cases/case-asset";
+import { parseCaseAssetRange } from "@/features/cases/case-asset";
+import { resolveAudioAsset } from "@/features/cases/evidence/audio-asset";
+import { isAudioAssetPath } from "@/features/cases/evidence/case-asset";
+import { resolvePhotoAsset } from "@/features/cases/evidence/photo-asset";
 
 export const runtime = "nodejs";
 
@@ -14,23 +17,26 @@ type CaseAssetRouteContext = {
 };
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: CaseAssetRouteContext,
 ) {
   try {
     const { caseSlug, assetPath } = await context.params;
     const relativeAssetPath = assetPath.join("/");
-    const asset = await resolveCaseAsset(caseSlug, relativeAssetPath);
+    const audioAsset = isAudioAssetPath(relativeAssetPath);
+    const asset = audioAsset
+      ? await resolveAudioAsset(caseSlug, relativeAssetPath)
+      : await resolvePhotoAsset(caseSlug, relativeAssetPath);
     const { size } = await stat(asset.filePath);
     const headers = new Headers({
       "content-length": String(size),
       "content-type": asset.contentType,
     });
 
-    if (asset.kind === "intro_audio") {
+    if (audioAsset) {
       headers.set("accept-ranges", "bytes");
 
-      const rangeHeader = _request.headers.get("range");
+      const rangeHeader = request.headers.get("range");
 
       if (rangeHeader) {
         const range = parseCaseAssetRange(rangeHeader, size);

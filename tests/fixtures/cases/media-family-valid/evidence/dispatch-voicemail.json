@@ -1,0 +1,6 @@
+{
+  "subtype": "voicemail",
+  "audio": "evidence/dispatch-voicemail.wav",
+  "transcript": "Check pier locker seven.",
+  "sourceLabel": "Harbor dispatch archive"
+}

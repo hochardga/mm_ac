@@ -1,10 +1,13 @@
 import {
+  audioEvidenceSourceSchema,
   caseEvidenceSchema,
+  diagramEvidenceSourceSchema,
   documentEvidenceSourceSchema,
   evidenceIndexEntrySchema,
   photoEvidenceSourceSchema,
   recordEvidenceSourceSchema,
   threadEvidenceSourceSchema,
+  webpageEvidenceSourceSchema,
 } from "@/features/cases/evidence/schema";
 
 test("accepts document, record, thread, and photo index entries", () => {
@@ -116,6 +119,20 @@ test("rejects unsupported photo subtypes", () => {
   ).toThrow(/subtype/i);
 });
 
+test("accepts portrait photo subtypes", () => {
+  expect(
+    photoEvidenceSourceSchema.parse({
+      subtype: "portrait_staff_directory",
+      image: "evidence/portrait-card.png",
+      caption: "A clipped staff portrait from the archive directory.",
+      sourceLabel: "Ashfall staff directory",
+    }),
+  ).toMatchObject({
+    subtype: "portrait_staff_directory",
+    image: "evidence/portrait-card.png",
+  });
+});
+
 test("rejects non-ISO thread timestamps", () => {
   expect(() =>
     threadEvidenceSourceSchema.parse({
@@ -160,6 +177,92 @@ test("normalized photo evidence keeps caption and sourceLabel required", () => {
       image: "evidence/photo.png",
       caption: "",
       sourceLabel: "",
+    }),
+  ).toThrow();
+});
+
+test("accepts audio, diagram, and webpage evidence index entries", () => {
+  expect(
+    evidenceIndexEntrySchema.parse({
+      id: "dispatch-voicemail",
+      title: "Dispatch Voicemail",
+      family: "audio",
+      subtype: "voicemail",
+      summary: "A short archived dispatch clip.",
+      source: "evidence/dispatch-voicemail.json",
+    }),
+  ).toMatchObject({ family: "audio" });
+
+  expect(
+    evidenceIndexEntrySchema.parse({
+      id: "harbor-map",
+      title: "Harbor Map",
+      family: "diagram",
+      subtype: "map",
+      summary: "A labeled harbor route sketch.",
+      source: "evidence/harbor-map.json",
+    }),
+  ).toMatchObject({ family: "diagram" });
+
+  expect(
+    evidenceIndexEntrySchema.parse({
+      id: "service-directory",
+      title: "Service Directory",
+      family: "webpage",
+      subtype: "directory_listing",
+      summary: "A cached intranet listing.",
+      source: "evidence/service-directory.json",
+    }),
+  ).toMatchObject({ family: "webpage" });
+});
+
+test("rejects invalid diagram element and webpage block types", () => {
+  expect(() =>
+    diagramEvidenceSourceSchema.parse({
+      subtype: "map",
+      viewport: { width: 1200, height: 800 },
+      elements: [{ id: "bad", type: "polygon-cloud" }],
+    }),
+  ).toThrow(/type/i);
+
+  expect(() =>
+    webpageEvidenceSourceSchema.parse({
+      subtype: "directory_listing",
+      page: { title: "Directory" },
+      blocks: [{ id: "bad", type: "carousel" }],
+    }),
+  ).toThrow(/type/i);
+});
+
+test("rejects webpage table rows that do not match the declared columns", () => {
+  expect(() =>
+    webpageEvidenceSourceSchema.parse({
+      subtype: "directory_listing",
+      page: { title: "Directory" },
+      blocks: [
+        {
+          id: "hours",
+          type: "table",
+          columns: ["Service", "Hours"],
+          rows: [["Pier desk"]],
+        },
+      ],
+    }),
+  ).toThrow(/row/i);
+});
+
+test("normalized audio evidence keeps transcript required", () => {
+  expect(() =>
+    caseEvidenceSchema.parse({
+      id: "audio-1",
+      title: "Audio",
+      family: "audio",
+      subtype: "voicemail",
+      summary: "Summary",
+      source: "evidence/audio.json",
+      audio: "evidence/audio.wav",
+      transcript: "",
+      sourceLabel: "Archive",
     }),
   ).toThrow();
 });

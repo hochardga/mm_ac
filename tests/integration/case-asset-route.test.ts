@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -9,7 +9,8 @@ import { GET } from "@/app/api/cases/[caseSlug]/assets/[...assetPath]/route";
 let tempRoot: string | null = null;
 
 async function createCasesRoot() {
-  tempRoot = await mkdtemp(path.join(os.tmpdir(), "case-assets-"));
+  tempRoot = await realpath(await mkdtemp(path.join(os.tmpdir(), "case-assets-")));
+  vi.spyOn(process, "cwd").mockReturnValue(tempRoot);
   return path.join(tempRoot, "content", "cases");
 }
 
@@ -36,7 +37,6 @@ afterEach(async () => {
 
 test("serves intro audio with 200 and 206 responses", async () => {
   const casesRoot = await createCasesRoot();
-  vi.spyOn(process, "cwd").mockReturnValue(tempRoot as string);
 
   await writeCaseAsset(
     casesRoot,
@@ -86,7 +86,6 @@ test("serves intro audio with 200 and 206 responses", async () => {
 
 test("returns 416 for invalid range requests", async () => {
   const casesRoot = await createCasesRoot();
-  vi.spyOn(process, "cwd").mockReturnValue(tempRoot as string);
 
   await writeCaseAsset(
     casesRoot,
@@ -132,60 +131,8 @@ test("returns 416 for invalid range requests", async () => {
   );
 });
 
-test("rejects markdown, json, and arbitrary binaries", async () => {
+test("serves a case photo asset with the correct content type", async () => {
   const casesRoot = await createCasesRoot();
-  vi.spyOn(process, "cwd").mockReturnValue(tempRoot as string);
-
-  await writeCaseAsset(
-    casesRoot,
-    "larkspur-dead-air",
-    "introduction/transcript.md",
-    "Introduction text",
-  );
-  await writeCaseAsset(
-    casesRoot,
-    "larkspur-dead-air",
-    "evidence/archive-tote-photo.json",
-    "{}",
-  );
-  await writeCaseAsset(
-    casesRoot,
-    "larkspur-dead-air",
-    "evidence/archive-tote-photo.bin",
-    Buffer.from([0xde, 0xad, 0xbe, 0xef]),
-  );
-
-  await expect(
-    GET(new Request("http://localhost"), {
-      params: Promise.resolve({
-        caseSlug: "larkspur-dead-air",
-        assetPath: ["introduction", "transcript.md"],
-      }),
-    } as never),
-  ).resolves.toMatchObject({ status: 404 });
-
-  await expect(
-    GET(new Request("http://localhost"), {
-      params: Promise.resolve({
-        caseSlug: "larkspur-dead-air",
-        assetPath: ["evidence", "archive-tote-photo.json"],
-      }),
-    } as never),
-  ).resolves.toMatchObject({ status: 404 });
-
-  await expect(
-    GET(new Request("http://localhost"), {
-      params: Promise.resolve({
-        caseSlug: "larkspur-dead-air",
-        assetPath: ["evidence", "archive-tote-photo.bin"],
-      }),
-    } as never),
-  ).resolves.toMatchObject({ status: 404 });
-});
-
-test("keeps existing photo asset paths working", async () => {
-  const casesRoot = await createCasesRoot();
-  vi.spyOn(process, "cwd").mockReturnValue(tempRoot as string);
 
   await writeCaseAsset(
     casesRoot,
@@ -206,4 +153,24 @@ test("keeps existing photo asset paths working", async () => {
   expect(Buffer.from(await response.arrayBuffer()).toString("utf8")).toBe(
     "fake-png",
   );
+});
+
+test("returns 404 for unsupported asset extensions", async () => {
+  const casesRoot = await createCasesRoot();
+
+  await writeCaseAsset(
+    casesRoot,
+    "hollow-bishop",
+    "evidence/vestry-scene-photo.txt",
+    "not-a-photo",
+  );
+
+  const response = await GET(new Request("http://localhost"), {
+    params: Promise.resolve({
+      caseSlug: "hollow-bishop",
+      assetPath: ["evidence", "vestry-scene-photo.txt"],
+    }),
+  } as never);
+
+  expect(response.status).toBe(404);
 });

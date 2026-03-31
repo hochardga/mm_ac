@@ -1,0 +1,27 @@
+{
+  "slug": "evidence-variety-showcase",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 2
+  },
+  "canonicalAnswers": {
+    "continue-annex": {
+      "type": "boolean",
+      "value": true
+    },
+    "identify-new-families": {
+      "type": "multi_choice",
+      "choiceIds": ["audio", "diagram", "webpage"]
+    }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Showcase Complete",
+      "summary": "The training archive demonstrated the full evidence system, including the mixed-media annex."
+    },
+    "closed_unsolved": {
+      "title": "Showcase Closed",
+      "summary": "The training archive closed before the full mixed-media walkthrough was completed."
+    }
+  }
+}

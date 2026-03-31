@@ -1,0 +1,145 @@
+{
+  "slug": "evidence-variety-showcase",
+  "revision": "rev-1",
+  "title": "Evidence Variety Showcase",
+  "summary": "An Ashfall training archive built to demonstrate every supported evidence family in one staged package.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "archive-brief",
+      "title": "Archive Brief",
+      "family": "document",
+      "subtype": "case_brief",
+      "summary": "A top-line training summary for the showcase package.",
+      "source": "evidence/archive-brief.md"
+    },
+    {
+      "id": "chain-of-custody",
+      "title": "Chain of Custody",
+      "family": "document",
+      "subtype": "incident_form",
+      "summary": "A templated intake form that tracks how the archive materials moved between handlers.",
+      "source": "evidence/chain-of-custody.md"
+    },
+    {
+      "id": "access-log",
+      "title": "Access Log",
+      "family": "record",
+      "subtype": "badge_swipes",
+      "summary": "A structured log of archive-room entry badges.",
+      "source": "evidence/access-log.json"
+    },
+    {
+      "id": "archive-thread",
+      "title": "Archive Thread",
+      "family": "thread",
+      "subtype": "handler_message",
+      "summary": "A short handler exchange about which annex materials deserve attention first.",
+      "source": "evidence/archive-thread.json"
+    },
+    {
+      "id": "portrait-card",
+      "title": "Portrait Card",
+      "family": "photo",
+      "subtype": "portrait_staff_directory",
+      "summary": "A portrait-style archive card for the annex custodian.",
+      "source": "evidence/portrait-card.json"
+    },
+    {
+      "id": "scene-board",
+      "title": "Scene Board",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "A still image of the annotated evidence board used during training.",
+      "source": "evidence/scene-board.json"
+    },
+    {
+      "id": "handler-voicemail",
+      "title": "Handler Voicemail",
+      "family": "audio",
+      "subtype": "voicemail",
+      "summary": "A short voice note that introduces the mixed-media annex.",
+      "source": "evidence/handler-voicemail.json"
+    },
+    {
+      "id": "archive-floorplan",
+      "title": "Archive Floorplan",
+      "family": "diagram",
+      "subtype": "floorplan",
+      "summary": "A structured floorplan for the annex layout.",
+      "source": "evidence/archive-floorplan.json"
+    },
+    {
+      "id": "directory-snapshot",
+      "title": "Directory Snapshot",
+      "family": "webpage",
+      "subtype": "directory_listing",
+      "summary": "A cached intranet directory used to cross-reference the annex services.",
+      "source": "evidence/directory-snapshot.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "core-archive",
+      "startsUnlocked": true,
+      "title": "Core Archive",
+      "summary": "Review the text, record, thread, and photo artifacts that frame the training package.",
+      "handlerPrompts": [
+        "Start with the archive brief, then compare the record and thread entries.",
+        "Use the portrait and scene still to see how the photo family changes the presentation."
+      ],
+      "evidenceIds": [
+        "archive-brief",
+        "chain-of-custody",
+        "access-log",
+        "archive-thread",
+        "portrait-card",
+        "scene-board"
+      ],
+      "objectives": [
+        {
+          "id": "continue-annex",
+          "prompt": "Should the trainee continue to the mixed-media annex?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": {
+            "stageIds": ["mixed-media-annex"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "mixed-media-annex",
+      "startsUnlocked": false,
+      "title": "Mixed-Media Annex",
+      "summary": "Review the audio, diagram, and webpage evidence families.",
+      "handlerPrompts": [
+        "Listen to the voicemail, then compare it to the floorplan and directory snapshot."
+      ],
+      "evidenceIds": [
+        "handler-voicemail",
+        "archive-floorplan",
+        "directory-snapshot"
+      ],
+      "objectives": [
+        {
+          "id": "identify-new-families",
+          "prompt": "Which evidence families are introduced in the annex stage?",
+          "type": "multi_choice",
+          "stakes": "advisory",
+          "options": [
+            { "id": "audio", "label": "Audio" },
+            { "id": "diagram", "label": "Diagram" },
+            { "id": "webpage", "label": "Webpage" },
+            { "id": "photo", "label": "Photo" }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
+    }
+  ]
+}

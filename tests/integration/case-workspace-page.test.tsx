@@ -128,6 +128,119 @@ test("renders an evidence index, evidence modal, and persistent notes together",
   ).toBeInTheDocument();
 });
 
+test("thread evidence surfaces participant metadata while keeping notes visible", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "thread-meta-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Thread Meta",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+      searchParams: Promise.resolve({ evidence: "vestry-interview" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /vestry interview transcript/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /participants:\s*handler rowan,\s*groundskeeper bram yates/i,
+    ),
+  ).toBeInTheDocument();
+});
+
+test("renders showcase audio evidence after unlocking the annex while keeping notes and objectives visible", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "showcase-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Showcase",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "evidence-variety-showcase",
+  });
+
+  await db
+    .update(playerCaseObjectives)
+    .set({
+      status: "solved",
+      solvedAt: new Date("2026-03-20T06:00:00.000Z"),
+      draftPayload: null,
+      updatedAt: new Date("2026-03-20T06:00:00.000Z"),
+    })
+    .where(
+      and(
+        eq(playerCaseObjectives.playerCaseId, playerCase.id),
+        eq(playerCaseObjectives.objectiveId, "continue-annex"),
+      ),
+    );
+
+  await db
+    .update(playerCaseObjectives)
+    .set({
+      status: "active",
+      updatedAt: new Date("2026-03-20T06:01:00.000Z"),
+    })
+    .where(
+      and(
+        eq(playerCaseObjectives.playerCaseId, playerCase.id),
+        eq(playerCaseObjectives.objectiveId, "identify-new-families"),
+      ),
+    );
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "evidence-variety-showcase" }),
+      searchParams: Promise.resolve({ evidence: "handler-voicemail" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("heading", { name: /field notes/i, hidden: true }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("heading", { name: /active objectives/i, hidden: true }),
+  ).toBeInTheDocument();
+  expect(screen.getByText(/stage 2 of 2/i)).toBeInTheDocument();
+  expect(
+    screen.getByRole("dialog", { name: /handler voicemail/i }),
+  ).toBeInTheDocument();
+  expect(screen.getByText(/check pier locker seven/i)).toBeInTheDocument();
+});
+
 test("preserves the selected evidence when saving an objective draft", async () => {
   const db = await getDb();
   const userId = randomUUID();

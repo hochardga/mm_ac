@@ -264,7 +264,7 @@ Phase one should preserve one case-local evidence directory per case package and
 
 Recommended payload expectations:
 
-- `document`: markdown body plus structured metadata/frontmatter
+- `document`: Markdown body plus structured metadata/frontmatter
 - `record`: JSON columns and rows
 - `thread`: JSON thread metadata plus ordered messages
 - `photo`: JSON metadata plus referenced still image asset
@@ -282,7 +282,7 @@ The workspace should continue to use one shared evidence index and one shared vi
 
 The viewer goal for this phase is distinct presentation, not deep interactivity.
 
-`document` should feel like reviewing a formatted artifact rather than reading a raw markdown blob.
+`document` should feel like reviewing a formatted artifact rather than reading a raw Markdown blob.
 
 `record` should still support lightweight sorting and filtering where already useful, but the focus should remain on strong presentation and scanability.
 

@@ -12,5 +12,5 @@ test("db:seed succeeds from the CLI entrypoint", () => {
   });
 
   expect(result.status).toBe(0);
-  expect(result.stdout).toContain("Seeded 4 published cases.");
+  expect(result.stdout).toContain("Seeded 5 published cases.");
 });

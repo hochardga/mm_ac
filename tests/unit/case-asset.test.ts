@@ -1,4 +1,4 @@
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
@@ -13,7 +13,9 @@ import { buildCaseAssetUrl } from "@/features/cases/case-asset-url";
 let tempCasesRoot: string | null = null;
 
 async function createCasesRoot() {
-  tempCasesRoot = await mkdtemp(path.join(os.tmpdir(), "case-asset-"));
+  tempCasesRoot = await realpath(
+    await mkdtemp(path.join(os.tmpdir(), "case-asset-")),
+  );
   return tempCasesRoot;
 }
 

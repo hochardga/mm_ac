@@ -91,6 +91,42 @@ test("rejects photo assets that escape the case directory", async () => {
   ).rejects.toThrow(/image path/i);
 });
 
+test("loads audio, diagram, and webpage evidence from payload files", async () => {
+  const manifest = await loadStagedCaseManifest("media-family-valid", {
+    casesRoot: fixturesRoot,
+  });
+
+  expect(manifest.evidence.map((entry) => entry.family)).toEqual([
+    "audio",
+    "diagram",
+    "webpage",
+  ]);
+});
+
+test("rejects audio assets that escape the case directory", async () => {
+  await expect(
+    loadStagedCaseManifest("audio-traversal-asset", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/audio asset path/i);
+});
+
+test("rejects unsupported diagram element types", async () => {
+  await expect(
+    loadStagedCaseManifest("diagram-invalid-element", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/type/i);
+});
+
+test("rejects unsupported webpage block types", async () => {
+  await expect(
+    loadStagedCaseManifest("webpage-invalid-block", {
+      casesRoot: fixturesRoot,
+    }),
+  ).rejects.toThrow(/type/i);
+});
+
 test("rejects manifest loads when the expected revision does not match", async () => {
   await expect(
     loadStagedCaseManifest("text-first-valid", {
@@ -101,13 +137,15 @@ test("rejects manifest loads when the expected revision does not match", async (
 });
 
 test("fixture cases load successfully with photo evidence included", async () => {
-  const [textFirst, photo] = await Promise.all([
+  const [textFirst, photo, media] = await Promise.all([
     loadStagedCaseManifest("text-first-valid", { casesRoot: fixturesRoot }),
     loadStagedCaseManifest("photo-valid", { casesRoot: fixturesRoot }),
+    loadStagedCaseManifest("media-family-valid", { casesRoot: fixturesRoot }),
   ]);
 
   expect(textFirst.evidence.some((item) => item.family === "document")).toBe(true);
   expect(photo.evidence.some((item) => item.family === "photo")).toBe(true);
+  expect(media.evidence.some((item) => item.family === "audio")).toBe(true);
 });
 
 test("the shipped cases load successfully with photo evidence included", async () => {
@@ -123,4 +161,20 @@ test("the shipped cases load successfully with photo evidence included", async (
   expect("complexity" in briar && briar.complexity).toBe("deep");
   expect("complexity" in bishop && bishop.complexity).toBe("standard");
   expect("complexity" in harbor && harbor.complexity).toBe("light");
+});
+
+test("the shipped showcase case loads every supported evidence family", async () => {
+  const manifest = await loadAnyCaseManifest("evidence-variety-showcase");
+
+  expect(new Set(manifest.evidence.map((entry) => entry.family))).toEqual(
+    new Set([
+      "document",
+      "record",
+      "thread",
+      "photo",
+      "audio",
+      "diagram",
+      "webpage",
+    ]),
+  );
 });

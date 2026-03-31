@@ -1,0 +1,36 @@
+{
+  "slug": "audio-traversal-asset",
+  "revision": "rev-1",
+  "title": "Audio Traversal Fixture",
+  "summary": "Fixture case for audio path traversal handling.",
+  "complexity": "light",
+  "evidence": [
+    {
+      "id": "dispatch-voicemail",
+      "title": "Dispatch Voicemail",
+      "family": "audio",
+      "subtype": "voicemail",
+      "summary": "An audio payload that tries to escape the case root.",
+      "source": "evidence/dispatch-voicemail.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Inspect the traversal payload.",
+      "handlerPrompts": ["Check the audio asset reference."],
+      "evidenceIds": ["dispatch-voicemail"],
+      "objectives": [
+        {
+          "id": "verify-media",
+          "prompt": "Does the audio load?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

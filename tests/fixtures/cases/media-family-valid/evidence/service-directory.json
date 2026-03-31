@@ -1,0 +1,27 @@
+{
+  "subtype": "directory_listing",
+  "page": {
+    "title": "Harbor Service Directory",
+    "urlLabel": "harbor.local/services",
+    "sourceLabel": "Cached port intranet"
+  },
+  "blocks": [
+    {
+      "id": "intro",
+      "type": "hero",
+      "heading": "Night Services",
+      "body": "Verified services available after the third bell."
+    },
+    {
+      "id": "vendors",
+      "type": "directory",
+      "items": [
+        {
+          "title": "Pier Locker Rentals",
+          "meta": "Warehouse Row",
+          "body": "After-hours access by coded key."
+        }
+      ]
+    }
+  ]
+}
