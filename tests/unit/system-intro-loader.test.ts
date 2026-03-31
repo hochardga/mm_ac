@@ -39,10 +39,13 @@ test("loads transcript and optional audio when files are present", async () => {
 test("returns null when transcript is missing, empty, or unreadable", async () => {
   const missingRoot = await createIntroRoot();
   const emptyRoot = await createIntroRoot();
+  const unreadableRoot = await createIntroRoot();
   await writeTranscript(emptyRoot, "  \n\t  ");
+  await mkdir(path.join(unreadableRoot, "transcript.md"), { recursive: true });
 
   await expect(loadSystemIntro({ introRoot: missingRoot })).resolves.toBeNull();
   await expect(loadSystemIntro({ introRoot: emptyRoot })).resolves.toBeNull();
+  await expect(loadSystemIntro({ introRoot: unreadableRoot })).resolves.toBeNull();
 });
 
 test("returns transcript-only bundle when audio is absent", async () => {
