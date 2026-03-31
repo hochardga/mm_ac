@@ -57,6 +57,13 @@
       "when": 1773600692564,
       "tag": "0007_viewed_evidence_ids",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1774971495708,
+      "tag": "0008_case_introduction_seen_at",
+      "breakpoints": true
     }
   ]
 }
