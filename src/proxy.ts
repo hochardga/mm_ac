@@ -24,7 +24,7 @@ export const config = {
   matcher: [
     "/vault/:path*",
     "/cases/:path*",
-    "/the-system-into/:path*",
-    "/api/the-system-into/audio/:path*",
+    "/the-system-intro/:path*",
+    "/api/the-system-intro/audio/:path*",
   ],
 };

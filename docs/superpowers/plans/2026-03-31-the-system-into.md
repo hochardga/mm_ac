@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED: Use `@superpowers:subagent-driven-development` if subagents are available, or `@superpowers:executing-plans` to implement this plan. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Add a hidden authenticated dossier page at `/the-system-into` with transcript-preserving rendering, autoplay narration, and a clear vault CTA.
+**Goal:** Add a hidden authenticated dossier page at `/the-system-intro` with transcript-preserving rendering, autoplay narration, and a clear vault CTA.
 
-**Architecture:** Keep the page as a standalone authenticated route under the app tree, not part of the shell chrome. Load the page content from a dedicated `content/the-system-into/` bundle, render the transcript in a centered dossier panel, and use a small client component to handle autoplay and fallback playback controls. Serve the narration from a protected Node route so the page stays behind login end to end.
+**Architecture:** Keep the page as a standalone authenticated route under the app tree, not part of the shell chrome. Load the page content from a dedicated `content/the-system-intro/` bundle, render the transcript in a centered dossier panel, and use a small client component to handle autoplay and fallback playback controls. Serve the narration from a protected Node route so the page stays behind login end to end.
 
 **Tech Stack:** Next.js App Router, React 19, TypeScript, NextAuth middleware, Node `fs`/stream APIs, Vitest, Testing Library
 
@@ -13,7 +13,7 @@
 ## Preflight
 
 - Start implementation in a fresh git worktree rooted at this repository.
-- Keep the approved spec open at `docs/superpowers/specs/2026-03-31-the-system-into-design.md`.
+- Keep the approved spec open at `docs/superpowers/specs/2026-03-31-the-system-intro-design.md`.
 - Do not add the hidden page to navigation, vault cards, or any other visible link surface.
 - Keep the page-specific content bundle separate from `content/cases/*`.
 - Run focused tests after every task and `pnpm build` before the final handoff.
@@ -25,14 +25,14 @@
 **Files:**
 - Modify: `src/lib/route-protection.ts`
 - Modify: `src/proxy.ts`
-- Create: `src/features/the-system-into/load-system-intro.ts`
+- Create: `src/features/the-system-intro/load-system-intro.ts`
 - Test: `tests/unit/system-intro-loader.test.ts`
 - Test: `tests/integration/auth-route.test.ts`
 
 - [ ] **Step 1: Write the failing tests**
 
 ```ts
-test("treats /the-system-into and its audio endpoint as protected", () => {});
+test("treats /the-system-intro and its audio endpoint as protected", () => {});
 test("loads transcript and optional audio from the system intro bundle", () => {});
 test("returns null when transcript.md is missing or empty", () => {});
 ```
@@ -45,7 +45,7 @@ Expected: FAIL because the route protection rules and intro loader do not exist 
 - [ ] **Step 3: Implement the minimal loader and protection rules**
 
 Implement `loadSystemIntro` so it:
-- reads `content/the-system-into/transcript.md`
+- reads `content/the-system-intro/transcript.md`
 - returns `null` when the transcript is missing, empty, or unreadable
 - treats `audio.mp3` as optional
 - preserves the transcript text formatting instead of normalizing it into paragraphs
@@ -60,7 +60,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/lib/route-protection.ts src/proxy.ts src/features/the-system-into/load-system-intro.ts tests/unit/system-intro-loader.test.ts tests/integration/auth-route.test.ts
+git add src/lib/route-protection.ts src/proxy.ts src/features/the-system-intro/load-system-intro.ts tests/unit/system-intro-loader.test.ts tests/integration/auth-route.test.ts
 git commit -m "feat: add system intro auth and loader"
 ```
 
@@ -69,8 +69,8 @@ git commit -m "feat: add system intro auth and loader"
 ### Task 2: Build the centered dossier page and autoplay fallback
 
 **Files:**
-- Create: `src/app/(app)/the-system-into/page.tsx`
-- Create: `src/features/the-system-into/components/system-intro-panel.tsx`
+- Create: `src/app/(app)/the-system-intro/page.tsx`
+- Create: `src/features/the-system-intro/components/system-intro-panel.tsx`
 - Test: `tests/unit/system-intro-panel.test.tsx`
 - Test: `tests/integration/system-intro-page.test.tsx`
 
@@ -111,7 +111,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/(app)/the-system-into/page.tsx src/features/the-system-into/components/system-intro-panel.tsx tests/unit/system-intro-panel.test.tsx tests/integration/system-intro-page.test.tsx
+git add src/app/(app)/the-system-intro/page.tsx src/features/the-system-intro/components/system-intro-panel.tsx tests/unit/system-intro-panel.test.tsx tests/integration/system-intro-page.test.tsx
 git commit -m "feat: add system intro page shell"
 ```
 
@@ -120,9 +120,9 @@ git commit -m "feat: add system intro page shell"
 ### Task 3: Serve the narration file and land the authored content
 
 **Files:**
-- Create: `src/app/api/the-system-into/audio/route.ts`
-- Create: `content/the-system-into/transcript.md`
-- Create: `content/the-system-into/audio.mp3`
+- Create: `src/app/api/the-system-intro/audio/route.ts`
+- Create: `content/the-system-intro/transcript.md`
+- Create: `content/the-system-intro/audio.mp3`
 - Test: `tests/integration/system-intro-audio-route.test.ts`
 
 - [ ] **Step 1: Write the failing route test**
@@ -140,12 +140,12 @@ Expected: FAIL because the audio route and authored content are missing.
 - [ ] **Step 3: Implement the route and add the authored files**
 
 Implement the audio route so it:
-- reads `content/the-system-into/audio.mp3`
+- reads `content/the-system-intro/audio.mp3`
 - streams the file from Node
 - returns the correct audio content type
 - relies on the existing auth boundary for protection
 
-Copy the supplied transcript and audio files into `content/the-system-into/`.
+Copy the supplied transcript and audio files into `content/the-system-intro/`.
 
 - [ ] **Step 4: Re-run the route test and build**
 
@@ -161,7 +161,7 @@ Expected: PASS.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add src/app/api/the-system-into/audio/route.ts content/the-system-into/transcript.md content/the-system-into/audio.mp3 tests/integration/system-intro-audio-route.test.ts
+git add src/app/api/the-system-intro/audio/route.ts content/the-system-intro/transcript.md content/the-system-intro/audio.mp3 tests/integration/system-intro-audio-route.test.ts
 git commit -m "feat: serve system intro audio"
 ```
 

@@ -6,7 +6,7 @@ import { Readable } from "node:stream";
 export const runtime = "nodejs";
 
 function resolveNarrationPath() {
-  return path.join(process.cwd(), "content", "the-system-into", "audio.mp3");
+  return path.join(process.cwd(), "content", "the-system-intro", "audio.mp3");
 }
 
 export async function GET() {
@@ -28,4 +28,3 @@ export async function GET() {
     return new Response(null, { status: 404 });
   }
 }
-

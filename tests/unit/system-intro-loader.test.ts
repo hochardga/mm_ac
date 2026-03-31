@@ -2,7 +2,7 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-import { loadSystemIntro } from "@/features/the-system-into/load-system-intro";
+import { loadSystemIntro } from "@/features/the-system-intro/load-system-intro";
 
 async function createIntroRoot() {
   return mkdtemp(path.join(os.tmpdir(), "system-intro-"));

@@ -12,7 +12,7 @@ export type SystemIntroBundle = {
 
 function resolveIntroRoot(customRoot?: string) {
   return path.resolve(
-    customRoot ?? path.join(process.cwd(), "content", "the-system-into"),
+    customRoot ?? path.join(process.cwd(), "content", "the-system-intro"),
   );
 }
 

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import { SystemIntroPanel } from "@/features/the-system-into/components/system-intro-panel";
+import { SystemIntroPanel } from "@/features/the-system-intro/components/system-intro-panel";
 
 beforeEach(() => {
   vi.restoreAllMocks();
@@ -15,7 +15,7 @@ test("autoplay success does not show the play fallback", async () => {
   render(
     <SystemIntroPanel
       transcript={"[pause]\nLine two.\n"}
-      audioSrc="/api/the-system-into/audio"
+      audioSrc="/api/the-system-intro/audio"
     />,
   );
 
@@ -34,7 +34,7 @@ test("autoplay rejection exposes a visible play fallback", async () => {
   render(
     <SystemIntroPanel
       transcript={"[pause]\nLine two.\n"}
-      audioSrc="/api/the-system-into/audio"
+      audioSrc="/api/the-system-intro/audio"
     />,
   );
 

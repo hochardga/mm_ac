@@ -4,7 +4,7 @@ Date: 2026-03-31
 
 ## Summary
 
-Add a hidden, shareable introduction page for "the system" at `/the-system-into`. The page should live behind the login boundary already used elsewhere in the app, should not appear in navigation, and should feel like a deliberate dossier artifact rather than a standard site page.
+Add a hidden, shareable introduction page for "the system" at `/the-system-intro`. The page should live behind the login boundary already used elsewhere in the app, should not appear in navigation, and should feel like a deliberate dossier artifact rather than a standard site page.
 
 The page must show the supplied transcript, attempt to autoplay the narration audio when the browser allows it, and offer a clear action button that takes the user to the vault.
 
@@ -30,7 +30,7 @@ The page must show the supplied transcript, attempt to autoplay the narration au
 
 ### Recommended: Standalone authenticated dossier page
 
-Create a dedicated authenticated route for `/the-system-into`, load the transcript from a page-specific content bundle, and serve the narration through a protected audio endpoint. This keeps the page self-contained, easy to share, and clearly separated from case content.
+Create a dedicated authenticated route for `/the-system-intro`, load the transcript from a page-specific content bundle, and serve the narration through a protected audio endpoint. This keeps the page self-contained, easy to share, and clearly separated from case content.
 
 ### Reuse the case introduction infrastructure
 
@@ -44,7 +44,7 @@ Render a simple page and place the audio in `public/` for easy loading. This is 
 
 ### Route and auth boundary
 
-- Create the page at `src/app/(app)/the-system-into/page.tsx`.
+- Create the page at `src/app/(app)/the-system-intro/page.tsx`.
 - Protect the route with the same login gate used for vault and case routes.
 - Extend the route protection rules and middleware matcher so unauthenticated visitors are redirected to the existing sign-in flow.
 - Keep the page outside the shell layout so it does not inherit the normal navigation chrome.
@@ -54,7 +54,7 @@ This keeps the page hidden in practice while still making the URL shareable for 
 
 ### Content contract
 
-- Store the page content in a dedicated bundle at `content/the-system-into/`.
+- Store the page content in a dedicated bundle at `content/the-system-intro/`.
 - `transcript.md` is required and should be treated as the authoritative text.
 - `audio.mp3` is optional in the contract, but the first rollout should include it.
 - The transcript loader should return a normalized string and preserve line breaks, bracketed cue text, and pauses.
@@ -100,7 +100,7 @@ This should feel intentional and secretive, not like a normal app screen.
 
 ## Definition Of Done
 
-- `/the-system-into` is accessible only to authenticated users.
+- `/the-system-intro` is accessible only to authenticated users.
 - The page does not appear in the visible navigation.
 - The page renders the supplied transcript with formatting preserved.
 - The narration attempts autoplay on load and falls back cleanly if blocked.
@@ -113,16 +113,16 @@ This should feel intentional and secretive, not like a normal app screen.
 
 ### Create
 
-- `src/app/(app)/the-system-into/page.tsx`: server page that assembles the hidden intro experience.
-- `src/features/the-system-into/load-system-intro.ts`: loader for the page-specific transcript and optional audio asset.
-- `src/features/the-system-into/components/system-intro-panel.tsx`: client component that handles autoplay, fallback controls, and the centered dossier layout.
-- `src/app/api/the-system-into/audio/route.ts`: protected audio endpoint for the narration file.
-- `content/the-system-into/transcript.md`: the supplied transcript.
-- `content/the-system-into/audio.mp3`: the supplied narration audio.
+- `src/app/(app)/the-system-intro/page.tsx`: server page that assembles the hidden intro experience.
+- `src/features/the-system-intro/load-system-intro.ts`: loader for the page-specific transcript and optional audio asset.
+- `src/features/the-system-intro/components/system-intro-panel.tsx`: client component that handles autoplay, fallback controls, and the centered dossier layout.
+- `src/app/api/the-system-intro/audio/route.ts`: protected audio endpoint for the narration file.
+- `content/the-system-intro/transcript.md`: the supplied transcript.
+- `content/the-system-intro/audio.mp3`: the supplied narration audio.
 
 ### Modify
 
-- `src/lib/route-protection.ts`: treat `/the-system-into` as protected.
+- `src/lib/route-protection.ts`: treat `/the-system-intro` as protected.
 - `src/proxy.ts`: include the new page and audio endpoint in the auth matcher.
 - `tests/integration/auth-route.test.ts`: verify the new route is considered protected.
 - `tests/unit/system-intro-loader.test.ts`: cover transcript loading, missing transcript, and optional audio behavior.

@@ -4,7 +4,7 @@ import path from "node:path";
 
 import { afterEach, expect, test, vi } from "vitest";
 
-import { GET } from "@/app/api/the-system-into/audio/route";
+import { GET } from "@/app/api/the-system-intro/audio/route";
 
 let tempRoot: string | null = null;
 
@@ -17,7 +17,7 @@ async function createRepoRoot() {
 }
 
 async function writeAudio(repoRoot: string, contents: Buffer | string) {
-  const filePath = path.join(repoRoot, "content", "the-system-into", "audio.mp3");
+  const filePath = path.join(repoRoot, "content", "the-system-intro", "audio.mp3");
   await mkdir(path.dirname(filePath), { recursive: true });
   await writeFile(filePath, contents);
   return filePath;
@@ -51,4 +51,3 @@ test("returns 404 when the narration file is missing", async () => {
 
   expect(response.status).toBe(404);
 });
-

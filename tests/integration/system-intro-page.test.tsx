@@ -29,8 +29,8 @@ vi.mock("next/navigation", () => ({
   notFound: notFoundMock,
 }));
 
-import SystemIntroPage from "@/app/(app)/the-system-into/page";
-import * as systemIntroLoader from "@/features/the-system-into/load-system-intro";
+import SystemIntroPage from "@/app/(app)/the-system-intro/page";
+import * as systemIntroLoader from "@/features/the-system-intro/load-system-intro";
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -91,4 +91,3 @@ test("missing transcript fails closed with notFound", async () => {
   await expect(SystemIntroPage()).rejects.toThrow("NEXT_NOT_FOUND");
   expect(notFoundMock).toHaveBeenCalledTimes(1);
 });
-
