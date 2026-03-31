@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
+import { hasIdentity } from "@/features/auth/has-identity";
 import { SystemIntroPanel } from "@/features/the-system-intro/components/system-intro-panel";
 import { loadSystemIntro } from "@/features/the-system-intro/load-system-intro";
 import { authOptions } from "@/lib/auth";
@@ -12,12 +13,7 @@ export default async function SystemIntroPage() {
     cookies(),
   ]);
 
-  const hasSessionIdentity = Boolean(
-    session?.user && "id" in session.user && session.user.id,
-  );
-  const hasIntakeIdentity = Boolean(cookieStore.get("ashfall-agent-id")?.value);
-
-  if (!hasSessionIdentity && !hasIntakeIdentity) {
+  if (!hasIdentity(session, cookieStore)) {
     redirect("/signin");
   }
 

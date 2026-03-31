@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { cookies } from "next/headers";
 
+import { hasIdentity } from "@/features/auth/has-identity";
 import { authOptions } from "@/lib/auth";
 
 export default async function HomePage() {
@@ -9,11 +10,7 @@ export default async function HomePage() {
     getServerSession(authOptions),
     cookies(),
   ]);
-  const hasSessionIdentity = Boolean(
-    session?.user && "id" in session.user && session.user.id,
-  );
-  const hasIntakeIdentity = Boolean(cookieStore.get("ashfall-agent-id")?.value);
-  const isSignedIn = hasSessionIdentity || hasIntakeIdentity;
+  const isSignedIn = hasIdentity(session, cookieStore);
 
   return (
     <main className="px-6 py-16">
