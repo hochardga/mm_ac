@@ -1,6 +1,5 @@
+import { buildCaseAssetUrl } from "@/features/cases/case-asset-url";
+
 export function buildPhotoAssetUrl(caseSlug: string, assetPath: string) {
-  return `/api/cases/${encodeURIComponent(caseSlug)}/assets/${assetPath
-    .split("/")
-    .map((segment) => encodeURIComponent(segment))
-    .join("/")}`;
+  return buildCaseAssetUrl(caseSlug, assetPath);
 }

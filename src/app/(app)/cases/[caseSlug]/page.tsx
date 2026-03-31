@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 
 import { desc, eq } from "drizzle-orm";
 import { notFound, redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect-error";
 
 import {
   notes,
@@ -19,9 +20,11 @@ import {
   type LoadedCaseManifest,
   type LoadedStagedCaseManifest,
 } from "@/features/cases/load-case-manifest";
+import { loadCaseIntroduction } from "@/features/cases/load-case-introduction";
 import { openCase } from "@/features/cases/open-case";
 import { rememberViewedEvidence } from "@/features/cases/remember-viewed-evidence";
 import { getDb } from "@/lib/db";
+import { CaseIntroductionModal } from "@/features/cases/components/case-introduction-modal";
 
 type CasePageProps = {
   params: Promise<{
@@ -30,9 +33,52 @@ type CasePageProps = {
   searchParams?: Promise<CaseSearchParams>;
 };
 
-type CaseSearchParams = {
+type CaseSearchParams = Record<string, string | string[] | undefined> & {
   evidence?: string | string[];
+  intro?: string | string[];
 };
+
+function getFirstSearchParamValue(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function buildCaseHref(
+  caseSlug: string,
+  searchParams: CaseSearchParams,
+  mutations: Record<string, string | null | undefined>,
+) {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(searchParams)) {
+    if (Object.prototype.hasOwnProperty.call(mutations, key)) {
+      continue;
+    }
+
+    if (value === undefined) {
+      continue;
+    }
+
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        params.append(key, entry);
+      }
+      continue;
+    }
+
+    params.set(key, value);
+  }
+
+  for (const [key, value] of Object.entries(mutations)) {
+    if (value === null || value === undefined) {
+      continue;
+    }
+
+    params.set(key, value);
+  }
+
+  const query = params.toString();
+  return `/cases/${caseSlug}${query ? `?${query}` : ""}`;
+}
 
 function isStagedManifest(
   manifest: LoadedCaseManifest,
@@ -44,6 +90,10 @@ export default async function CasePage({
   params,
   searchParams,
 }: CasePageProps) {
+  let introduction: Awaited<ReturnType<typeof loadCaseIntroduction>> = null;
+  let introCloseHref: string | undefined;
+  let replayIntroductionHref: string | undefined;
+  let shouldOpenIntroduction = false;
   let caseData:
     | {
         manifest: Awaited<ReturnType<typeof loadAnyCaseManifest>>;
@@ -64,6 +114,8 @@ export default async function CasePage({
       searchParams ?? Promise.resolve<CaseSearchParams>({}),
       getCurrentAgentId(),
     ]);
+  const introQueryValue = getFirstSearchParamValue(resolvedSearchParams.intro);
+  const introQueryPresent = introQueryValue === "1";
   const selectedEvidenceIds = Array.isArray(resolvedSearchParams.evidence)
     ? resolvedSearchParams.evidence
     : resolvedSearchParams.evidence
@@ -76,9 +128,30 @@ export default async function CasePage({
 
   try {
     const lifecycle = await openCase({ userId, caseSlug });
-    const manifest = await loadAnyCaseManifest(caseSlug, {
-      expectedRevision: lifecycle.playerCase.caseRevision,
-    });
+    const [manifest, loadedIntroduction] = await Promise.all([
+      loadAnyCaseManifest(caseSlug, {
+        expectedRevision: lifecycle.playerCase.caseRevision,
+      }),
+      loadCaseIntroduction(caseSlug),
+    ]);
+
+    introduction = loadedIntroduction;
+
+    if (introQueryPresent && !introduction) {
+      redirect(buildCaseHref(caseSlug, resolvedSearchParams, { intro: null }));
+    }
+
+    shouldOpenIntroduction =
+      introQueryPresent ||
+      Boolean(
+        introduction && lifecycle.playerCase.introductionSeenAt === null,
+      );
+    replayIntroductionHref = introduction
+      ? buildCaseHref(caseSlug, resolvedSearchParams, { intro: "1" })
+      : undefined;
+    introCloseHref = introQueryPresent
+      ? buildCaseHref(caseSlug, resolvedSearchParams, { intro: null })
+      : undefined;
     const db = await getDb();
     const [
       savedNote,
@@ -117,7 +190,9 @@ export default async function CasePage({
       : null;
     const visibleEvidence = stagedProgression?.visibleEvidence ?? manifest.evidence;
     const requestedEvidenceId = selectedEvidenceIds[0];
-    const openedEvidence = requestedEvidenceId
+    const openedEvidence = shouldOpenIntroduction
+      ? undefined
+      : requestedEvidenceId
       ? visibleEvidence.find((item) => item.id === requestedEvidenceId)
       : undefined;
     let viewedEvidenceIds = lifecycle.playerCase.viewedEvidenceIds ?? [];
@@ -147,7 +222,14 @@ export default async function CasePage({
       viewedEvidenceIds,
       submissionToken: randomUUID(),
     };
-  } catch {
+  } catch (error) {
+    if (
+      isRedirectError(error) ||
+      (error instanceof Error && error.message.startsWith("NEXT_REDIRECT:"))
+    ) {
+      throw error;
+    }
+
     notFound();
   }
 
@@ -174,10 +256,23 @@ export default async function CasePage({
           progressSnapshot={progressSnapshot}
           summary={caseData.manifest.summary}
           title={caseData.manifest.title}
+          replayIntroductionHref={replayIntroductionHref}
         />
+
+        {shouldOpenIntroduction && introduction ? (
+          <CaseIntroductionModal
+            caseName={caseData.manifest.title}
+            caseSlug={caseSlug}
+            closeHref={introCloseHref}
+            intro={introduction}
+            open={shouldOpenIntroduction}
+            playerCaseId={caseData.lifecycle.playerCase.id}
+          />
+        ) : null}
 
         <CaseWorkspace
           caseSlug={caseSlug}
+          introOpen={shouldOpenIntroduction}
           manifest={caseData.manifest}
           playerCaseId={caseData.lifecycle.playerCase.id}
           latestSubmission={caseData.latestSubmission}

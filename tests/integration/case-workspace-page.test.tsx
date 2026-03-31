@@ -43,6 +43,7 @@ import {
   playerCases,
   users,
 } from "@/db/schema";
+import * as caseIntroductionLoader from "@/features/cases/load-case-introduction";
 import * as caseManifestLoader from "@/features/cases/load-case-manifest";
 import type { LoadedStagedCaseManifest } from "@/features/cases/load-case-manifest";
 import { openCase } from "@/features/cases/open-case";
@@ -234,6 +235,112 @@ test("uses the first repeated evidence query value when the case page receives a
   ).toBeInTheDocument();
 });
 
+test("auto-opens the intro once for a fresh player case", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "intro-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Intro",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  vi.spyOn(caseIntroductionLoader, "loadCaseIntroduction").mockResolvedValue({
+    transcript: "# Introduction\n\nSomething is wrong in Studio B.",
+    audioPath: "introduction/audio.mp3",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("dialog", { name: /introduction for signal at red harbor/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("dialog", { name: /dispatch log/i }),
+  ).not.toBeInTheDocument();
+});
+
+test("suppresses evidence while the intro is open, then restores it after close", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "suppressed-intro-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Suppressed Intro",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  vi.spyOn(caseIntroductionLoader, "loadCaseIntroduction").mockResolvedValue({
+    transcript: "# Introduction\n\nThe exchange happened before dawn.",
+  });
+  const rememberViewedEvidenceSpy = vi.spyOn(
+    await import("@/features/cases/remember-viewed-evidence"),
+    "rememberViewedEvidence",
+  );
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("dialog", { name: /introduction for signal at red harbor/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("dialog", { name: /dispatch log/i }),
+  ).not.toBeInTheDocument();
+  expect(rememberViewedEvidenceSpy).not.toHaveBeenCalled();
+
+  cleanup();
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db
+    .update(playerCases)
+    .set({ introductionSeenAt: new Date() })
+    .where(eq(playerCases.id, playerCase.id));
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("dialog", { name: /dispatch log/i }),
+  ).toBeInTheDocument();
+});
+
 test("objective responses require explicit choices before submission", async () => {
   const db = await getDb();
   const userId = randomUUID();
@@ -412,6 +519,117 @@ test("keeps field notes visible without showing active-evidence copy when no mod
     screen.queryByText(/active evidence:/i),
   ).not.toBeInTheDocument();
   expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+test("shows a replay button only when a valid intro bundle exists", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "replay-link-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Replay Link",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  const { playerCase } = await openCase({
+    userId,
+    caseSlug: "red-harbor",
+  });
+
+  await db
+    .update(playerCases)
+    .set({ introductionSeenAt: new Date() })
+    .where(eq(playerCases.id, playerCase.id));
+
+  const introSpy = vi.spyOn(caseIntroductionLoader, "loadCaseIntroduction");
+  introSpy.mockResolvedValueOnce({
+    transcript: "# Introduction\n\nLook more closely.",
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "red-harbor" }),
+      searchParams: Promise.resolve({ evidence: "dispatch-log" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("link", { name: /replay introduction/i, hidden: true }),
+  ).toHaveAttribute("href", "/cases/red-harbor?evidence=dispatch-log&intro=1");
+
+  cleanup();
+
+  introSpy.mockResolvedValueOnce(null);
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "hollow-bishop" }),
+    } as never),
+  );
+
+  expect(
+    screen.queryByRole("link", { name: /replay introduction/i, hidden: true }),
+  ).not.toBeInTheDocument();
+});
+
+test("larkspur exposes a replayable intro bundle without touching evidence", async () => {
+  const db = await getDb();
+  const userId = randomUUID();
+
+  await db.insert(users).values({
+    id: userId,
+    email: "larkspur-intro-agent@example.com",
+    passwordHash: "hashed-password",
+    alias: "Agent Larkspur Intro",
+  });
+
+  getServerSessionMock.mockResolvedValue({
+    user: {
+      id: userId,
+    },
+  });
+  cookiesMock.mockResolvedValue({
+    get: () => undefined,
+  });
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "larkspur-dead-air" }),
+    } as never),
+  );
+
+  expect(
+    screen.getByRole("dialog", {
+      name: /introduction for dead air at larkspur house/i,
+    }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /larkspur house has spent forty years turning static into memory/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("button", { name: /play introduction/i }),
+  ).toBeInTheDocument();
+  expect(
+    screen.getByRole("link", { name: /replay introduction/i, hidden: true }),
+  ).toHaveAttribute(
+    "href",
+    "/cases/larkspur-dead-air?intro=1",
+  );
+  expect(
+    screen.queryByRole("dialog", { name: /dispatch log/i, hidden: true }),
+  ).not.toBeInTheDocument();
 });
 
 test("falls back to the first visible evidence without silently repairing stale remembered evidence ids", async () => {

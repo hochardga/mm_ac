@@ -33,9 +33,10 @@ export async function resolvePhotoAsset(
 
   await access(resolved.filePath);
   const realFilePath = await realpath(resolved.filePath);
+  const realCaseDir = await realpath(resolved.caseDir);
 
   assertPathWithinRoot(
-    resolved.caseDir,
+    realCaseDir,
     realFilePath,
     `photo image path for ${caseSlug}: ${assetPath}`,
   );
@@ -43,7 +44,7 @@ export async function resolvePhotoAsset(
   return {
     ...resolved,
     filePath: realFilePath,
-    relativePath: path.relative(resolved.caseDir, realFilePath).split(path.sep).join("/"),
+    relativePath: path.relative(realCaseDir, realFilePath).split(path.sep).join("/"),
     contentType,
   };
 }

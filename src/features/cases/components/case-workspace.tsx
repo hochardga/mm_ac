@@ -26,6 +26,7 @@ type ObjectiveSubmissionRows = typeof objectiveSubmissions.$inferSelect[];
 
 type CaseWorkspaceProps = {
   caseSlug: string;
+  introOpen?: boolean;
   manifest: LoadedCaseManifest;
   playerCaseId: string;
   savedNote: SavedNote;
@@ -62,7 +63,9 @@ export function CaseWorkspace({
   submissionToken,
   selectedEvidenceId,
   viewedEvidenceIds,
+  introOpen = false,
 }: CaseWorkspaceProps) {
+  const activeSelectedEvidenceId = introOpen ? undefined : selectedEvidenceId;
   const stagedProgression = isStagedManifest(manifest)
     ? buildCaseProgression({
         manifest,
@@ -78,8 +81,8 @@ export function CaseWorkspace({
   const newEvidenceIds = visibleEvidence
     .map((item) => item.id)
     .filter((evidenceId) => !viewedEvidenceIds.includes(evidenceId));
-  const selectedEvidence = selectedEvidenceId
-    ? visibleEvidence.find((item) => item.id === selectedEvidenceId)
+  const selectedEvidence = activeSelectedEvidenceId
+    ? visibleEvidence.find((item) => item.id === activeSelectedEvidenceId)
     : undefined;
 
   if (!defaultEvidence) {
