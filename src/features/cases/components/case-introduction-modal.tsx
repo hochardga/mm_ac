@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  useCallback,
   useEffect,
-  useEffectEvent,
   useRef,
   useState,
   type MouseEvent,
@@ -119,7 +119,7 @@ export function CaseIntroductionModal({
     }
   }, [open]);
 
-  const restoreFocus = useEffectEvent(() => {
+  const restoreFocus = useCallback(() => {
     if (restoreFocusFrameRef.current !== null) {
       window.cancelAnimationFrame(restoreFocusFrameRef.current);
     }
@@ -129,27 +129,31 @@ export function CaseIntroductionModal({
         openerRef.current.focus({ preventScroll: true });
       }
     });
-  });
+  }, []);
 
-  const closeModal = useEffectEvent((syncUrl: boolean) => {
-    pauseAudio(audioRef.current);
-    setIsOpen(false);
+  const closeModal = useCallback(
+    (syncUrl: boolean) => {
+      pauseAudio(audioRef.current);
+      setIsOpen(false);
 
-    if (syncUrl && closeHref) {
-      router.replace(`${closeHref}${window.location.hash}`);
-    }
+      if (syncUrl && closeHref) {
+        router.replace(`${closeHref}${window.location.hash}`);
+      }
 
-    restoreFocus();
-  });
+      restoreFocus();
+    },
+    [closeHref, restoreFocus, router],
+  );
 
-  const handleCloseClick = useEffectEvent(
+  const handleCloseClick = useCallback(
     (event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
       event.preventDefault();
       closeModal(Boolean(closeHref));
     },
+    [closeHref, closeModal],
   );
 
-  const handlePlayClick = useEffectEvent(() => {
+  const handlePlayClick = useCallback(() => {
     const audio = audioRef.current;
 
     if (!audio) {
@@ -162,7 +166,7 @@ export function CaseIntroductionModal({
       setAutoplayBlocked(true);
       playButtonRef.current?.focus({ preventScroll: true });
     });
-  });
+  }, []);
 
   useEffect(() => {
     const node = document.createElement("div");

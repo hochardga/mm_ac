@@ -80,7 +80,7 @@ This approach keeps the architecture coherent while letting authored content gro
 - `evidence_tag`
 - `coroner_report`
 
-Documents should continue to be authored as markdown plus structured metadata, with deterministic presentation treatments such as header blocks, signatures, stamps, redactions, or optional scan styling.
+Documents should continue to be authored as Markdown plus structured metadata, with deterministic presentation treatments such as header blocks, signatures, stamps, redactions, or optional scan styling.
 
 `record` should remain the home for structured row-and-column evidence. It should expand to better support subtypes such as:
 
@@ -168,7 +168,7 @@ The phase-one diagram payload should be a JSON object with:
 - `width`
 - `height`
 
-`elements` should be a list of structured render primitives using a small allowed set:
+The `elements` field should be a list of structured render primitives using a small allowed set:
 
 - `area`
 - `line`

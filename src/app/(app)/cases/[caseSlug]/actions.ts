@@ -57,6 +57,7 @@ export async function markIntroductionSeenAction(formData: FormData) {
     .where(
       and(
         eq(playerCases.id, playerCaseId),
+        eq(playerCases.userId, playerCase.userId),
         isNull(playerCases.introductionSeenAt),
       ),
     );

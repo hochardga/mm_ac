@@ -313,6 +313,12 @@ test("suppresses evidence while the intro is open, then restores it after close"
     screen.getByRole("dialog", { name: /introduction for signal at red harbor/i }),
   ).toBeInTheDocument();
   expect(
+    screen.getByRole("link", { name: /close introduction/i }),
+  ).toHaveAttribute(
+    "href",
+    "/cases/red-harbor?evidence=dispatch-log",
+  );
+  expect(
     screen.queryByRole("dialog", { name: /dispatch log/i }),
   ).not.toBeInTheDocument();
   expect(rememberViewedEvidenceSpy).not.toHaveBeenCalled();

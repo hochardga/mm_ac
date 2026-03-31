@@ -1,4 +1,6 @@
-import { readFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
+import { Readable } from "node:stream";
 
 import { parseCaseAssetRange, resolveCaseAsset } from "@/features/cases/case-asset";
 
@@ -19,9 +21,9 @@ export async function GET(
     const { caseSlug, assetPath } = await context.params;
     const relativeAssetPath = assetPath.join("/");
     const asset = await resolveCaseAsset(caseSlug, relativeAssetPath);
-    const body = await readFile(asset.filePath);
+    const { size } = await stat(asset.filePath);
     const headers = new Headers({
-      "content-length": String(body.length),
+      "content-length": String(size),
       "content-type": asset.contentType,
     });
 
@@ -31,10 +33,10 @@ export async function GET(
       const rangeHeader = _request.headers.get("range");
 
       if (rangeHeader) {
-        const range = parseCaseAssetRange(rangeHeader, body.length);
+        const range = parseCaseAssetRange(rangeHeader, size);
 
         if (!range) {
-          headers.set("content-range", `bytes */${body.length}`);
+          headers.set("content-range", `bytes */${size}`);
           headers.set("content-length", "0");
           return new Response(null, {
             status: 416,
@@ -42,21 +44,25 @@ export async function GET(
           });
         }
 
-        const partialBody = body.subarray(range.start, range.end + 1);
         headers.set(
           "content-range",
-          `bytes ${range.start}-${range.end}/${body.length}`,
+          `bytes ${range.start}-${range.end}/${size}`,
         );
-        headers.set("content-length", String(partialBody.length));
+        headers.set("content-length", String(range.end - range.start + 1));
 
-        return new Response(partialBody, {
+        const partialStream = createReadStream(asset.filePath, {
+          start: range.start,
+          end: range.end,
+        });
+        return new Response(Readable.toWeb(partialStream) as unknown as BodyInit, {
           status: 206,
           headers,
         });
       }
     }
 
-    return new Response(body, {
+    const fullStream = createReadStream(asset.filePath);
+    return new Response(Readable.toWeb(fullStream) as unknown as BodyInit, {
       status: 200,
       headers,
     });

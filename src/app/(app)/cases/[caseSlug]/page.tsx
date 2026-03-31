@@ -149,9 +149,10 @@ export default async function CasePage({
     replayIntroductionHref = introduction
       ? buildCaseHref(caseSlug, resolvedSearchParams, { intro: "1" })
       : undefined;
-    introCloseHref = introQueryPresent
-      ? buildCaseHref(caseSlug, resolvedSearchParams, { intro: null })
-      : undefined;
+    introCloseHref =
+      introQueryPresent || selectedEvidenceIds.length > 0
+        ? buildCaseHref(caseSlug, resolvedSearchParams, { intro: null })
+        : undefined;
     const db = await getDb();
     const [
       savedNote,
