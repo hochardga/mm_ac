@@ -1,0 +1,10 @@
+{
+  "subtype": "map",
+  "viewport": { "width": 1200, "height": 800 },
+  "elements": [
+    {
+      "id": "bad",
+      "type": "polygon-cloud"
+    }
+  ]
+}

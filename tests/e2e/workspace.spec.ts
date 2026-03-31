@@ -122,3 +122,41 @@ test("agent can open photo evidence and return to its evidence card", async ({
     page.locator("#evidence-vestry-scene-photo"),
   ).toBeVisible();
 });
+
+test("workspace handles mixed evidence families in the showcase case", async ({
+  page,
+}) => {
+  const email = `agent-${randomUUID()}@example.com`;
+
+  await page.goto("/apply");
+  await page.getByLabel("Operative Alias").fill("Agent Showcase");
+  await page.getByLabel("Agency Email").fill(email);
+  await page.getByLabel("Clearance Phrase").fill("CaseFile123!");
+  await page.getByRole("button", { name: /submit application/i }).click();
+  await page.waitForURL("**/vault");
+
+  await page.goto("/cases/evidence-variety-showcase?evidence=archive-brief");
+  await expect(page.getByRole("dialog", { name: /archive brief/i })).toBeVisible();
+  await page.goto("/cases/evidence-variety-showcase");
+  await expect(page.getByText(/stage 1 of 2/i)).toBeVisible();
+
+  await page.getByLabel("Response").selectOption("true");
+  await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(page.getByText(/stage 2 of 2/i)).toBeVisible();
+
+  await Promise.all([
+    page.waitForURL("**/cases/evidence-variety-showcase?evidence=handler-voicemail"),
+    page.getByRole("link", { name: /handler voicemail/i }).click(),
+  ]);
+  await expect(page.getByText(/check pier locker seven/i)).toBeVisible();
+  await page.goto("/cases/evidence-variety-showcase");
+  await expect(page.getByText(/stage 2 of 2/i)).toBeVisible();
+
+  await Promise.all([
+    page.waitForURL("**/cases/evidence-variety-showcase?evidence=directory-snapshot"),
+    page.getByRole("link", { name: /directory snapshot/i }).click(),
+  ]);
+  await expect(page.getByText(/harbor service directory/i)).toBeVisible();
+  await page.goto("/cases/evidence-variety-showcase");
+  await expect(page.getByRole("heading", { name: /field notes/i })).toBeVisible();
+});

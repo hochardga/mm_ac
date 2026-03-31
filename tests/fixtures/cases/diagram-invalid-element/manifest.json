@@ -1,0 +1,36 @@
+{
+  "slug": "diagram-invalid-element",
+  "revision": "rev-1",
+  "title": "Diagram Invalid Element Fixture",
+  "summary": "Fixture case for invalid diagram element handling.",
+  "complexity": "light",
+  "evidence": [
+    {
+      "id": "harbor-map",
+      "title": "Harbor Map",
+      "family": "diagram",
+      "subtype": "map",
+      "summary": "A diagram payload with an unsupported element type.",
+      "source": "evidence/harbor-map.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "briefing",
+      "startsUnlocked": true,
+      "title": "Briefing",
+      "summary": "Inspect the invalid diagram payload.",
+      "handlerPrompts": ["Check the element types carefully."],
+      "evidenceIds": ["harbor-map"],
+      "objectives": [
+        {
+          "id": "verify-media",
+          "prompt": "Does the diagram load?",
+          "type": "boolean",
+          "stakes": "advisory",
+          "successUnlocks": { "stageIds": [], "resolvesCase": true }
+        }
+      ]
+    }
+  ]
+}

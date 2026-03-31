@@ -1,0 +1,12 @@
+{
+  "subtype": "directory_listing",
+  "page": {
+    "title": "Harbor Service Directory"
+  },
+  "blocks": [
+    {
+      "id": "bad",
+      "type": "carousel"
+    }
+  ]
+}

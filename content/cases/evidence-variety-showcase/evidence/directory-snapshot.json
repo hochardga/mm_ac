@@ -1,0 +1,38 @@
+{
+  "subtype": "directory_listing",
+  "page": {
+    "title": "Harbor Service Directory",
+    "urlLabel": "harbor.local/services",
+    "sourceLabel": "Cached port intranet"
+  },
+  "blocks": [
+    {
+      "id": "intro",
+      "type": "hero",
+      "heading": "Night Services",
+      "body": "Verified services available after the third bell."
+    },
+    {
+      "id": "notice",
+      "type": "notice",
+      "heading": "Access",
+      "body": "Locker 7 remains reserved for training transfers."
+    },
+    {
+      "id": "vendors",
+      "type": "directory",
+      "items": [
+        {
+          "title": "Pier Locker Rentals",
+          "meta": "Warehouse Row",
+          "body": "After-hours access by coded key."
+        },
+        {
+          "title": "Graywake Cartage",
+          "meta": "Slip 4",
+          "body": "Cargo transfers and bonded storage."
+        }
+      ]
+    }
+  ]
+}

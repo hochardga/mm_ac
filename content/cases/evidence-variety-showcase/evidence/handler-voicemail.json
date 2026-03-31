@@ -1,0 +1,8 @@
+{
+  "subtype": "voicemail",
+  "audio": "evidence/handler-voicemail.wav",
+  "transcript": "Check pier locker seven.",
+  "sourceLabel": "Harbor dispatch archive",
+  "date": "2026-03-20T05:42:00Z",
+  "durationSeconds": 34
+}

@@ -12,7 +12,15 @@ export const evidenceIndexEntrySchema = z
   .object({
     id: z.string(),
     title: z.string(),
-    family: z.enum(["document", "record", "thread", "photo"]),
+    family: z.enum([
+      "document",
+      "record",
+      "thread",
+      "photo",
+      "audio",
+      "diagram",
+      "webpage",
+    ]),
     subtype: z.string(),
     summary: z.string(),
     source: z.string().min(1),
@@ -88,6 +96,9 @@ const photoSubtypeSchema = z.enum([
   "object_photo",
   "surveillance_still",
   "found_photo",
+  "portrait_mugshot",
+  "portrait_staff_directory",
+  "portrait_social",
 ]);
 
 export const photoEvidenceSourceSchema = z
@@ -97,6 +108,209 @@ export const photoEvidenceSourceSchema = z
     caption: z.string().min(1),
     sourceLabel: z.string().min(1),
     date: z.string().optional(),
+  })
+  .strict();
+
+const audioSubtypeSchema = z.enum([
+  "voicemail",
+  "interview_audio",
+  "dispatch_audio",
+  "radio_call",
+  "confession_audio",
+]);
+
+export const audioEvidenceSourceSchema = z
+  .object({
+    subtype: audioSubtypeSchema,
+    audio: z.string().min(1),
+    transcript: z.string().min(1),
+    sourceLabel: z.string().min(1),
+    date: z.string().optional(),
+    durationSeconds: z.number().int().positive().optional(),
+  })
+  .strict();
+
+const diagramSubtypeSchema = z.enum([
+  "map",
+  "floorplan",
+  "site_diagram",
+  "route_sketch",
+]);
+
+const diagramViewportSchema = z
+  .object({
+    width: z.number().positive(),
+    height: z.number().positive(),
+  })
+  .strict();
+
+const diagramPointSchema = z.tuple([z.number(), z.number()]);
+
+const diagramAreaElementSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("area"),
+    x: z.number(),
+    y: z.number(),
+    width: z.number().positive(),
+    height: z.number().positive(),
+    label: z.string().optional(),
+  })
+  .strict();
+
+const diagramLineElementSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("line"),
+    points: z.array(diagramPointSchema).min(2),
+  })
+  .strict();
+
+const diagramMarkerElementSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("marker"),
+    x: z.number(),
+    y: z.number(),
+    label: z.string(),
+  })
+  .strict();
+
+const diagramLabelElementSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("label"),
+    x: z.number(),
+    y: z.number(),
+    text: z.string(),
+  })
+  .strict();
+
+export const diagramElementSchema = z.discriminatedUnion("type", [
+  diagramAreaElementSchema,
+  diagramLineElementSchema,
+  diagramMarkerElementSchema,
+  diagramLabelElementSchema,
+]);
+
+export const diagramLegendEntrySchema = z
+  .object({
+    id: z.string(),
+    label: z.string(),
+  })
+  .strict();
+
+export const diagramEvidenceSourceSchema = z
+  .object({
+    subtype: diagramSubtypeSchema,
+    viewport: diagramViewportSchema,
+    elements: z.array(diagramElementSchema).min(1),
+    legend: z.array(diagramLegendEntrySchema).optional(),
+  })
+  .strict();
+
+const webpageSubtypeSchema = z.enum([
+  "webpage",
+  "portal_screen",
+  "directory_listing",
+  "classified_ad",
+  "company_site",
+  "harbor_schedule_site",
+]);
+
+const webpagePageSchema = z
+  .object({
+    title: z.string(),
+    urlLabel: z.string().optional(),
+    sourceLabel: z.string().optional(),
+  })
+  .strict();
+
+const webpageCardItemSchema = z
+  .object({
+    title: z.string(),
+    meta: z.string().optional(),
+    body: z.string(),
+  })
+  .strict();
+
+const webpageHeroBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("hero"),
+    heading: z.string(),
+    body: z.string(),
+  })
+  .strict();
+
+const webpageNoticeBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("notice"),
+    heading: z.string().optional(),
+    body: z.string(),
+  })
+  .strict();
+
+const webpageListBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("list"),
+    heading: z.string().optional(),
+    items: z.array(z.string()).min(1),
+  })
+  .strict();
+
+const webpageTableBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("table"),
+    columns: z.array(z.string()).min(1),
+    rows: z.array(z.array(z.string())).min(1),
+  })
+  .superRefine((block, ctx) => {
+    for (const [rowIndex, row] of block.rows.entries()) {
+      if (row.length !== block.columns.length) {
+        ctx.addIssue({
+          code: "custom",
+          message: `table row ${rowIndex} must match the declared column count`,
+          path: ["rows", rowIndex],
+        });
+      }
+    }
+  })
+  .strict();
+
+const webpagePostsBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("posts"),
+    items: z.array(webpageCardItemSchema).min(1),
+  })
+  .strict();
+
+const webpageDirectoryBlockSchema = z
+  .object({
+    id: z.string(),
+    type: z.literal("directory"),
+    items: z.array(webpageCardItemSchema).min(1),
+  })
+  .strict();
+
+export const webpageBlockSchema = z.discriminatedUnion("type", [
+  webpageHeroBlockSchema,
+  webpageNoticeBlockSchema,
+  webpageListBlockSchema,
+  webpageTableBlockSchema,
+  webpagePostsBlockSchema,
+  webpageDirectoryBlockSchema,
+]);
+
+export const webpageEvidenceSourceSchema = z
+  .object({
+    subtype: webpageSubtypeSchema,
+    page: webpagePageSchema,
+    blocks: z.array(webpageBlockSchema).min(1),
   })
   .strict();
 
@@ -136,11 +350,42 @@ export const photoEvidenceSchema = normalizedEvidenceBaseSchema
   })
   .strict();
 
+export const audioEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("audio"),
+    audio: z.string().min(1),
+    transcript: z.string().min(1),
+    sourceLabel: z.string().min(1),
+    date: z.string().optional(),
+    durationSeconds: z.number().int().positive().optional(),
+  })
+  .strict();
+
+export const diagramEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("diagram"),
+    viewport: diagramViewportSchema,
+    elements: z.array(diagramElementSchema).min(1),
+    legend: z.array(diagramLegendEntrySchema).optional(),
+  })
+  .strict();
+
+export const webpageEvidenceSchema = normalizedEvidenceBaseSchema
+  .extend({
+    family: z.literal("webpage"),
+    page: webpagePageSchema,
+    blocks: z.array(webpageBlockSchema).min(1),
+  })
+  .strict();
+
 export const caseEvidenceSchema = z.discriminatedUnion("family", [
   documentEvidenceSchema,
   recordEvidenceSchema,
   threadEvidenceSchema,
   photoEvidenceSchema,
+  audioEvidenceSchema,
+  diagramEvidenceSchema,
+  webpageEvidenceSchema,
 ]);
 
 export type EvidenceIndexEntry = z.infer<typeof evidenceIndexEntrySchema>;
@@ -148,8 +393,17 @@ export type DocumentEvidenceSource = z.infer<typeof documentEvidenceSourceSchema
 export type RecordEvidenceSource = z.infer<typeof recordEvidenceSourceSchema>;
 export type ThreadEvidenceSource = z.infer<typeof threadEvidenceSourceSchema>;
 export type PhotoEvidenceSource = z.infer<typeof photoEvidenceSourceSchema>;
+export type AudioEvidenceSource = z.infer<typeof audioEvidenceSourceSchema>;
+export type DiagramElement = z.infer<typeof diagramElementSchema>;
+export type DiagramLegendEntry = z.infer<typeof diagramLegendEntrySchema>;
+export type DiagramEvidenceSource = z.infer<typeof diagramEvidenceSourceSchema>;
+export type WebpageBlock = z.infer<typeof webpageBlockSchema>;
+export type WebpageEvidenceSource = z.infer<typeof webpageEvidenceSourceSchema>;
 export type DocumentEvidence = z.infer<typeof documentEvidenceSchema>;
 export type RecordEvidence = z.infer<typeof recordEvidenceSchema>;
 export type ThreadEvidence = z.infer<typeof threadEvidenceSchema>;
 export type PhotoEvidence = z.infer<typeof photoEvidenceSchema>;
+export type AudioEvidence = z.infer<typeof audioEvidenceSchema>;
+export type DiagramEvidence = z.infer<typeof diagramEvidenceSchema>;
+export type WebpageEvidence = z.infer<typeof webpageEvidenceSchema>;
 export type CaseEvidence = z.infer<typeof caseEvidenceSchema>;

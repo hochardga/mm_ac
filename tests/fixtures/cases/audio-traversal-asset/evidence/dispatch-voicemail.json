@@ -1,0 +1,6 @@
+{
+  "subtype": "voicemail",
+  "audio": "../escape-record.json",
+  "transcript": "Check pier locker seven.",
+  "sourceLabel": "Harbor dispatch archive"
+}

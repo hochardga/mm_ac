@@ -1,0 +1,28 @@
+{
+  "subtype": "handler_message",
+  "thread": {
+    "subject": "Showcase archive routing",
+    "channel": "Operations relay",
+    "participants": ["Handler Rowan", "Archivist Mira Sol"]
+  },
+  "messages": [
+    {
+      "id": "thread-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-20T05:15:00Z",
+      "body": "I want the trainee to see the text-first evidence before the annex unlocks."
+    },
+    {
+      "id": "thread-2",
+      "sender": "Archivist Mira Sol",
+      "timestamp": "2026-03-20T05:16:00Z",
+      "body": "Understood. The portrait card and scene board are already in place beside the access log."
+    },
+    {
+      "id": "thread-3",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-20T05:17:00Z",
+      "body": "Good. The voicemail, floorplan, and directory snapshot can wait in the annex until stage two."
+    }
+  ]
+}

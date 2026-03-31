@@ -1,5 +1,7 @@
 import { readFile } from "node:fs/promises";
 
+import { resolveAudioAsset } from "@/features/cases/evidence/audio-asset";
+import { isAudioAssetPath } from "@/features/cases/evidence/case-asset";
 import { resolvePhotoAsset } from "@/features/cases/evidence/photo-asset";
 
 type CaseAssetRouteContext = {
@@ -16,10 +18,10 @@ export async function GET(
   try {
     const { caseSlug, assetPath } = await context.params;
     const relativeAssetPath = assetPath.join("/");
-    const { contentType, filePath } = await resolvePhotoAsset(
-      caseSlug,
-      relativeAssetPath,
-    );
+    const resolver = isAudioAssetPath(relativeAssetPath)
+      ? resolveAudioAsset
+      : resolvePhotoAsset;
+    const { contentType, filePath } = await resolver(caseSlug, relativeAssetPath);
     const body = await readFile(filePath);
 
     return new Response(body, {
