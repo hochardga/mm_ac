@@ -1,0 +1,47 @@
+{
+  "subtype": "company_site",
+  "page": {
+    "title": "The Nocturne Orchid Preview",
+    "urlLabel": "halcyonglass.preview/nocturne",
+    "sourceLabel": "Cached donor microsite"
+  },
+  "blocks": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "heading": "A Restored Wonder Returns to Bloom",
+      "body": "The Nocturne Orchid arrives with a once-lost provenance, restored for a single-night donor preview."
+    },
+    {
+      "id": "notice",
+      "type": "notice",
+      "heading": "Preview Note",
+      "body": "Please review the updated provenance binder at the display pedestal before entering the Moonbridge sequence."
+    },
+    {
+      "id": "list",
+      "type": "list",
+      "items": [
+        "Revised provenance packet approved by donor relations.",
+        "Sponsor recognition to follow the blackout rehearsal.",
+        "Collection story condensed for donor-facing presentation."
+      ]
+    },
+    {
+      "id": "directory",
+      "type": "directory",
+      "items": [
+        {
+          "title": "Restoration Story",
+          "meta": "Public narrative",
+          "body": "Frames the orchid as a recovered and stabilized icon piece."
+        },
+        {
+          "title": "Sponsor Credits",
+          "meta": "Curated by donor relations",
+          "body": "Presentation copy and donor packet managed through Daria Pell\u2019s office."
+        }
+      ]
+    }
+  ]
+}

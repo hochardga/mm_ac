@@ -1,0 +1,8 @@
+{
+  "subtype": "radio_call",
+  "audio": "evidence/grounds-radio-call.wav",
+  "transcript": "Grounds to ops: getting fresh condensation in the mist tunnel and cart C-4 is not in its bay. Copy? Copy. Ops: Hold that tunnel and log the time.",
+  "sourceLabel": "Grounds radio archive",
+  "date": "2026-03-18T21:12:00Z",
+  "durationSeconds": 23
+}

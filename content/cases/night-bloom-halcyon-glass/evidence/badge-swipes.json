@@ -1,0 +1,75 @@
+{
+  "subtype": "badge_swipes",
+  "columns": [
+    {
+      "id": "timestamp",
+      "label": "Timestamp",
+      "sortable": true
+    },
+    {
+      "id": "door",
+      "label": "Door",
+      "filterable": true
+    },
+    {
+      "id": "holder",
+      "label": "Holder",
+      "filterable": true
+    },
+    {
+      "id": "result",
+      "label": "Result"
+    }
+  ],
+  "rows": [
+    {
+      "id": "swipe-1",
+      "timestamp": "2026-03-18T21:04:00Z",
+      "door": "Donor Suite",
+      "holder": "Daria Pell",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-2",
+      "timestamp": "2026-03-18T21:08:00Z",
+      "door": "Propagation Lab",
+      "holder": "Tomas Reed",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-3",
+      "timestamp": "2026-03-18T21:11:00Z",
+      "door": "Propagation Lab",
+      "holder": "Daria Pell",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-4",
+      "timestamp": "2026-03-18T21:13:00Z",
+      "door": "Service Lift Landing",
+      "holder": "Daria Pell",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-5",
+      "timestamp": "2026-03-18T21:15:00Z",
+      "door": "Donor Suite",
+      "holder": "Daria Pell",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-6",
+      "timestamp": "2026-03-18T21:16:00Z",
+      "door": "Exterior Irrigation Gate",
+      "holder": "Tomas Reed",
+      "result": "Granted"
+    },
+    {
+      "id": "swipe-7",
+      "timestamp": "2026-03-18T21:17:00Z",
+      "door": "Security Edit Console",
+      "holder": "Mara Ives",
+      "result": "Granted"
+    }
+  ]
+}

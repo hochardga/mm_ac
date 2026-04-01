@@ -94,10 +94,10 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   expect(screen.getByText("Evidence Variety Showcase")).toBeInTheDocument();
   expect(screen.getByText("Cinder Procession")).toBeInTheDocument();
   expect(screen.getByText("In Progress")).toBeInTheDocument();
-  expect(screen.getAllByText("New")).toHaveLength(5);
+  expect(screen.getAllByText("New")).toHaveLength(6);
   expect(screen.getByText("Light")).toBeInTheDocument();
   expect(screen.getAllByText("Standard")).toHaveLength(4);
-  expect(screen.getByText("Deep")).toBeInTheDocument();
+  expect(screen.getAllByText("Deep")).toHaveLength(2);
   expect(screen.queryByText(/90 min/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/80 min/i)).not.toBeInTheDocument();
 });

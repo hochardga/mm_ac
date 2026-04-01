@@ -1,0 +1,44 @@
+{
+  "subtype": "message_log",
+  "thread": {
+    "subject": "Preview audio revisions",
+    "channel": "Halcyon stage staff chat",
+    "participants": [
+      "Soren Vale",
+      "Jules Arden",
+      "Stage Ops"
+    ]
+  },
+  "messages": [
+    {
+      "id": "chat-1",
+      "sender": "Soren Vale",
+      "timestamp": "2026-03-17T17:22:00Z",
+      "body": "The donor walkthrough will be cleaner without the full soundscape in the Moonbridge section."
+    },
+    {
+      "id": "chat-2",
+      "sender": "Jules Arden",
+      "timestamp": "2026-03-17T17:24:00Z",
+      "body": "That is the centerpiece audio pass. You are cutting it on less than a day\u2019s notice?"
+    },
+    {
+      "id": "chat-3",
+      "sender": "Stage Ops",
+      "timestamp": "2026-03-17T17:24:36Z",
+      "body": "Need final decision by morning for cue sheets."
+    },
+    {
+      "id": "chat-4",
+      "sender": "Soren Vale",
+      "timestamp": "2026-03-17T17:25:21Z",
+      "body": "Final decision stands. We can discuss privately if needed."
+    },
+    {
+      "id": "chat-5",
+      "sender": "Jules Arden",
+      "timestamp": "2026-03-17T17:26:02Z",
+      "body": "We already did. I am not repeating that conversation for the rest of the team."
+    }
+  ]
+}

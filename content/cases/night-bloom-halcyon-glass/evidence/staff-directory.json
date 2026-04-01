@@ -1,0 +1,42 @@
+{
+  "subtype": "directory_listing",
+  "page": {
+    "title": "Halcyon Glass Staff Directory",
+    "urlLabel": "halcyon.local/staff",
+    "sourceLabel": "Cached staff intranet"
+  },
+  "blocks": [
+    {
+      "id": "hero",
+      "type": "hero",
+      "heading": "Tonight\u2019s Department Leads",
+      "body": "Key staff supporting the donor preview and blackout rehearsal."
+    },
+    {
+      "id": "directory",
+      "type": "directory",
+      "items": [
+        {
+          "title": "Daria Pell",
+          "meta": "Director of Donor Relations",
+          "body": "Controls sponsor communications, donor packets, and preview-floor presentation materials."
+        },
+        {
+          "title": "Mara Ives",
+          "meta": "Head of Security",
+          "body": "Supervises cameras, guest flow, and restricted-access compliance."
+        },
+        {
+          "title": "Jules Arden",
+          "meta": "Sound Designer",
+          "body": "Oversees ambient installation and timed audio cues."
+        },
+        {
+          "title": "Tomas Reed",
+          "meta": "Night Horticulturist",
+          "body": "Assigned to propagation support and exterior irrigation checks."
+        }
+      ]
+    }
+  ]
+}

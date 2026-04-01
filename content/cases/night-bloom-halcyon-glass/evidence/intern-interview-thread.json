@@ -1,0 +1,43 @@
+{
+  "subtype": "interview_thread",
+  "thread": {
+    "subject": "Interview: Bea Mercer",
+    "channel": "Ashfall interview room transcript",
+    "participants": [
+      "Handler Rowan",
+      "Bea Mercer"
+    ]
+  },
+  "messages": [
+    {
+      "id": "bea-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-19T09:02:00Z",
+      "body": "Walk me through the orchid display from afternoon prep to the blackout."
+    },
+    {
+      "id": "bea-2",
+      "sender": "Bea Mercer",
+      "timestamp": "2026-03-19T09:02:31Z",
+      "body": "In the afternoon the old accession card was clipped behind the binder ring. At night the packet looked cleaner, like someone had rebuilt it."
+    },
+    {
+      "id": "bea-3",
+      "sender": "Handler Rowan",
+      "timestamp": "2026-03-19T09:03:14Z",
+      "body": "Who would have had reason to touch donor-facing provenance materials that late?"
+    },
+    {
+      "id": "bea-4",
+      "sender": "Bea Mercer",
+      "timestamp": "2026-03-19T09:03:42Z",
+      "body": "Daria. She kept saying the story had to stay polished for the sponsors."
+    },
+    {
+      "id": "bea-5",
+      "sender": "Bea Mercer",
+      "timestamp": "2026-03-19T09:04:10Z",
+      "body": "I thought I had mixed something up, so I did not say anything right away."
+    }
+  ]
+}

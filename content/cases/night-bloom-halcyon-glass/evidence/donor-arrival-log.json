@@ -1,0 +1,61 @@
+{
+  "subtype": "timeline",
+  "columns": [
+    {
+      "id": "time",
+      "label": "Time",
+      "sortable": true
+    },
+    {
+      "id": "location",
+      "label": "Location",
+      "filterable": true
+    },
+    {
+      "id": "subject",
+      "label": "Subject",
+      "filterable": true
+    },
+    {
+      "id": "note",
+      "label": "Note"
+    }
+  ],
+  "rows": [
+    {
+      "id": "arrival-1",
+      "time": "21:00",
+      "location": "North Vestibule",
+      "subject": "Major donors",
+      "note": "Daria greeting arrivals at main entrance."
+    },
+    {
+      "id": "arrival-2",
+      "time": "21:07",
+      "location": "Sponsor Wall",
+      "subject": "Daria Pell",
+      "note": "Seen introducing board guests to orchid restoration story."
+    },
+    {
+      "id": "arrival-3",
+      "time": "21:10",
+      "location": "Unaccounted",
+      "subject": "Daria Pell",
+      "note": "No donor-facing obligation logged for next several minutes."
+    },
+    {
+      "id": "arrival-4",
+      "time": "21:15",
+      "location": "Donor Suite",
+      "subject": "Daria Pell",
+      "note": "Reappears to manage drinks and preview packet handoff."
+    },
+    {
+      "id": "arrival-5",
+      "time": "21:18",
+      "location": "Moonbridge Atrium",
+      "subject": "Event staff",
+      "note": "Distress call and containment."
+    }
+  ]
+}
