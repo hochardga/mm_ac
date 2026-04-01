@@ -4,6 +4,8 @@ This guide explains how to add a new staged case package to Ashfall Collective.
 
 It is written for new work only. If you are adding a case today, use the staged format already present in [`content/cases/red-harbor`](../content/cases/red-harbor), [`content/cases/hollow-bishop`](../content/cases/hollow-bishop), and [`content/cases/briar-ledger`](../content/cases/briar-ledger).
 
+For a family-by-family reference on evidence formats, use [Supported Evidence Types](evidence-types.md). If your opening brief or introduction needs to mention the system, use [Ashfall Guidance: Referencing "the system"](ashfall-system-guidance.md) to keep that language sparse and controlled.
+
 ## What You Are Creating
 
 Each case lives in its own folder under `content/cases/<slug>/` and has three core authored layers plus an optional opening introduction:
@@ -25,7 +27,7 @@ These layers have to stay aligned:
 1. Create a new folder at `content/cases/<slug>/`.
 2. Add `manifest.json` with top-level metadata, evidence entries, and at least one stage.
 3. Add `protected.json` with `maxGradedFailures`, canonical answers, and both debrief outcomes.
-4. Add the files referenced from `manifest.json` under `evidence/`. If the case has an opening introduction, add `introduction/transcript.md` and optional `introduction/audio.mp3`.
+4. Add the files referenced from `manifest.json` under `evidence/`. If the case has an opening introduction, add `introduction/transcript.md` and optional `introduction/audio.mp3`. When the introduction or the opening brief mentions the system, keep the reference brief and controlled.
 5. Run `pnpm validate:cases`.
 6. Run `pnpm build`.
 
@@ -61,6 +63,8 @@ Notes:
 ## Optional Introduction Folder
 
 Use `content/cases/<slug>/introduction/` for a case-opening narration that should feel like part of the case opener instead of evidence.
+
+If the narration leans on Ashfall worldbuilding about the system, keep the language restrained and match the tone guidance in [Ashfall Guidance: Referencing "the system"](ashfall-system-guidance.md).
 
 The folder is separate from the manifest and evidence index:
 
@@ -236,6 +240,8 @@ Watch out for:
 ### Markdown document evidence
 
 Use markdown for letters, briefs, transcripts, notices, and other text-first artifacts.
+
+Opening briefs usually live here. If the brief mentions the system, keep the reference short and defer to [Ashfall Guidance: Referencing "the system"](ashfall-system-guidance.md) for the tone.
 
 Path example: `evidence/opening-brief.md`
 
