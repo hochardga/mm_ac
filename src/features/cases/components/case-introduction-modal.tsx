@@ -10,11 +10,10 @@ import {
   type MouseEvent,
 } from "react";
 import { createPortal } from "react-dom";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 
 import { markIntroductionSeenAction } from "@/app/(app)/cases/[caseSlug]/actions";
 import { buildCaseAssetUrl } from "@/features/cases/case-asset-url";
+import { MarkdownContent } from "@/features/cases/components/markdown-content";
 
 type CaseIntroductionBundle = {
   transcript: string;
@@ -400,29 +399,8 @@ export function CaseIntroductionModal({
           />
         ) : null}
 
-        <div className="prose prose-invert max-w-none rounded-[1.5rem] border border-white/10 bg-black/20 p-6 text-sm leading-7">
-          <ReactMarkdown
-            components={{
-              h1: ({ children }) => (
-                <h3 className="text-xl font-semibold text-stone-50">
-                  {children}
-                </h3>
-              ),
-              h2: ({ children }) => (
-                <h4 className="text-lg font-semibold text-stone-50">
-                  {children}
-                </h4>
-              ),
-              h3: ({ children }) => (
-                <h5 className="text-base font-semibold text-stone-50">
-                  {children}
-                </h5>
-              ),
-            }}
-            remarkPlugins={[remarkGfm]}
-          >
-            {intro.transcript}
-          </ReactMarkdown>
+        <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-6">
+          <MarkdownContent content={intro.transcript} />
         </div>
       </div>
     </div>,

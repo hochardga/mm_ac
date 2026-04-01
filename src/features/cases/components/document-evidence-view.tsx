@@ -1,7 +1,5 @@
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-
 import { EvidencePanelShell } from "@/features/cases/components/evidence-panel-shell";
+import { MarkdownContent } from "@/features/cases/components/markdown-content";
 import type { DocumentEvidence } from "@/features/cases/evidence/schema";
 
 type DocumentEvidenceViewProps = {
@@ -30,25 +28,8 @@ export function DocumentEvidenceView({
       summary={evidence.summary}
       title={evidence.title}
     >
-      <div className="mt-6 space-y-4 rounded-3xl border border-white/10 bg-black/20 p-6">
-        <div className="prose prose-invert max-w-none text-sm leading-7">
-          <ReactMarkdown
-            components={{
-              h1: ({ children }) => (
-                <h3 className="text-xl font-semibold text-stone-50">{children}</h3>
-              ),
-              h2: ({ children }) => (
-                <h4 className="text-lg font-semibold text-stone-50">{children}</h4>
-              ),
-              h3: ({ children }) => (
-                <h5 className="text-base font-semibold text-stone-50">{children}</h5>
-              ),
-            }}
-            remarkPlugins={[remarkGfm]}
-          >
-            {evidence.body}
-          </ReactMarkdown>
-        </div>
+      <div className="mt-6 rounded-3xl border border-white/10 bg-black/20 p-6">
+        <MarkdownContent content={evidence.body} />
       </div>
     </EvidencePanelShell>
   );

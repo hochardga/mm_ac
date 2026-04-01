@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 const { routerReplaceMock } = vi.hoisted(() => ({
@@ -100,7 +106,10 @@ test("renders transcript-only introductions without audio controls", async () =>
     <CaseIntroductionModal
       caseName="Signal at Red Harbor"
       caseSlug="red-harbor"
-      intro={{ transcript: "# Introduction\n\nThe signal failed." }}
+      intro={{
+        transcript:
+          "# Introduction\n\n- First clue\n- **Second clue**\n\nThe signal failed.",
+      }}
       open
       playerCaseId="player-case-2"
     />,
@@ -112,6 +121,11 @@ test("renders transcript-only introductions without audio controls", async () =>
 
   expect(
     screen.getByRole("heading", { level: 2, name: /introduction/i }),
+  ).toBeInTheDocument();
+  const list = screen.getByRole("list");
+  expect(within(list).getAllByRole("listitem")).toHaveLength(2);
+  expect(
+    screen.getByText("Second clue", { selector: "strong" }),
   ).toBeInTheDocument();
   expect(
     screen.getByText(/the signal failed/i),
