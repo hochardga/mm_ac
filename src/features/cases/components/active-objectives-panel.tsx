@@ -67,7 +67,10 @@ export function ActiveObjectivesPanel({
   const latestSubmissionByObjective =
     buildLatestSubmissionByObjective(objectiveSubmissions);
   const completedSection = solvedObjectives.length > 0 ? (
-    <section className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+    <section
+      className="rounded-[2rem] border border-white/10 bg-white/5 p-6"
+      id="completed-objectives"
+    >
       <h2 className="text-2xl font-semibold">Completed Objectives</h2>
       <div className="mt-6 space-y-4">
         {solvedObjectives.map((objective) => {
@@ -75,8 +78,9 @@ export function ActiveObjectivesPanel({
 
           return (
             <article
+              id={`completed-objective-${objective.id}`}
               key={objective.id}
-              className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5"
+              className="rounded-[1.5rem] border border-white/10 bg-black/20 p-5 scroll-mt-28"
             >
               <p className="text-xs uppercase tracking-[0.2em] text-stone-400">
                 Solved / {objective.stageId}

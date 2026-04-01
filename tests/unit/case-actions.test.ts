@@ -210,3 +210,41 @@ test("rejects objective submissions for a player case owned by another agent", a
   await expect(submitObjectiveAction(formData)).rejects.toThrow(/not authorized/i);
   expect(submitObjectiveMock).not.toHaveBeenCalled();
 });
+
+test("redirects to the solved objective after a successful objective submission", async () => {
+  const userId = randomUUID();
+  const playerCaseId = await seedPlayerCase(userId);
+  setAuthenticatedSession(userId);
+  submitObjectiveMock.mockResolvedValue({
+    id: "objective-submission-1",
+    attemptNumber: 1,
+    isCorrect: true,
+    nextStatus: "in_progress",
+    feedback: "Objective solved.",
+  });
+
+  const formData = new FormData();
+  formData.set("caseSlug", "red-harbor");
+  formData.set("playerCaseId", playerCaseId);
+  formData.set("objectiveId", "pick-suspect");
+  formData.set("objectiveType", "single_choice");
+  formData.set("submissionToken", "submission-token");
+  formData.set("choiceId", "bookkeeper");
+
+  await expect(submitObjectiveAction(formData)).rejects.toThrow(
+    "NEXT_REDIRECT:/cases/red-harbor?focus=completed-objective-pick-suspect#completed-objective-pick-suspect",
+  );
+
+  expect(submitObjectiveMock).toHaveBeenCalledWith({
+    playerCaseId,
+    objectiveId: "pick-suspect",
+    submissionToken: "submission-token",
+    payload: {
+      type: "single_choice",
+      choiceId: "bookkeeper",
+    },
+  });
+  expect(redirectMock).toHaveBeenCalledWith(
+    "/cases/red-harbor?focus=completed-objective-pick-suspect#completed-objective-pick-suspect",
+  );
+});

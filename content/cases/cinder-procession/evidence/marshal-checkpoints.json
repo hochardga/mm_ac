@@ -1,0 +1,39 @@
+{
+  "subtype": "checkpoint_log",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "post", "label": "Post", "filterable": true },
+    { "id": "marshal", "label": "Marshal" },
+    { "id": "note", "label": "Note" }
+  ],
+  "rows": [
+    {
+      "id": "cp-1",
+      "timestamp": "2018-10-12T18:20:00Z",
+      "post": "Post 1",
+      "marshal": "Elin Voss",
+      "note": "Review table active. Rohe checking final route copies."
+    },
+    {
+      "id": "cp-2",
+      "timestamp": "2018-10-12T18:28:00Z",
+      "post": "Post 3",
+      "marshal": "Mara Venn",
+      "note": "Service lane clear. Gate C4 remains latched."
+    },
+    {
+      "id": "cp-3",
+      "timestamp": "2018-10-12T18:41:00Z",
+      "post": "Post 5",
+      "marshal": "Jon Far",
+      "note": "North Arch clear. Carpenter still adjusting lantern frame."
+    },
+    {
+      "id": "cp-4",
+      "timestamp": "2018-10-12T18:46:00Z",
+      "post": "Post 1",
+      "marshal": "Elin Voss",
+      "note": "Rohe left the review table with a blue folder and did not return."
+    }
+  ]
+}

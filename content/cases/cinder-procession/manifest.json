@@ -1,0 +1,209 @@
+{
+  "slug": "cinder-procession",
+  "revision": "rev-1",
+  "title": "Cinder Procession",
+  "summary": "On the night of Glassmere's Emberwake parade, route director Alina Rohe is found dead beneath a ceremonial arch in what the city calls a tragic setup accident. A missing blue folder, an unsigned note, and a sealed service gate suggest the body was staged and the parade was used as cover.",
+  "complexity": "standard",
+  "evidence": [
+    {
+      "id": "opening-brief",
+      "title": "Opening Brief",
+      "family": "document",
+      "subtype": "case_brief",
+      "summary": "Ashfall's intake summary of the death at the Emberwake procession.",
+      "source": "evidence/opening-brief.md"
+    },
+    {
+      "id": "incident-report",
+      "title": "Festival Incident Report",
+      "family": "document",
+      "subtype": "incident_report",
+      "summary": "The official account of how Alina Rohe was found beneath the North Arch.",
+      "source": "evidence/incident-report.md"
+    },
+    {
+      "id": "route-map",
+      "title": "Emberwake Route Map",
+      "family": "diagram",
+      "subtype": "map",
+      "summary": "A simplified procession map showing the review table, North Arch, and older service access points.",
+      "source": "evidence/route-map.json"
+    },
+    {
+      "id": "pocket-note",
+      "title": "Pocket Note",
+      "family": "document",
+      "subtype": "found_note",
+      "summary": "A note recovered from the victim that points to a specific meeting place before the first bell.",
+      "source": "evidence/pocket-note.md"
+    },
+    {
+      "id": "marshal-checkpoints",
+      "title": "Marshal Checkpoints",
+      "family": "record",
+      "subtype": "checkpoint_log",
+      "summary": "Checkpoint entries for route marshals working the parade perimeter.",
+      "source": "evidence/marshal-checkpoints.json"
+    },
+    {
+      "id": "maintenance-key-log",
+      "title": "Maintenance Key Log",
+      "family": "record",
+      "subtype": "key_log",
+      "summary": "The checkout log for service keys used during festival setup.",
+      "source": "evidence/maintenance-key-log.json"
+    },
+    {
+      "id": "reroute-orders",
+      "title": "Reroute Orders",
+      "family": "record",
+      "subtype": "reroute_log",
+      "summary": "Last-minute staffing changes issued minutes before first bell.",
+      "source": "evidence/reroute-orders.json"
+    },
+    {
+      "id": "treasurer-reinterview",
+      "title": "Treasurer Re-Interview",
+      "family": "thread",
+      "subtype": "interview_transcript",
+      "summary": "A second interview with the festival treasurer about the victim's missing blue folder.",
+      "source": "evidence/treasurer-reinterview.json"
+    },
+    {
+      "id": "reimbursement-ledger",
+      "title": "Reimbursement Ledger",
+      "family": "record",
+      "subtype": "expense_ledger",
+      "summary": "Festival reimbursement entries showing repeated payments to the same storage vendor.",
+      "source": "evidence/reimbursement-ledger.json"
+    },
+    {
+      "id": "cart-search-report",
+      "title": "Supply Cart Search Report",
+      "family": "document",
+      "subtype": "search_report",
+      "summary": "A field report describing what was recovered from a route cart assigned to the deputy director.",
+      "source": "evidence/cart-search-report.md"
+    }
+  ],
+  "stages": [
+    {
+      "id": "opening-pass",
+      "startsUnlocked": true,
+      "title": "Before First Bell",
+      "summary": "Figure out where the victim intended to go before the parade began.",
+      "handlerPrompts": [
+        "Start with the unsigned note and translate it into a precise place.",
+        "The route diagram is there to turn vague language into a usable code."
+      ],
+      "evidenceIds": [
+        "opening-brief",
+        "incident-report",
+        "route-map",
+        "pocket-note",
+        "marshal-checkpoints"
+      ],
+      "objectives": [
+        {
+          "id": "locate-meeting-gate",
+          "prompt": "Which gate code matches the meeting point in the victim's note?",
+          "type": "code_entry",
+          "stakes": "graded",
+          "successUnlocks": {
+            "stageIds": ["access-window"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "access-window",
+      "startsUnlocked": false,
+      "title": "Private Window",
+      "summary": "Identify the two findings that prove somebody created a private access window at the gate.",
+      "handlerPrompts": [
+        "Now that you have the gate, ask who could clear the area and still open it.",
+        "Compare key custody with staff movement. Opportunity is being built in plain sight."
+      ],
+      "evidenceIds": [
+        "maintenance-key-log",
+        "reroute-orders"
+      ],
+      "objectives": [
+        {
+          "id": "prove-private-window",
+          "prompt": "Which two findings prove someone deliberately created a private meeting window at Gate C4?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "bram-key-checkout",
+              "label": "Bram Sayer checked out the service master key before first bell."
+            },
+            {
+              "id": "arch-pin-failure",
+              "label": "The incident report says the North Arch pin failed after the body was found."
+            },
+            {
+              "id": "post-three-reroute",
+              "label": "Post Three was reassigned away from Gate C4 minutes before the meeting."
+            },
+            {
+              "id": "unsigned-note",
+              "label": "The pocket note says the victim should bring the blue folder herself."
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": ["final-accusation"],
+            "resolvesCase": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-accusation",
+      "startsUnlocked": false,
+      "title": "The Blue Folder",
+      "summary": "Use the new financial and search evidence to decide who killed Alina Rohe.",
+      "handlerPrompts": [
+        "Do not stop at access. Find the reason the victim brought that folder in person.",
+        "One suspect had motive, opportunity, and a recovered trace of the missing folder."
+      ],
+      "evidenceIds": [
+        "treasurer-reinterview",
+        "reimbursement-ledger",
+        "cart-search-report"
+      ],
+      "objectives": [
+        {
+          "id": "identify-killer",
+          "prompt": "Who killed Alina Rohe and staged the North Arch accident?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "bram-sayer",
+              "label": "Bram Sayer, Deputy Route Director"
+            },
+            {
+              "id": "ivo-pell",
+              "label": "Ivo Pell, Float Carpenter"
+            },
+            {
+              "id": "mara-venn",
+              "label": "Mara Venn, Route Marshal"
+            },
+            {
+              "id": "sera-holt",
+              "label": "Sera Holt, Festival Treasurer"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        }
+      ]
+    }
+  ]
+}

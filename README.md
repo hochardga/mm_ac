@@ -13,7 +13,7 @@ pnpm install
 2. Create a local env file from `.env.example`.
 3. Set `NEXTAUTH_SECRET` to any non-empty local secret.
    No local Postgres server is required; local development defaults to embedded `PGlite` with `DATABASE_DRIVER=pglite`.
-4. Seed the three authored case definitions into the embedded local database:
+4. Seed the authored case definitions into the embedded local database:
 
 ```bash
 pnpm db:seed

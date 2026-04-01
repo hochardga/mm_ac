@@ -1,0 +1,31 @@
+{
+  "slug": "cinder-procession",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 3
+  },
+  "canonicalAnswers": {
+    "locate-meeting-gate": {
+      "type": "code_entry",
+      "value": "C4"
+    },
+    "prove-private-window": {
+      "type": "multi_choice",
+      "choiceIds": ["bram-key-checkout", "post-three-reroute"]
+    },
+    "identify-killer": {
+      "type": "single_choice",
+      "choiceId": "bram-sayer"
+    }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: Cinder Procession",
+      "summary": "Alina Rohe discovered that Deputy Route Director Bram Sayer had been padding festival reimbursements through a sham storage vendor and assembled the proof in a blue folder. Bram arranged a private meeting at Gate C4, checked out the only master key, reassigned the nearest marshal, killed Alina during the confrontation, and moved her body beneath the North Arch to disguise the murder as a setup accident. The broken folder clasp recovered from Bram's route cart tied him to the missing evidence he was trying to bury before first bell."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: Cinder Procession",
+      "summary": "Ashfall determined that Alina Rohe's death was not a simple festival accident. The strongest unreconciled facts point to a private meeting at Gate C4, controlled access to that area, and a missing blue folder connected to reimbursement fraud inside festival operations. Without a correct accusation, the city would likely reopen the death as a homicide but leave the final blame contested."
+    }
+  }
+}

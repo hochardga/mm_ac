@@ -1,0 +1,28 @@
+{
+  "subtype": "reroute_log",
+  "columns": [
+    { "id": "issued_at", "label": "Issued At", "sortable": true },
+    { "id": "issued_by", "label": "Issued By", "filterable": true },
+    { "id": "affected_post", "label": "Affected Post", "filterable": true },
+    { "id": "new_assignment", "label": "New Assignment" },
+    { "id": "reason", "label": "Reason" }
+  ],
+  "rows": [
+    {
+      "id": "rr-1",
+      "issued_at": "2018-10-12T18:34:00Z",
+      "issued_by": "Bram Sayer",
+      "affected_post": "Post 3",
+      "new_assignment": "Donor Entry spillover lane",
+      "reason": "Banner crowding near sponsor queue."
+    },
+    {
+      "id": "rr-2",
+      "issued_at": "2018-10-12T18:36:00Z",
+      "issued_by": "Bram Sayer",
+      "affected_post": "Post 2",
+      "new_assignment": "North Arch rope line",
+      "reason": "Advance lantern cart expected early."
+    }
+  ]
+}

@@ -35,6 +35,9 @@ test("agent can review evidence, unlock the next objective, and save a staged dr
 
   await page.getByLabel("Response").selectOption("false");
   await page.getByRole("button", { name: /submit objective/i }).click();
+  await expect(page.getByRole("heading", { name: /completed objectives/i })).toBeVisible();
+  await expect(page.getByText(/correct \/ attempt 1/i)).toBeVisible();
+  await expect(page.getByText(/objective solved\./i)).toBeVisible();
   await expect(page.getByText(/stage 2 of 2/i)).toBeVisible();
   await expect(page.getByText(/poison proof/i)).toBeVisible();
   await expect(
