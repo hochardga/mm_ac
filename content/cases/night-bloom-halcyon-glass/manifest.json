@@ -638,7 +638,7 @@
         },
         {
           "id": "identify-motive",
-          "prompt": "Why did Daria kill him?",
+          "prompt": "Why did the suspect do it?",
           "type": "single_choice",
           "stakes": "graded",
           "options": [
@@ -701,7 +701,7 @@
         },
         {
           "id": "identify-physical-link",
-          "prompt": "Which object physically ties Daria to the real scene?",
+          "prompt": "Which object physically ties the suspect to the real scene?",
           "type": "single_choice",
           "stakes": "graded",
           "options": [

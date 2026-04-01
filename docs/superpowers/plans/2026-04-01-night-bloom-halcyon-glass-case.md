@@ -10,7 +10,7 @@
 
 ---
 
-### Chunk 1: Assemble the case package
+## Chunk 1: Assemble the case package
 
 **Files:**
 - Create: `content/cases/night-bloom-halcyon-glass/manifest.json`
@@ -31,7 +31,7 @@ Copy every real evidence artifact from `_tmp/night-bloom-halcyon-glass/evidence/
 
 Copy `author-hints.md` from the package-export folder into the new case folder so the author can keep working from the staged bundle.
 
-### Chunk 2: Validate and prepare for review
+## Chunk 2: Validate and prepare for review
 
 **Files:**
 - Test: repo validation output
