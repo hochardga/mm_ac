@@ -37,6 +37,32 @@ async function requireOwnedPlayerCase(playerCaseId: string) {
   return playerCase;
 }
 
+function buildCaseHref(
+  caseSlug: string,
+  options?: {
+    selectedEvidenceId?: string;
+    focusId?: string;
+    hash?: string;
+  },
+) {
+  const queryParts: string[] = [];
+
+  if (options?.selectedEvidenceId) {
+    queryParts.push(
+      `evidence=${encodeURIComponent(options.selectedEvidenceId)}`,
+    );
+  }
+
+  if (options?.focusId) {
+    queryParts.push(`focus=${encodeURIComponent(options.focusId)}`);
+  }
+
+  const query = queryParts.length > 0 ? `?${queryParts.join("&")}` : "";
+  const hash = options?.hash ? `#${options.hash}` : "";
+
+  return `/cases/${caseSlug}${query}${hash}`;
+}
+
 export async function markIntroductionSeenAction(formData: FormData) {
   const playerCaseId = String(formData.get("playerCaseId") ?? "");
 
@@ -102,13 +128,7 @@ export async function saveReportDraftAction(formData: FormData) {
   });
 
   if (caseSlug) {
-    if (selectedEvidenceId) {
-      redirect(
-        `/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`,
-      );
-    }
-
-    redirect(`/cases/${caseSlug}`);
+    redirect(buildCaseHref(caseSlug, { selectedEvidenceId }));
   }
 }
 
@@ -133,13 +153,7 @@ export async function saveObjectiveDraftAction(formData: FormData) {
   });
 
   if (caseSlug) {
-    if (selectedEvidenceId) {
-      redirect(
-        `/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`,
-      );
-    }
-
-    redirect(`/cases/${caseSlug}`);
+    redirect(buildCaseHref(caseSlug, { selectedEvidenceId }));
   }
 }
 
@@ -212,9 +226,15 @@ export async function submitObjectiveAction(formData: FormData) {
     redirect(`/cases/${caseSlug}/debrief`);
   }
 
-  if (selectedEvidenceId) {
-    redirect(`/cases/${caseSlug}?evidence=${encodeURIComponent(selectedEvidenceId)}`);
+  if (result.isCorrect) {
+    redirect(
+      buildCaseHref(caseSlug, {
+        selectedEvidenceId,
+        focusId: `completed-objective-${objectiveId}`,
+        hash: `completed-objective-${objectiveId}`,
+      }),
+    );
   }
 
-  redirect(`/cases/${caseSlug}`);
+  redirect(buildCaseHref(caseSlug, { selectedEvidenceId }));
 }

@@ -26,6 +26,7 @@ type SubmitObjectiveInput = {
 type SubmitObjectiveResult = {
   id: string;
   attemptNumber: number;
+  isCorrect: boolean;
   nextStatus: "in_progress" | "completed" | "closed_unsolved";
   feedback: string;
 };
@@ -56,6 +57,7 @@ export async function submitObjective(
           return {
             id: existingSubmission.id,
             attemptNumber: existingSubmission.attemptNumber,
+            isCorrect: existingSubmission.isCorrect,
             nextStatus:
               existingSubmission.nextStatus as SubmitObjectiveResult["nextStatus"],
             feedback: existingSubmission.feedback,
@@ -239,6 +241,7 @@ export async function submitObjective(
         return {
           id: savedSubmission.id,
           attemptNumber,
+          isCorrect: evaluation.isCorrect,
           nextStatus: evaluation.caseStatus,
           feedback: evaluation.feedback,
         };
