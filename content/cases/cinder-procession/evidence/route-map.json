@@ -1,0 +1,66 @@
+{
+  "subtype": "map",
+  "viewport": { "width": 1200, "height": 800 },
+  "elements": [
+    {
+      "id": "route-band",
+      "type": "line",
+      "points": [[120, 460], [300, 460], [460, 420], [720, 360], [980, 300]]
+    },
+    {
+      "id": "review-table",
+      "type": "marker",
+      "x": 220,
+      "y": 500,
+      "label": "Route Review Table"
+    },
+    {
+      "id": "north-arch",
+      "type": "marker",
+      "x": 920,
+      "y": 280,
+      "label": "North Arch"
+    },
+    {
+      "id": "old-gate",
+      "type": "marker",
+      "x": 540,
+      "y": 300,
+      "label": "Old Service Gate C4"
+    },
+    {
+      "id": "post-three",
+      "type": "marker",
+      "x": 600,
+      "y": 360,
+      "label": "Marshal Post 3"
+    },
+    {
+      "id": "donor-entry",
+      "type": "marker",
+      "x": 760,
+      "y": 470,
+      "label": "Donor Entry"
+    },
+    {
+      "id": "service-lane",
+      "type": "area",
+      "x": 470,
+      "y": 220,
+      "width": 180,
+      "height": 170,
+      "label": "Service Lane"
+    },
+    {
+      "id": "label-1",
+      "type": "label",
+      "x": 505,
+      "y": 410,
+      "text": "Only older gate on active route"
+    }
+  ],
+  "legend": [
+    { "id": "marker", "label": "Named location" },
+    { "id": "route", "label": "Procession route" }
+  ]
+}

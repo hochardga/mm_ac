@@ -1,0 +1,49 @@
+{
+  "subtype": "expense_ledger",
+  "columns": [
+    { "id": "date", "label": "Date", "sortable": true },
+    { "id": "vendor", "label": "Vendor", "filterable": true },
+    { "id": "description", "label": "Description" },
+    { "id": "approved_by", "label": "Approved By", "filterable": true },
+    { "id": "amount", "label": "Amount" },
+    { "id": "flag", "label": "Flag" }
+  ],
+  "rows": [
+    {
+      "id": "exp-1",
+      "date": "2018-10-04",
+      "vendor": "North Quay Storage",
+      "description": "Emergency lantern crate holding",
+      "approved_by": "Bram Sayer",
+      "amount": "$1,240",
+      "flag": "duplicate of invoice 881-B"
+    },
+    {
+      "id": "exp-2",
+      "date": "2018-10-07",
+      "vendor": "North Quay Storage",
+      "description": "Secondary overnight holding",
+      "approved_by": "Bram Sayer",
+      "amount": "$1,240",
+      "flag": "same amount and reference pattern"
+    },
+    {
+      "id": "exp-3",
+      "date": "2018-10-10",
+      "vendor": "Gleam Rope Works",
+      "description": "North Arch safety cord",
+      "approved_by": "Sera Holt",
+      "amount": "$180",
+      "flag": "none"
+    },
+    {
+      "id": "exp-4",
+      "date": "2018-10-12",
+      "vendor": "North Quay Storage",
+      "description": "Rush route-side holding",
+      "approved_by": "Bram Sayer",
+      "amount": "$620",
+      "flag": "marked by Alina Rohe for review"
+    }
+  ]
+}

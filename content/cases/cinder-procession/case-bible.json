@@ -1,0 +1,362 @@
+{
+  "case_id": "case_2018_10_cinder_procession",
+  "meta": {
+    "title": "Cinder Procession",
+    "setting": { "city": "Glassmere", "year": 2018 },
+    "content_warnings": ["violence_non_graphic"],
+    "difficulty": 2,
+    "estimated_playtime_minutes": 90
+  },
+  "ground_truth": {
+    "victim": "npc_alina_rohe",
+    "killer": "npc_bram_sayer",
+    "motive": "Alina Rohe discovered that Bram Sayer had been padding festival reimbursements through repeated sham storage invoices and was about to confront him with a blue folder of proof.",
+    "means": "Bram lured Alina to Gate C4 for a private confrontation, killed her there off-route, then moved her body beneath the North Arch and let a partial arch failure reinforce the appearance of an accident.",
+    "opportunity": "Bram checked out the service master key and reassigned the only nearby marshal, creating a private five-minute window at the old gate.",
+    "timeline": [
+      { "ts": "2018-10-12T18:31:00Z", "event": "Bram checks out service master key SVC-MASTER-1." },
+      { "ts": "2018-10-12T18:34:00Z", "event": "Bram reroutes Post 3 away from Gate C4." },
+      { "ts": "2018-10-12T18:46:00Z", "event": "Alina leaves the review table carrying the blue folder." },
+      { "ts": "2018-10-12T19:08:00Z", "event": "Alina is reported beneath the North Arch." },
+      { "ts": "2018-10-12T19:23:00Z", "event": "Bram returns the service master key." }
+    ],
+    "red_herrings": [
+      "Ivo Pell worked on the North Arch earlier that evening and appears capable of causing a hardware accident.",
+      "Sera Holt knew about the suspicious reimbursements and could be mistaken for someone with financial motive.",
+      "Mara Venn was assigned closest to Gate C4 before being rerouted, which makes her seem like a witness withholding something."
+    ],
+    "canonical_facts": [
+      "fact_meeting_point_c4",
+      "fact_private_window_created",
+      "fact_bram_key_holder",
+      "fact_blue_folder_proved_fraud",
+      "fact_cart_contains_folder_trace"
+    ]
+  },
+  "characters": [
+    {
+      "npc_id": "npc_alina_rohe",
+      "role": "victim",
+      "bio": "Route director for the Emberwake procession. Organized, respected, and quietly building a finance discrepancy file the week she died.",
+      "relationships": [
+        { "to": "npc_bram_sayer", "type": "coworker" },
+        { "to": "npc_sera_holt", "type": "coworker" }
+      ],
+      "alibis": []
+    },
+    {
+      "npc_id": "npc_bram_sayer",
+      "role": "suspect",
+      "bio": "Deputy route director responsible for staffing changes and service access during final setup.",
+      "relationships": [
+        { "to": "npc_alina_rohe", "type": "coworker" },
+        { "to": "npc_mara_venn", "type": "supervisor" }
+      ],
+      "alibis": [
+        {
+          "claim": "He was solving sponsor-entry congestion during the critical window.",
+          "status": "false",
+          "proof": ["reroute-orders", "maintenance-key-log"]
+        }
+      ]
+    },
+    {
+      "npc_id": "npc_ivo_pell",
+      "role": "suspect",
+      "bio": "Float carpenter who signed off on North Arch hardware and becomes the obvious accident-based suspect.",
+      "relationships": [
+        { "to": "npc_alina_rohe", "type": "contractor" }
+      ],
+      "alibis": [
+        {
+          "claim": "He remained at the North Arch during final adjustments.",
+          "status": "unknown",
+          "proof": ["incident-report", "marshal-checkpoints"]
+        }
+      ]
+    },
+    {
+      "npc_id": "npc_sera_holt",
+      "role": "suspect",
+      "bio": "Festival treasurer who worked with Alina on reimbursement approvals and later confirms what the missing folder contained.",
+      "relationships": [
+        { "to": "npc_alina_rohe", "type": "coworker" },
+        { "to": "npc_bram_sayer", "type": "coworker" }
+      ],
+      "alibis": [
+        {
+          "claim": "She remained at the sponsor desk during final review.",
+          "status": "unknown",
+          "proof": ["treasurer-reinterview"]
+        }
+      ]
+    },
+    {
+      "npc_id": "npc_mara_venn",
+      "role": "suspect",
+      "bio": "Marshal originally stationed at Gate C4 who lost sight of the lane after a last-minute reroute.",
+      "relationships": [
+        { "to": "npc_bram_sayer", "type": "subordinate" }
+      ],
+      "alibis": [
+        {
+          "claim": "She was moved off the service lane before Alina arrived there.",
+          "status": "true",
+          "proof": ["reroute-orders"]
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "objective_id": "locate-meeting-gate",
+      "prompt": "Which gate code matches the meeting point in the victim's note?",
+      "unlock": { "type": "start" },
+      "validation": {
+        "type": "code_entry",
+        "accepted_answers": ["C4"]
+      },
+      "rewards": {
+        "evidence_drop": ["maintenance-key-log", "reroute-orders"],
+        "narration_script": "script_obj1_complete"
+      },
+      "hint_ladder": [
+        { "tier": 1, "hint": "The note gives a nickname, not a code. Translate it using the map." },
+        { "tier": 2, "hint": "Only one location on the map is labeled as an older gate." },
+        { "tier": 3, "hint": "Find the marker labeled 'Old Service Gate.'" },
+        { "tier": "reveal", "reveal": "The meeting point is Gate C4." }
+      ]
+    },
+    {
+      "objective_id": "prove-private-window",
+      "prompt": "Which two findings prove someone deliberately created a private meeting window at Gate C4?",
+      "unlock": { "type": "after_obj_1" },
+      "validation": {
+        "type": "multi_choice",
+        "accepted_answers": ["bram-key-checkout", "post-three-reroute"],
+        "required_evidence_refs": ["maintenance-key-log", "reroute-orders"]
+      },
+      "rewards": {
+        "evidence_drop": ["treasurer-reinterview", "reimbursement-ledger", "cart-search-report"],
+        "narration_script": "script_obj2_complete"
+      },
+      "hint_ladder": [
+        { "tier": 1, "hint": "One clue controls the lock. Another removes the witness." },
+        { "tier": 2, "hint": "Check who held the service master key, then check what happened to Post 3." },
+        { "tier": 3, "hint": "Bram's name appears in both the key log and the staffing change." },
+        { "tier": "reveal", "reveal": "The private window is proved by Bram checking out SVC-MASTER-1 and rerouting Post 3 away from Gate C4." }
+      ]
+    },
+    {
+      "objective_id": "identify-killer",
+      "prompt": "Who killed Alina Rohe and staged the North Arch accident?",
+      "unlock": { "type": "after_obj_2" },
+      "validation": {
+        "type": "single_choice",
+        "accepted_answers": ["npc_bram_sayer"],
+        "required_evidence_refs": ["treasurer-reinterview", "reimbursement-ledger", "cart-search-report"]
+      },
+      "rewards": {
+        "evidence_drop": [],
+        "narration_script": "script_obj3_complete"
+      },
+      "hint_ladder": [
+        { "tier": 1, "hint": "Follow motive now. Who feared the blue folder most?" },
+        { "tier": 2, "hint": "The treasurer names the person Alina intended to confront." },
+        { "tier": 3, "hint": "The search report puts a trace of the missing folder in the same suspect's cart." },
+        { "tier": "reveal", "reveal": "Bram Sayer killed Alina Rohe and staged the body beneath the North Arch." }
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "opening-brief",
+      "type": "report",
+      "title": "Opening Brief",
+      "source": "evidence/opening-brief.md",
+      "unlock_rule": "start",
+      "content": {
+        "text": "Ashfall intake summary of Alina Rohe's apparent festival-setup death and initial suspect pool."
+      },
+      "tags": ["overview", "victim", "suspects"],
+      "item_hints": [
+        { "type": "hint", "text": "The brief tells you what matters first: not the killer, but the victim's intended destination." },
+        { "type": "reveal", "text": "The first stage is about locating the meeting point, not solving the whole murder." }
+      ]
+    },
+    {
+      "evidence_id": "incident-report",
+      "type": "report",
+      "title": "Festival Incident Report",
+      "source": "evidence/incident-report.md",
+      "unlock_rule": "start",
+      "content": {
+        "text": "Official account placing Alina beneath the North Arch and noting the missing blue folder."
+      },
+      "tags": ["timeline", "official_story", "missing_item"],
+      "item_hints": [
+        { "type": "hint", "text": "Treat the report as the official version, not the trustworthy version." },
+        { "type": "reveal", "text": "The report matters most because it records the missing blue folder and the note recovered from Alina's coat." }
+      ]
+    },
+    {
+      "evidence_id": "route-map",
+      "type": "map",
+      "title": "Emberwake Route Map",
+      "source": "evidence/route-map.json",
+      "unlock_rule": "start",
+      "content": {
+        "text": "Map of the route and service lane showing Old Service Gate C4."
+      },
+      "tags": ["map", "gate", "location"],
+      "item_hints": [
+        { "type": "hint", "text": "One label on the map translates the note's vague wording into a code." },
+        { "type": "reveal", "text": "The old gate mentioned in the note is Gate C4." }
+      ]
+    },
+    {
+      "evidence_id": "pocket-note",
+      "type": "handwriting",
+      "title": "Pocket Note",
+      "source": "evidence/pocket-note.md",
+      "unlock_rule": "start",
+      "content": {
+        "text": "Unsigned note directing Alina to the old gate before first bell with the blue folder."
+      },
+      "tags": ["meeting", "folder", "prebell"],
+      "item_hints": [
+        { "type": "hint", "text": "This note points away from the discovery scene." },
+        { "type": "reveal", "text": "The note sets up a meeting at the old gate and explains why Alina left with the folder." }
+      ]
+    },
+    {
+      "evidence_id": "marshal-checkpoints",
+      "type": "record",
+      "title": "Marshal Checkpoints",
+      "source": "evidence/marshal-checkpoints.json",
+      "unlock_rule": "start",
+      "content": {
+        "text": "Checkpoint entries showing the route was normal until Alina left the review table."
+      },
+      "tags": ["timeline", "movement", "route"],
+      "item_hints": [
+        { "type": "hint", "text": "Use the checkpoint log to anchor when Alina stopped being publicly visible." },
+        { "type": "reveal", "text": "The log shows Alina left the review table with the blue folder at 18:46 and did not return." }
+      ]
+    },
+    {
+      "evidence_id": "maintenance-key-log",
+      "type": "record",
+      "title": "Maintenance Key Log",
+      "source": "evidence/maintenance-key-log.json",
+      "unlock_rule": "after_obj_1",
+      "content": {
+        "text": "Checkout record for service access keys, including Bram's use of SVC-MASTER-1."
+      },
+      "tags": ["access", "key", "bram"],
+      "item_hints": [
+        { "type": "hint", "text": "Ask who could physically open the gate you identified." },
+        { "type": "reveal", "text": "Bram checked out the only service master key before the meeting and returned it after the incident." }
+      ]
+    },
+    {
+      "evidence_id": "reroute-orders",
+      "type": "record",
+      "title": "Reroute Orders",
+      "source": "evidence/reroute-orders.json",
+      "unlock_rule": "after_obj_1",
+      "content": {
+        "text": "Last-minute staffing changes issued by Bram minutes before first bell."
+      },
+      "tags": ["staffing", "witness_gap", "bram"],
+      "item_hints": [
+        { "type": "hint", "text": "It is not enough to open the gate. Someone also needed the lane unwatched." },
+        { "type": "reveal", "text": "Bram moved Post 3 away from Gate C4, creating a private window." }
+      ]
+    },
+    {
+      "evidence_id": "treasurer-reinterview",
+      "type": "recording",
+      "title": "Treasurer Re-Interview",
+      "source": "evidence/treasurer-reinterview.json",
+      "unlock_rule": "after_obj_2",
+      "content": {
+        "transcript": "Sera Holt confirms that Alina planned to confront Bram over duplicate storage reimbursements and that Bram promised a private explanation at the old gate."
+      },
+      "tags": ["motive", "folder", "bram"],
+      "item_hints": [
+        { "type": "hint", "text": "This interview tells you why the meeting happened at all." },
+        { "type": "reveal", "text": "Sera says Alina planned to confront Bram and that Bram requested the private meeting at the old gate." }
+      ]
+    },
+    {
+      "evidence_id": "reimbursement-ledger",
+      "type": "record",
+      "title": "Reimbursement Ledger",
+      "source": "evidence/reimbursement-ledger.json",
+      "unlock_rule": "after_obj_2",
+      "content": {
+        "text": "Duplicate storage reimbursements repeatedly approved by Bram and flagged by Alina."
+      },
+      "tags": ["fraud", "motive", "ledger"],
+      "item_hints": [
+        { "type": "hint", "text": "Look for a repeated pattern, not a single large number." },
+        { "type": "reveal", "text": "The ledger shows Bram approved repeated sham storage payments that Alina flagged for review." }
+      ]
+    },
+    {
+      "evidence_id": "cart-search-report",
+      "type": "report",
+      "title": "Supply Cart Search Report",
+      "source": "evidence/cart-search-report.md",
+      "unlock_rule": "after_obj_2",
+      "content": {
+        "text": "Search report describing blue-folder hardware and a C4-marked route copy recovered from Bram's cart."
+      },
+      "tags": ["physical_trace", "folder", "cart"],
+      "item_hints": [
+        { "type": "hint", "text": "This is the closest thing to the missing folder itself." },
+        { "type": "reveal", "text": "A broken clasp matching the blue finance folders was recovered from Bram's cart along with a route copy marked at C4." }
+      ]
+    }
+  ],
+  "solution_graph": {
+    "nodes": [
+      "pocket-note",
+      "route-map",
+      "fact_meeting_point_c4",
+      "maintenance-key-log",
+      "reroute-orders",
+      "fact_private_window_created",
+      "treasurer-reinterview",
+      "reimbursement-ledger",
+      "cart-search-report",
+      "fact_blue_folder_proved_fraud",
+      "fact_cart_contains_folder_trace",
+      "identify-killer"
+    ],
+    "edges": [
+      { "from": "pocket-note", "to": "fact_meeting_point_c4", "type": "supports" },
+      { "from": "route-map", "to": "fact_meeting_point_c4", "type": "supports" },
+      { "from": "maintenance-key-log", "to": "fact_private_window_created", "type": "supports" },
+      { "from": "reroute-orders", "to": "fact_private_window_created", "type": "supports" },
+      { "from": "treasurer-reinterview", "to": "fact_blue_folder_proved_fraud", "type": "supports" },
+      { "from": "reimbursement-ledger", "to": "fact_blue_folder_proved_fraud", "type": "supports" },
+      { "from": "cart-search-report", "to": "fact_cart_contains_folder_trace", "type": "supports" },
+      { "from": "fact_meeting_point_c4", "to": "identify-killer", "type": "supports" },
+      { "from": "fact_private_window_created", "to": "identify-killer", "type": "supports" },
+      { "from": "fact_blue_folder_proved_fraud", "to": "identify-killer", "type": "supports" },
+      { "from": "fact_cart_contains_folder_trace", "to": "identify-killer", "type": "supports" }
+    ]
+  },
+  "qa": {
+    "consistency_checks": [
+      "no_real_places",
+      "no_public_figure_names",
+      "no_trademark_logos",
+      "non_graphic_depiction",
+      "deterministic_stage_solvability"
+    ],
+    "playtest_runs": []
+  }
+}

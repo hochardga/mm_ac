@@ -1,0 +1,46 @@
+{
+  "subtype": "interview_transcript",
+  "thread": {
+    "subject": "Second interview with Sera Holt",
+    "channel": "Ashfall review room",
+    "participants": ["Handler Rowan", "Sera Holt"]
+  },
+  "messages": [
+    {
+      "id": "sera-1",
+      "sender": "Handler Rowan",
+      "timestamp": "2018-10-13T09:10:00Z",
+      "body": "You said Alina was carrying a blue folder. What was inside it?"
+    },
+    {
+      "id": "sera-2",
+      "sender": "Sera Holt",
+      "timestamp": "2018-10-13T09:11:00Z",
+      "body": "Duplicate reimbursement approvals. Storage invoices, mostly. Alina thought someone inside operations was padding the totals before I signed them."
+    },
+    {
+      "id": "sera-3",
+      "sender": "Handler Rowan",
+      "timestamp": "2018-10-13T09:12:00Z",
+      "body": "Did she name anyone?"
+    },
+    {
+      "id": "sera-4",
+      "sender": "Sera Holt",
+      "timestamp": "2018-10-13T09:13:00Z",
+      "body": "Bram. She said he asked for one private chance to explain before first bell. She did not want panic in front of the sponsors if the numbers were innocent."
+    },
+    {
+      "id": "sera-5",
+      "sender": "Handler Rowan",
+      "timestamp": "2018-10-13T09:14:00Z",
+      "body": "Why meet at the old gate?"
+    },
+    {
+      "id": "sera-6",
+      "sender": "Sera Holt",
+      "timestamp": "2018-10-13T09:15:00Z",
+      "body": "Because Bram said the service lane would be empty for five minutes and nobody needed to know unless the folder was real trouble."
+    }
+  ]
+}

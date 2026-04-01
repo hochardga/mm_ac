@@ -1,0 +1,36 @@
+{
+  "subtype": "key_log",
+  "columns": [
+    { "id": "timestamp", "label": "Timestamp", "sortable": true },
+    { "id": "key_id", "label": "Key ID", "filterable": true },
+    { "id": "staff", "label": "Staff" },
+    { "id": "action", "label": "Action" },
+    { "id": "note", "label": "Note" }
+  ],
+  "rows": [
+    {
+      "id": "key-1",
+      "timestamp": "2018-10-12T18:12:00Z",
+      "key_id": "ARCH-TOOL-2",
+      "staff": "Ivo Pell",
+      "action": "checked_out",
+      "note": "North Arch adjustment kit."
+    },
+    {
+      "id": "key-2",
+      "timestamp": "2018-10-12T18:31:00Z",
+      "key_id": "SVC-MASTER-1",
+      "staff": "Bram Sayer",
+      "action": "checked_out",
+      "note": "Service gate access during final route review."
+    },
+    {
+      "id": "key-3",
+      "timestamp": "2018-10-12T19:23:00Z",
+      "key_id": "SVC-MASTER-1",
+      "staff": "Bram Sayer",
+      "action": "returned",
+      "note": "Returned after route closure."
+    }
+  ]
+}
