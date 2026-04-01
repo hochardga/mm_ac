@@ -153,7 +153,7 @@
       "unlock": { "type": "after_obj_2" },
       "validation": {
         "type": "single_choice",
-        "accepted_answers": ["npc_bram_sayer"],
+        "accepted_answers": ["bram-sayer"],
         "required_evidence_refs": ["treasurer-reinterview", "reimbursement-ledger", "cart-search-report"]
       },
       "rewards": {
