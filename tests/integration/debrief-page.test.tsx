@@ -115,9 +115,13 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
   const reconstructionSection = screen
     .getByRole("heading", { name: /ashfall reconstruction/i })
     .closest("section");
+  const attemptHistorySection = screen
+    .getByRole("heading", { name: /attempt history/i })
+    .closest("section");
 
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
+  expect(attemptHistorySection).not.toBeNull();
   expect(
     within(finalReportSection as HTMLElement).getByText(
       /was the silver chalice actually the murder weapon\?/i,
@@ -169,6 +173,24 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
       "section",
     ) as HTMLElement).getByText("Attempt 2"),
   ).toBeInTheDocument();
+  expect(
+    within(attemptHistorySection as HTMLElement).getByText("Objective Solved"),
+  ).toBeInTheDocument();
+  expect(
+    within(attemptHistorySection as HTMLElement).getByText("Accepted"),
+  ).toBeInTheDocument();
+  expect(
+    within(attemptHistorySection as HTMLElement).queryByText("In Progress"),
+  ).not.toBeInTheDocument();
+  const feedbackBlocks = within(attemptHistorySection as HTMLElement)
+    .getAllByText("Handler feedback")
+    .map((label) => label.parentElement);
+  expect(feedbackBlocks).toHaveLength(2);
+  feedbackBlocks.forEach((block) => {
+    expect(block).not.toBeNull();
+    expect(block as HTMLElement).toHaveClass("border-emerald-400/30");
+    expect(block as HTMLElement).toHaveClass("bg-emerald-500/10");
+  });
   expect(
     within(screen.getByRole("heading", { name: /attempt history/i }).closest(
       "section",

@@ -35,6 +35,7 @@ export type DebriefEntry = {
 
 export type DebriefAttempt = {
   attemptNumber: number;
+  isCorrect: boolean;
   nextStatus: DebriefAttemptStatus;
   feedback: string;
   entries: DebriefEntry[];
@@ -153,6 +154,17 @@ function toLegacySolutionEntries(
   ];
 }
 
+function isLegacySelectionCorrect(
+  attempt: typeof reportSubmissions.$inferSelect,
+  protectedCase: LegacyProtectedCase,
+) {
+  return (
+    attempt.suspectId === protectedCase.canonicalAnswers.suspect &&
+    attempt.motiveId === protectedCase.canonicalAnswers.motive &&
+    attempt.methodId === protectedCase.canonicalAnswers.method
+  );
+}
+
 function getStagedObjectiveMap(manifest: LoadedStagedCaseManifest) {
   const objectiveMap = new Map<
     string,
@@ -254,6 +266,7 @@ function buildLegacyDebrief(
     ),
     attempts: attempts.map((attempt) => ({
       attemptNumber: attempt.attemptNumber,
+      isCorrect: isLegacySelectionCorrect(attempt, protectedCase),
       nextStatus: toDebriefAttemptStatus(attempt.nextStatus),
       feedback: attempt.feedback,
       entries: [
@@ -361,6 +374,7 @@ function buildStagedDebrief(
       return [
         {
           attemptNumber: globalAttemptIndex + 1,
+          isCorrect: attempt.isCorrect,
           nextStatus: toDebriefAttemptStatus(attempt.nextStatus),
           feedback: attempt.feedback,
           entries: [
