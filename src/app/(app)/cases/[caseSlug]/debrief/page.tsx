@@ -5,6 +5,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { CaseReturnHeader } from "@/components/case-return-header";
 import { caseDefinitions, playerCases } from "@/db/schema";
+import { CaseClosingNarrative } from "@/features/cases/components/case-closing-narrative";
 import { DebriefAttemptHistory } from "@/features/debrief/components/debrief-attempt-history";
 import { DebriefReportCard } from "@/features/debrief/components/debrief-report-card";
 import { getDebrief } from "@/features/debrief/get-debrief";
@@ -84,9 +85,17 @@ export default async function DebriefPage({ params }: DebriefPageProps) {
               {debrief.attempts.length} attempts filed
             </p>
           </div>
-          <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-300">
-            {outcomeDescription}
-          </p>
+          {debrief.closingNarrative ? (
+            <CaseClosingNarrative
+              caseName={caseDefinition.title}
+              caseSlug={caseSlug}
+              closingNarrative={debrief.closingNarrative}
+            />
+          ) : (
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-300">
+              {outcomeDescription}
+            </p>
+          )}
         </section>
 
         <section className="grid gap-6 lg:grid-cols-2">

@@ -20,6 +20,7 @@ import type {
   LoadedStagedCaseManifest,
 } from "@/features/cases/load-case-manifest";
 import { loadAnyCaseManifest } from "@/features/cases/load-case-manifest";
+import { loadCaseClosing } from "@/features/cases/load-case-closing";
 import { loadAnyProtectedCase } from "@/features/cases/load-protected-case";
 import type { ObjectiveAnswerPayload } from "@/features/cases/objective-payload";
 import { getDb } from "@/lib/db";
@@ -45,6 +46,10 @@ export type DebriefSummary = {
   title: string;
   summary: string;
   status: DebriefStatus;
+  closingNarrative?: {
+    transcript: string;
+    audioPath?: string;
+  };
   finalReport?: {
     eyebrow?: string;
     entries: DebriefEntry[];
@@ -432,12 +437,14 @@ export async function getDebrief(
       where: eq(reportSubmissions.playerCaseId, input.playerCaseId),
       orderBy: [asc(reportSubmissions.attemptNumber)],
     });
+    const closingNarrative = await loadCaseClosing(caseDefinition.slug, status);
     const legacy = buildLegacyDebrief(manifest, protectedCase, attempts);
 
     return {
       title: playerCase.terminalDebriefTitle,
       summary: playerCase.terminalDebriefSummary,
       status,
+      closingNarrative: closingNarrative ?? undefined,
       finalReport: legacy.finalReport,
       solution: legacy.solution,
       attempts: legacy.attempts,
@@ -460,11 +467,13 @@ export async function getDebrief(
       objectiveStates,
       attempts,
     );
+    const closingNarrative = await loadCaseClosing(caseDefinition.slug, status);
 
     return {
       title: playerCase.terminalDebriefTitle,
       summary: playerCase.terminalDebriefSummary,
       status,
+      closingNarrative: closingNarrative ?? undefined,
       finalReport: staged.finalReport,
       solution: staged.solution,
       attempts: staged.attempts,

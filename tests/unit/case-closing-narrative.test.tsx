@@ -1,0 +1,59 @@
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, expect, test, vi } from "vitest";
+
+import { CaseClosingNarrative } from "@/features/cases/components/case-closing-narrative";
+
+beforeEach(() => {
+  vi.restoreAllMocks();
+});
+
+test("renders transcript-only closing narration when audio is absent", () => {
+  render(
+    <CaseClosingNarrative
+      caseSlug="hollow-bishop"
+      caseName="The Hollow Bishop"
+      closingNarrative={{
+        transcript: "Quinn poisoned the sacramental wine.",
+      }}
+    />,
+  );
+
+  expect(
+    screen.getByText(/quinn poisoned the sacramental wine\./i),
+  ).toBeInTheDocument();
+  expect(
+    screen.queryByLabelText(/closing narration audio/i),
+  ).toBeNull();
+  expect(
+    screen.queryByRole("button", { name: /play closing narration/i }),
+  ).toBeNull();
+});
+
+test("attempts autoplay and reveals a play button when blocked", async () => {
+  const playMock = vi
+    .spyOn(HTMLMediaElement.prototype, "play")
+    .mockRejectedValueOnce(new Error("blocked"))
+    .mockResolvedValueOnce(undefined);
+
+  render(
+    <CaseClosingNarrative
+      caseSlug="hollow-bishop"
+      caseName="The Hollow Bishop"
+      closingNarrative={{
+        transcript: "Quinn poisoned the sacramental wine.",
+        audioPath: "closing/solved/audio.mp3",
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(playMock).toHaveBeenCalledTimes(1);
+  });
+
+  expect(
+    screen.getByRole("button", { name: /play closing narration/i }),
+  ).toBeInTheDocument();
+
+  fireEvent.click(screen.getByRole("button", { name: /play closing narration/i }));
+  expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+});
