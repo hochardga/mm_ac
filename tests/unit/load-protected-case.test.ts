@@ -57,6 +57,16 @@ test("protected loader supports staged shipped cases", async () => {
   expect(payload.debriefs.solved.title).toMatch(/hollow bishop/i);
 });
 
+test("night bloom allows a wider graded-failure budget", async () => {
+  const payload = await loadAnyProtectedCase("night-bloom-halcyon-glass");
+
+  if ("feedbackTemplates" in payload) {
+    throw new Error("expected staged shipped payload");
+  }
+
+  expect(payload.grading.maxGradedFailures).toBe(6);
+});
+
 test("protected loader rejects case slugs that escape the cases root", async () => {
   await expect(
     loadProtectedCase("../cases/text-first-valid", {
