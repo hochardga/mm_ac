@@ -1,0 +1,53 @@
+{
+  "subtype": "inventory_log",
+  "columns": [
+    {
+      "id": "entry",
+      "label": "Entry",
+      "sortable": true
+    },
+    {
+      "id": "item",
+      "label": "Item",
+      "filterable": true
+    },
+    {
+      "id": "accession",
+      "label": "Accession"
+    },
+    {
+      "id": "note",
+      "label": "Note"
+    }
+  ],
+  "rows": [
+    {
+      "id": "acc-1",
+      "entry": "2026-03-11",
+      "item": "Nocturne Orchid display binder",
+      "accession": "NC-441-A",
+      "note": "Original accession card removed for conservation scan."
+    },
+    {
+      "id": "acc-2",
+      "entry": "2026-03-15",
+      "item": "Nocturne Orchid donor packet",
+      "accession": "NC-441-R",
+      "note": "Replacement packet assembled through donor relations."
+    },
+    {
+      "id": "acc-3",
+      "entry": "2026-03-18",
+      "item": "Display pedestal card",
+      "accession": "NC-441-R",
+      "note": "Night preview setup reflects replacement number rather than archival source."
+    },
+    {
+      "id": "acc-4",
+      "entry": "2026-03-18",
+      "item": "Collection archive note",
+      "accession": "NC-441-A",
+      "note": "Original reference retained in back-file, mismatch unresolved."
+    }
+  ]
+}

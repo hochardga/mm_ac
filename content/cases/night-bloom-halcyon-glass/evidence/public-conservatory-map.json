@@ -1,0 +1,76 @@
+{
+  "subtype": "map",
+  "viewport": {
+    "width": 1200,
+    "height": 800
+  },
+  "elements": [
+    {
+      "id": "atrium",
+      "type": "area",
+      "x": 420,
+      "y": 260,
+      "width": 320,
+      "height": 220,
+      "label": "Moonbridge Atrium"
+    },
+    {
+      "id": "moonbridge",
+      "type": "line",
+      "points": [
+        [
+          510,
+          220
+        ],
+        [
+          650,
+          220
+        ],
+        [
+          720,
+          260
+        ]
+      ]
+    },
+    {
+      "id": "rain",
+      "type": "area",
+      "x": 160,
+      "y": 250,
+      "width": 180,
+      "height": 180,
+      "label": "Rain Chamber"
+    },
+    {
+      "id": "cafe",
+      "type": "area",
+      "x": 820,
+      "y": 280,
+      "width": 170,
+      "height": 150,
+      "label": "Cafe"
+    },
+    {
+      "id": "gallery",
+      "type": "area",
+      "x": 460,
+      "y": 560,
+      "width": 250,
+      "height": 120,
+      "label": "Gallery Corridor"
+    },
+    {
+      "id": "label-1",
+      "type": "label",
+      "x": 450,
+      "y": 180,
+      "text": "Public-facing route centers on the Moonbridge."
+    }
+  ],
+  "legend": [
+    {
+      "id": "public",
+      "label": "Public rooms and paths"
+    }
+  ]
+}

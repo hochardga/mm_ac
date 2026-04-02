@@ -1,0 +1,60 @@
+{
+  "subtype": "access_log",
+  "columns": [
+    {
+      "id": "timestamp",
+      "label": "Timestamp",
+      "sortable": true
+    },
+    {
+      "id": "zone",
+      "label": "Zone",
+      "filterable": true
+    },
+    {
+      "id": "event",
+      "label": "Event"
+    },
+    {
+      "id": "note",
+      "label": "Note"
+    }
+  ],
+  "rows": [
+    {
+      "id": "climate-1",
+      "timestamp": "2026-03-18T21:09:00Z",
+      "zone": "Moonbridge / Atrium",
+      "event": "Blackout rehearsal armed",
+      "note": "Ten-minute timed run scheduled by event ops."
+    },
+    {
+      "id": "climate-2",
+      "timestamp": "2026-03-18T21:10:00Z",
+      "zone": "Public floors",
+      "event": "Lighting drop",
+      "note": "Guest-facing lighting reduced for rehearsal."
+    },
+    {
+      "id": "climate-3",
+      "timestamp": "2026-03-18T21:12:00Z",
+      "zone": "Mist Tunnel",
+      "event": "Humidity spike",
+      "note": "Localized condensation increase above expected transit baseline."
+    },
+    {
+      "id": "climate-4",
+      "timestamp": "2026-03-18T21:13:00Z",
+      "zone": "Service Lift",
+      "event": "Lift call",
+      "note": "Unscheduled short-haul movement logged between propagation level and atrium service landing."
+    },
+    {
+      "id": "climate-5",
+      "timestamp": "2026-03-18T21:18:00Z",
+      "zone": "Moonbridge / Atrium",
+      "event": "Body reported",
+      "note": "Discovery call placed from atrium floor."
+    }
+  ]
+}

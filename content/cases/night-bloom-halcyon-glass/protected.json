@@ -1,0 +1,97 @@
+{
+  "slug": "night-bloom-halcyon-glass",
+  "revision": "rev-1",
+  "grading": {
+    "maxGradedFailures": 4
+  },
+  "canonicalAnswers": {
+    "was-soren-killed-where-found": {
+      "type": "boolean",
+      "value": false
+    },
+    "identify-true-primary-scene": {
+      "type": "single_choice",
+      "choiceId": "propagation-lab"
+    },
+    "identify-staged-scene-exhibits": {
+      "type": "multi_choice",
+      "choiceIds": [
+        "scene-photo-atrium",
+        "medical-note-addendum"
+      ]
+    },
+    "identify-body-route": {
+      "type": "single_choice",
+      "choiceId": "route-mist-tunnel-service-lift"
+    },
+    "identify-service-cart": {
+      "type": "code_entry",
+      "value": "C-4"
+    },
+    "confirm-mist-tunnel-passage": {
+      "type": "boolean",
+      "value": true
+    },
+    "identify-swapped-item": {
+      "type": "single_choice",
+      "choiceId": "original-nocturne-orchid-accession-card"
+    },
+    "identify-provenance-fraud-facts": {
+      "type": "multi_choice",
+      "choiceIds": [
+        "display-documentation-changed-between-afternoon-prep-and-night-preview",
+        "public-provenance-story-relied-on-material-controlled-by-donor-relations"
+      ]
+    },
+    "identify-donor-packet-controller": {
+      "type": "single_choice",
+      "choiceId": "daria-pell"
+    },
+    "identify-broken-alibi": {
+      "type": "single_choice",
+      "choiceId": "daria-pell"
+    },
+    "identify-red-herring-revelations": {
+      "type": "multi_choice",
+      "choiceIds": [
+        "mara-ives-altered-camera-timing-to-hide-an-unauthorized-visit",
+        "jules-arden-lied-about-a-private-meeting-with-soren"
+      ]
+    },
+    "rule-out-tomas-window": {
+      "type": "boolean",
+      "value": false
+    },
+    "identify-killer": {
+      "type": "single_choice",
+      "choiceId": "daria-pell"
+    },
+    "identify-motive": {
+      "type": "single_choice",
+      "choiceId": "to-conceal-the-forged-provenance-scheme-and-misused-donor-funds"
+    },
+    "identify-sequence": {
+      "type": "multi_choice",
+      "choiceIds": [
+        "confrontation-in-propagation-lab",
+        "fatal-impact-at-potting-bench",
+        "body-moved-on-cart-c-4-through-mist-tunnel-and-service-lift",
+        "fall-scene-staged-at-moonbridge-atrium"
+      ]
+    },
+    "identify-physical-link": {
+      "type": "single_choice",
+      "choiceId": "broken-lapel-orchid-pin"
+    }
+  },
+  "debriefs": {
+    "solved": {
+      "title": "Debrief: The Night Bloom at Halcyon Glass",
+      "summary": "Daria Pell built the Nocturne Orchid into a donor miracle: rare, beautifully branded, financially irresistible, and false. When Soren Vale discovered that the provenance packet had been swapped and planned to halt the preview, Daria confronted him in the propagation lab during the blackout rehearsal. He died there from a fatal impact at the potting bench. Daria used service cart C-4, the mist tunnel, and the service lift to move the body, then staged broken safety glass near the Moonbridge railing and trusted the building's elegance to sell an accident. Mara's edit and Jules's lie mattered, but only as noise around the truth."
+    },
+    "closed_unsolved": {
+      "title": "Case Closed: The Night Bloom at Halcyon Glass",
+      "summary": "Ashfall proved the conservatory death was staged, identified serious document fraud around the Nocturne Orchid, and isolated a route through staff-only corridors used during the blackout. The evidence strongly indicates a deliberate killing tied to forged provenance material and donor pressure, but without a complete reconstruction the case remains formally unresolved. Halcyon Glass survives the night with its public image damaged and its internal records under review."
+    }
+  }
+}

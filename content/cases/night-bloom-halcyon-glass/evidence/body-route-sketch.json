@@ -1,0 +1,76 @@
+{
+  "subtype": "route_sketch",
+  "viewport": {
+    "width": 1200,
+    "height": 800
+  },
+  "elements": [
+    {
+      "id": "start",
+      "type": "marker",
+      "x": 150,
+      "y": 400,
+      "label": "Propagation Lab"
+    },
+    {
+      "id": "line-1",
+      "type": "line",
+      "points": [
+        [
+          180,
+          400
+        ],
+        [
+          360,
+          400
+        ],
+        [
+          550,
+          360
+        ],
+        [
+          760,
+          300
+        ],
+        [
+          980,
+          260
+        ]
+      ]
+    },
+    {
+      "id": "mid",
+      "type": "marker",
+      "x": 520,
+      "y": 370,
+      "label": "Mist Tunnel"
+    },
+    {
+      "id": "lift",
+      "type": "marker",
+      "x": 760,
+      "y": 300,
+      "label": "Service Lift"
+    },
+    {
+      "id": "end",
+      "type": "marker",
+      "x": 1000,
+      "y": 260,
+      "label": "Moonbridge Atrium"
+    },
+    {
+      "id": "label-1",
+      "type": "label",
+      "x": 270,
+      "y": 445,
+      "text": "Preferred cart path for fragile plant transport."
+    }
+  ],
+  "legend": [
+    {
+      "id": "path",
+      "label": "Operational route"
+    }
+  ]
+}

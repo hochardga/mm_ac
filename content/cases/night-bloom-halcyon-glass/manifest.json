@@ -1,0 +1,732 @@
+{
+  "slug": "night-bloom-halcyon-glass",
+  "revision": "rev-1",
+  "title": "The Night Bloom at Halcyon Glass",
+  "summary": "After a blackout rehearsal at Halcyon Glass Conservatory, star curator Soren Vale is found dead beneath the Moonbridge Atrium. The fall looks accidental until the rooms, routes, and donor paperwork start contradicting one another.",
+  "complexity": "deep",
+  "evidence": [
+    {
+      "id": "opening-brief",
+      "title": "Opening Brief",
+      "family": "document",
+      "subtype": "case_brief",
+      "summary": "Ashfall intake summary framing the death as an apparent fall that does not sit cleanly with the building or the timing.",
+      "source": "evidence/opening-brief.md"
+    },
+    {
+      "id": "scene-photo-atrium",
+      "title": "Scene Photo: Moonbridge Atrium",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "Wide response photo of the atrium floor and lower railing after the conservatory is cleared.",
+      "source": "evidence/scene-photo-atrium.json"
+    },
+    {
+      "id": "scene-photo-propagation-lab",
+      "title": "Scene Photo: Propagation Lab",
+      "family": "photo",
+      "subtype": "scene_photo",
+      "summary": "A clean staff room with one disturbed bench, wet flooring, and displaced soil plugs.",
+      "source": "evidence/scene-photo-propagation-lab.json"
+    },
+    {
+      "id": "incident-summary",
+      "title": "Incident Summary",
+      "family": "document",
+      "subtype": "incident_form",
+      "summary": "Official city summary that leans hard toward an accidental fall before the full review is complete.",
+      "source": "evidence/incident-summary.md"
+    },
+    {
+      "id": "medical-note-addendum",
+      "title": "Medical Note Addendum",
+      "family": "document",
+      "subtype": "memo",
+      "summary": "Short examiner note clarifying the injury pattern without graphic detail.",
+      "source": "evidence/medical-note-addendum.md"
+    },
+    {
+      "id": "public-conservatory-map",
+      "title": "Public Conservatory Map",
+      "family": "diagram",
+      "subtype": "map",
+      "summary": "Public-facing layout of the guest areas surrounding the atrium and Moonbridge.",
+      "source": "evidence/public-conservatory-map.json"
+    },
+    {
+      "id": "staff-directory",
+      "title": "Staff Directory Snapshot",
+      "family": "webpage",
+      "subtype": "directory_listing",
+      "summary": "Cached staff page introducing the departments, titles, and public-facing roles inside Halcyon Glass.",
+      "source": "evidence/staff-directory.json"
+    },
+    {
+      "id": "bridge-cam-still",
+      "title": "Bridge Camera Still",
+      "family": "photo",
+      "subtype": "surveillance_still",
+      "summary": "A grainy still from the Moonbridge camera moments before the body is discovered.",
+      "source": "evidence/bridge-cam-still.json"
+    },
+    {
+      "id": "service-floorplan",
+      "title": "Service Floorplan",
+      "family": "diagram",
+      "subtype": "floorplan",
+      "summary": "Staff-only layout showing the propagation lab, mist tunnel, service lift, and loading corridor.",
+      "source": "evidence/service-floorplan.json"
+    },
+    {
+      "id": "climate-event-log",
+      "title": "Climate Event Log",
+      "family": "record",
+      "subtype": "access_log",
+      "summary": "Timestamped system events covering the blackout rehearsal and environmental overrides.",
+      "source": "evidence/climate-event-log.json"
+    },
+    {
+      "id": "cart-wheel-photo",
+      "title": "Service Cart Wheel Photo",
+      "family": "photo",
+      "subtype": "object_photo",
+      "summary": "Close-up photo of a service cart wheel marked with a bay designation and fresh mineral streaking.",
+      "source": "evidence/cart-wheel-photo.json"
+    },
+    {
+      "id": "grounds-radio-call",
+      "title": "Grounds Radio Call",
+      "family": "audio",
+      "subtype": "radio_call",
+      "summary": "Short radio exchange about unexpected condensation in the mist tunnel and a cart left out of bay.",
+      "source": "evidence/grounds-radio-call.json"
+    },
+    {
+      "id": "mist-tunnel-still",
+      "title": "Mist Tunnel Still",
+      "family": "photo",
+      "subtype": "surveillance_still",
+      "summary": "Empty tunnel still showing a fresh wheel track cutting through condensation.",
+      "source": "evidence/mist-tunnel-still.json"
+    },
+    {
+      "id": "body-route-sketch",
+      "title": "Internal Route Sketch",
+      "family": "diagram",
+      "subtype": "route_sketch",
+      "summary": "Operations sketch of the preferred cart path used to move fragile plant material through service areas.",
+      "source": "evidence/body-route-sketch.json"
+    },
+    {
+      "id": "gala-microsite",
+      "title": "Nocturne Orchid Microsite",
+      "family": "webpage",
+      "subtype": "company_site",
+      "summary": "Donor-facing microsite presenting the Nocturne Orchid as the centerpiece of the preview.",
+      "source": "evidence/gala-microsite.json"
+    },
+    {
+      "id": "accession-ledger",
+      "title": "Accession Ledger Extract",
+      "family": "record",
+      "subtype": "inventory_log",
+      "summary": "Collection ledger rows showing accession inconsistencies around the Nocturne Orchid entry.",
+      "source": "evidence/accession-ledger.json"
+    },
+    {
+      "id": "display-photo-afternoon",
+      "title": "Display Photo: Afternoon Prep",
+      "family": "photo",
+      "subtype": "found_photo",
+      "summary": "Phone photo from afternoon setup showing the orchid pedestal before the display materials changed.",
+      "source": "evidence/display-photo-afternoon.json"
+    },
+    {
+      "id": "torn-accession-card",
+      "title": "Torn Accession Card",
+      "family": "photo",
+      "subtype": "object_photo",
+      "summary": "Macro photo of a torn archival card corner with a handwritten accession code and adhesive residue.",
+      "source": "evidence/torn-accession-card.json"
+    },
+    {
+      "id": "soren-voicemail",
+      "title": "Voicemail from Soren Vale",
+      "family": "audio",
+      "subtype": "voicemail",
+      "summary": "Tight, hurried voicemail from Soren insisting the preview cannot proceed until the packet is checked.",
+      "source": "evidence/soren-voicemail.json"
+    },
+    {
+      "id": "intern-interview-thread",
+      "title": "Interview Thread: Bea Mercer",
+      "family": "thread",
+      "subtype": "interview_thread",
+      "summary": "Interview transcript in which the intern describes the orchid display changing between afternoon prep and night preview.",
+      "source": "evidence/intern-interview-thread.json"
+    },
+    {
+      "id": "badge-swipes",
+      "title": "Badge Swipes",
+      "family": "record",
+      "subtype": "badge_swipes",
+      "summary": "Door access events for staff-only spaces during the preview rehearsal window.",
+      "source": "evidence/badge-swipes.json"
+    },
+    {
+      "id": "security-interview-audio",
+      "title": "Security Interview Audio",
+      "family": "audio",
+      "subtype": "interview_audio",
+      "summary": "Interview clip in which Mara Ives admits her edit was meant to hide an unauthorized visit, not a killing.",
+      "source": "evidence/security-interview-audio.json"
+    },
+    {
+      "id": "staff-chat-thread",
+      "title": "Staff Chat Thread",
+      "family": "thread",
+      "subtype": "message_log",
+      "summary": "Internal chat about cutting Jules Arden\u2019s audio installation from the preview schedule.",
+      "source": "evidence/staff-chat-thread.json"
+    },
+    {
+      "id": "loading-door-still",
+      "title": "Loading Corridor Still",
+      "family": "photo",
+      "subtype": "surveillance_still",
+      "summary": "Corridor still showing the security cover-up was tied to a tool pickup, not the homicide.",
+      "source": "evidence/loading-door-still.json"
+    },
+    {
+      "id": "donor-arrival-log",
+      "title": "Donor Arrival Log",
+      "family": "record",
+      "subtype": "timeline",
+      "summary": "Front-of-house timeline showing when Daria\u2019s public duties did and did not account for her movements.",
+      "source": "evidence/donor-arrival-log.json"
+    },
+    {
+      "id": "tomas-shift-board",
+      "title": "Tomas Reed Shift Board",
+      "family": "photo",
+      "subtype": "object_photo",
+      "summary": "Night shift whiteboard assigning Tomas Reed away from the propagation spaces during the fatal window.",
+      "source": "evidence/tomas-shift-board.json"
+    },
+    {
+      "id": "broken-lapel-pin",
+      "title": "Broken Lapel Pin",
+      "family": "photo",
+      "subtype": "object_photo",
+      "summary": "Macro evidence photo of a broken enamel orchid pin found beneath the propagation bench grating.",
+      "source": "evidence/broken-lapel-pin.json"
+    },
+    {
+      "id": "daria-portrait-directory",
+      "title": "Daria Pell Directory Portrait",
+      "family": "photo",
+      "subtype": "portrait_staff_directory",
+      "summary": "Formal directory portrait showing Daria wearing the intact orchid lapel pin.",
+      "source": "evidence/daria-portrait-directory.json"
+    },
+    {
+      "id": "donor-fund-memo",
+      "title": "Donor Fund Memo",
+      "family": "document",
+      "subtype": "memo",
+      "summary": "Internal memo on restoration overruns and sponsor pressure routed through donor relations.",
+      "source": "evidence/donor-fund-memo.md"
+    },
+    {
+      "id": "reconstruction-timeline",
+      "title": "Reconstruction Timeline",
+      "family": "record",
+      "subtype": "timeline",
+      "summary": "Condensed chronology assembled from logs, witness statements, and access records.",
+      "source": "evidence/reconstruction-timeline.json"
+    }
+  ],
+  "stages": [
+    {
+      "id": "opening-pass",
+      "startsUnlocked": true,
+      "title": "Opening Pass",
+      "summary": "Test the accident narrative against the rooms, injuries, and first camera read.",
+      "handlerPrompts": [
+        "Do not let the architecture decide for you. Start with the injury note, then compare it to the room.",
+        "The atrium wants to be the answer. Check whether the body agrees."
+      ],
+      "evidenceIds": [
+        "opening-brief",
+        "scene-photo-atrium",
+        "scene-photo-propagation-lab",
+        "incident-summary",
+        "medical-note-addendum",
+        "public-conservatory-map",
+        "staff-directory",
+        "bridge-cam-still"
+      ],
+      "objectives": [
+        {
+          "id": "was-soren-killed-where-found",
+          "prompt": "Was Soren killed where he was found in the Moonbridge Atrium?",
+          "type": "boolean",
+          "stakes": "graded",
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "identify-true-primary-scene",
+          "prompt": "Where did the lethal incident begin?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "moonbridge-atrium",
+              "label": "Moonbridge Atrium"
+            },
+            {
+              "id": "propagation-lab",
+              "label": "Propagation Lab"
+            },
+            {
+              "id": "rain-chamber",
+              "label": "Rain Chamber"
+            },
+            {
+              "id": "gallery-corridor",
+              "label": "Gallery Corridor"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "identify-staged-scene-exhibits",
+          "prompt": "Which two exhibits most directly prove the atrium scene was staged?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "scene-photo-atrium",
+              "label": "Scene Photo: Moonbridge Atrium"
+            },
+            {
+              "id": "medical-note-addendum",
+              "label": "Medical Note Addendum"
+            },
+            {
+              "id": "bridge-cam-still",
+              "label": "Bridge Camera Still"
+            },
+            {
+              "id": "incident-summary",
+              "label": "Incident Summary"
+            },
+            {
+              "id": "public-conservatory-map",
+              "label": "Public Conservatory Map"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [
+              "blackout-route"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "blackout-route",
+      "startsUnlocked": false,
+      "title": "Packet B: The Blackout Route",
+      "summary": "Reconstruct the unseen path used during the blackout and identify the cart that made it possible.",
+      "handlerPrompts": [
+        "A body can be moved anywhere in this building if you think like staff instead of guests.",
+        "The right route needs cover, not speed."
+      ],
+      "evidenceIds": [
+        "service-floorplan",
+        "climate-event-log",
+        "cart-wheel-photo",
+        "grounds-radio-call",
+        "mist-tunnel-still",
+        "body-route-sketch"
+      ],
+      "objectives": [
+        {
+          "id": "identify-body-route",
+          "prompt": "Which route bypassed the public-facing cameras during the blackout?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "route-mist-tunnel-service-lift",
+              "label": "Propagation Lab -> Mist Tunnel -> Service Lift -> Moonbridge Atrium"
+            },
+            {
+              "id": "route-gallery-public-stairs",
+              "label": "Propagation Lab -> Gallery Corridor -> Public Stairs -> Moonbridge Atrium"
+            },
+            {
+              "id": "route-rain-chamber-service-lift",
+              "label": "Rain Chamber -> Service Lift -> Moonbridge Atrium"
+            },
+            {
+              "id": "route-loading-corridor-cafe-stair",
+              "label": "Propagation Lab -> Loading Corridor -> Cafe Stair -> Moonbridge Atrium"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [
+              "missing-provenance"
+            ]
+          }
+        },
+        {
+          "id": "identify-service-cart",
+          "prompt": "Which cart bay designation matches the cart used to move the body?",
+          "type": "code_entry",
+          "stakes": "graded",
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "confirm-mist-tunnel-passage",
+          "prompt": "Did the body pass through the mist tunnel before being placed in the atrium?",
+          "type": "boolean",
+          "stakes": "graded",
+          "successUnlocks": {
+            "stageIds": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "missing-provenance",
+      "startsUnlocked": false,
+      "title": "Packet C: The Missing Provenance",
+      "summary": "Find the swapped documentation that gave the murder a motive and identify who controlled it.",
+      "handlerPrompts": [
+        "Someone killed to protect a story. Find the document that story needed.",
+        "Compare what donors were shown with what the collection records say."
+      ],
+      "evidenceIds": [
+        "gala-microsite",
+        "accession-ledger",
+        "display-photo-afternoon",
+        "torn-accession-card",
+        "soren-voicemail",
+        "intern-interview-thread"
+      ],
+      "objectives": [
+        {
+          "id": "identify-swapped-item",
+          "prompt": "What key item was removed or replaced before the preview?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "original-nocturne-orchid-accession-card",
+              "label": "The original Nocturne Orchid accession card"
+            },
+            {
+              "id": "donor-preview-seating-chart",
+              "label": "The donor preview seating chart"
+            },
+            {
+              "id": "rain-chamber-irrigation-schedule",
+              "label": "The Rain Chamber irrigation schedule"
+            },
+            {
+              "id": "moonbridge-safety-inspection",
+              "label": "The Moonbridge safety inspection sheet"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "identify-provenance-fraud-facts",
+          "prompt": "Which two statements about the Nocturne Orchid are true?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "display-documentation-changed-between-afternoon-prep-and-night-preview",
+              "label": "The display documentation changed between afternoon prep and the night preview."
+            },
+            {
+              "id": "public-provenance-story-relied-on-material-controlled-by-donor-relations",
+              "label": "The public provenance story relied on material controlled by donor relations."
+            },
+            {
+              "id": "bea-mercer-authored-the-donor-provenance-packet",
+              "label": "Bea Mercer authored the donor provenance packet."
+            },
+            {
+              "id": "accession-ledger-confirmed-an-unbroken-chain-of-custody",
+              "label": "The accession ledger confirmed an unbroken chain of custody."
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [
+              "false-alibis"
+            ]
+          }
+        },
+        {
+          "id": "identify-donor-packet-controller",
+          "prompt": "Who had direct control over the donor-facing provenance packet?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "daria-pell",
+              "label": "Daria Pell"
+            },
+            {
+              "id": "soren-vale",
+              "label": "Soren Vale"
+            },
+            {
+              "id": "bea-mercer",
+              "label": "Bea Mercer"
+            },
+            {
+              "id": "tomas-reed",
+              "label": "Tomas Reed"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "false-alibis",
+      "startsUnlocked": false,
+      "title": "Packet D: The Alibis That Break",
+      "summary": "Separate collateral wrongdoing from homicide and isolate the only suspect whose alibi fails in every direction.",
+      "handlerPrompts": [
+        "Two people lied. Only one lied in every direction at once.",
+        "Separate obstruction from homicide before you accuse anyone."
+      ],
+      "evidenceIds": [
+        "badge-swipes",
+        "security-interview-audio",
+        "staff-chat-thread",
+        "loading-door-still",
+        "donor-arrival-log",
+        "tomas-shift-board"
+      ],
+      "objectives": [
+        {
+          "id": "identify-broken-alibi",
+          "prompt": "Which suspect's alibi is contradicted by both access data and private messaging?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "daria-pell",
+              "label": "Daria Pell"
+            },
+            {
+              "id": "mara-ives",
+              "label": "Mara Ives"
+            },
+            {
+              "id": "jules-arden",
+              "label": "Jules Arden"
+            },
+            {
+              "id": "tomas-reed",
+              "label": "Tomas Reed"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [
+              "final-packet"
+            ]
+          }
+        },
+        {
+          "id": "identify-red-herring-revelations",
+          "prompt": "Which two revelations are true but do not prove murder?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "mara-ives-altered-camera-timing-to-hide-an-unauthorized-visit",
+              "label": "Mara Ives altered camera timing to hide an unauthorized visit."
+            },
+            {
+              "id": "jules-arden-lied-about-a-private-meeting-with-soren",
+              "label": "Jules Arden lied about a private meeting with Soren."
+            },
+            {
+              "id": "tomas-reed-moved-the-body-with-service-cart-c-4",
+              "label": "Tomas Reed moved the body using service cart C-4."
+            },
+            {
+              "id": "bea-mercer-replaced-the-accession-card-herself",
+              "label": "Bea Mercer replaced the accession card herself."
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "rule-out-tomas-window",
+          "prompt": "Could Tomas Reed have reached the propagation lab during the fatal window without appearing in the surviving logs?",
+          "type": "boolean",
+          "stakes": "graded",
+          "successUnlocks": {
+            "stageIds": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "final-packet",
+      "startsUnlocked": false,
+      "title": "Final Packet: The Night Bloom",
+      "summary": "Close the loop with a full reconstruction linking person, path, motive, and physical proof.",
+      "handlerPrompts": [
+        "Close the loop. Person, path, motive, object.",
+        "By now the building should stop looking elegant and start looking deliberate."
+      ],
+      "evidenceIds": [
+        "broken-lapel-pin",
+        "daria-portrait-directory",
+        "donor-fund-memo",
+        "reconstruction-timeline"
+      ],
+      "objectives": [
+        {
+          "id": "identify-killer",
+          "prompt": "Who killed Soren Vale?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "daria-pell",
+              "label": "Daria Pell"
+            },
+            {
+              "id": "mara-ives",
+              "label": "Mara Ives"
+            },
+            {
+              "id": "jules-arden",
+              "label": "Jules Arden"
+            },
+            {
+              "id": "tomas-reed",
+              "label": "Tomas Reed"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "identify-motive",
+          "prompt": "Why did the suspect do it?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "to-conceal-the-forged-provenance-scheme-and-misused-donor-funds",
+              "label": "To conceal the forged provenance scheme and misused donor funds"
+            },
+            {
+              "id": "to-revenge-the-cancelled-sound-installation",
+              "label": "To take revenge for the cancelled sound installation"
+            },
+            {
+              "id": "to-protect-the-security-cover-up-over-the-unauthorized-visit",
+              "label": "To protect the security cover-up over the unauthorized visit"
+            },
+            {
+              "id": "to-hide-off-book-cutting-sales-from-the-propagation-house",
+              "label": "To hide off-book cutting sales from the propagation house"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        },
+        {
+          "id": "identify-sequence",
+          "prompt": "Which steps belong in the correct reconstruction of the killing and staging?",
+          "type": "multi_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "confrontation-in-propagation-lab",
+              "label": "Confrontation in the propagation lab"
+            },
+            {
+              "id": "fatal-impact-at-potting-bench",
+              "label": "Fatal impact at the potting bench"
+            },
+            {
+              "id": "body-moved-on-cart-c-4-through-mist-tunnel-and-service-lift",
+              "label": "Body moved on cart C-4 through the mist tunnel and service lift"
+            },
+            {
+              "id": "fall-scene-staged-at-moonbridge-atrium",
+              "label": "Fall scene staged at the Moonbridge Atrium"
+            },
+            {
+              "id": "body-left-in-propagation-lab-until-dawn",
+              "label": "Body left in the propagation lab until dawn"
+            },
+            {
+              "id": "security-feed-tampered-before-the-confrontation",
+              "label": "Security feed tampered before the confrontation"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": [],
+            "resolvesCase": true
+          }
+        },
+        {
+          "id": "identify-physical-link",
+          "prompt": "Which object physically ties the suspect to the real scene?",
+          "type": "single_choice",
+          "stakes": "graded",
+          "options": [
+            {
+              "id": "broken-lapel-orchid-pin",
+              "label": "Broken orchid lapel pin"
+            },
+            {
+              "id": "cart-tag-c-4",
+              "label": "Cart tag C-4"
+            },
+            {
+              "id": "torn-accession-card",
+              "label": "Torn accession card"
+            },
+            {
+              "id": "snapped-label-stake",
+              "label": "Snapped label stake"
+            }
+          ],
+          "successUnlocks": {
+            "stageIds": []
+          }
+        }
+      ]
+    }
+  ]
+}

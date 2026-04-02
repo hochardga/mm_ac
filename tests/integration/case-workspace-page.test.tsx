@@ -545,6 +545,40 @@ test("renders document markdown, record tables, and photo evidence in the worksp
   ).toBeInTheDocument();
   expect(screen.getByText(/parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
+
+  cleanup();
+
+  const { playerCase: cinderProcessionPlayerCase } = await openCase({
+    userId,
+    caseSlug: "cinder-procession",
+  });
+
+  await db
+    .update(playerCases)
+    .set({ introductionSeenAt: new Date() })
+    .where(eq(playerCases.id, cinderProcessionPlayerCase.id));
+
+  render(
+    await CasePage({
+      params: Promise.resolve({ caseSlug: "cinder-procession" }),
+      searchParams: Promise.resolve({ evidence: "opening-brief" }),
+    } as never),
+  );
+
+  const openingBriefDialog = screen.getByRole("dialog", {
+    name: /opening brief/i,
+  });
+  expect(
+    within(openingBriefDialog).getAllByRole("list"),
+  ).toHaveLength(2);
+  expect(
+    within(openingBriefDialog).getAllByRole("listitem"),
+  ).toHaveLength(7);
+  expect(
+    within(openingBriefDialog).getByText("Victim:", {
+      selector: "strong",
+    }),
+  ).toBeInTheDocument();
 });
 
 test("does not render the progress restored banner when reopening a case with saved notes", async () => {

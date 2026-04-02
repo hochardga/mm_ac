@@ -37,9 +37,9 @@ export default async function VaultPage() {
         </p>
         <h1 className="mt-4 text-4xl font-semibold">Dossier Vault</h1>
         <p className="mt-4 max-w-2xl text-lg leading-8 text-stone-300">
-          Three active investigations are cleared for field review. Choose your
-          next file, preserve your notes, and report back before your handler
-          closes the line.
+          Active investigations are cleared for field review. Choose your next
+          file, preserve your notes, and report back before your handler closes
+          the line.
         </p>
       </section>
 

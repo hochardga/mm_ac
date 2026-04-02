@@ -94,10 +94,56 @@ test("renders dossier cards with the current agent's case statuses", async () =>
   expect(screen.getByText("Evidence Variety Showcase")).toBeInTheDocument();
   expect(screen.getByText("Cinder Procession")).toBeInTheDocument();
   expect(screen.getByText("In Progress")).toBeInTheDocument();
-  expect(screen.getAllByText("New")).toHaveLength(5);
-  expect(screen.getByText("Light")).toBeInTheDocument();
-  expect(screen.getAllByText("Standard")).toHaveLength(4);
-  expect(screen.getByText("Deep")).toBeInTheDocument();
+  const hollowBishopArticle = screen
+    .getByRole("heading", { name: /the hollow bishop/i })
+    .closest("article");
+  const signalAtRedHarborArticle = screen
+    .getByRole("heading", { name: /signal at red harbor/i })
+    .closest("article");
+  const briarLedgerArticle = screen
+    .getByRole("heading", { name: /the briar ledger/i })
+    .closest("article");
+  const evidenceVarietyArticle = screen
+    .getByRole("heading", { name: /evidence variety showcase/i })
+    .closest("article");
+  const cinderProcessionArticle = screen
+    .getByRole("heading", { name: /cinder procession/i })
+    .closest("article");
+  expect(hollowBishopArticle).not.toBeNull();
+  expect(signalAtRedHarborArticle).not.toBeNull();
+  expect(briarLedgerArticle).not.toBeNull();
+  expect(evidenceVarietyArticle).not.toBeNull();
+  expect(cinderProcessionArticle).not.toBeNull();
+  expect(
+    within(hollowBishopArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
+  expect(
+    within(hollowBishopArticle as HTMLElement).getByText("Standard"),
+  ).toBeInTheDocument();
+  expect(
+    within(signalAtRedHarborArticle as HTMLElement).getByText("In Progress"),
+  ).toBeInTheDocument();
+  expect(
+    within(signalAtRedHarborArticle as HTMLElement).getByText("Light"),
+  ).toBeInTheDocument();
+  expect(
+    within(briarLedgerArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
+  expect(
+    within(briarLedgerArticle as HTMLElement).getByText("Deep"),
+  ).toBeInTheDocument();
+  expect(
+    within(evidenceVarietyArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
+  expect(
+    within(evidenceVarietyArticle as HTMLElement).getByText("Standard"),
+  ).toBeInTheDocument();
+  expect(
+    within(cinderProcessionArticle as HTMLElement).getByText("New"),
+  ).toBeInTheDocument();
+  expect(
+    within(cinderProcessionArticle as HTMLElement).getByText("Standard"),
+  ).toBeInTheDocument();
   expect(screen.queryByText(/90 min/i)).not.toBeInTheDocument();
   expect(screen.queryByText(/80 min/i)).not.toBeInTheDocument();
 });

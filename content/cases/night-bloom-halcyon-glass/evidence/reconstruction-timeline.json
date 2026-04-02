@@ -1,0 +1,57 @@
+{
+  "subtype": "timeline",
+  "columns": [
+    {
+      "id": "time",
+      "label": "Time",
+      "sortable": true
+    },
+    {
+      "id": "event",
+      "label": "Event"
+    },
+    {
+      "id": "support",
+      "label": "Support"
+    }
+  ],
+  "rows": [
+    {
+      "id": "recon-1",
+      "time": "21:09",
+      "event": "Blackout rehearsal begins.",
+      "support": "Climate Event Log"
+    },
+    {
+      "id": "recon-2",
+      "time": "21:11",
+      "event": "Daria enters propagation lab.",
+      "support": "Badge Swipes"
+    },
+    {
+      "id": "recon-3",
+      "time": "21:12",
+      "event": "Confrontation and fatal impact in propagation lab.",
+      "support": "Scene comparison + medical note"
+    },
+    {
+      "id": "recon-4",
+      "time": "21:12",
+      "time_range": "21:12-21:14",
+      "event": "Body moved on cart C-4 through mist tunnel and service lift.",
+      "support": "Radio call + climate log + route sketch"
+    },
+    {
+      "id": "recon-5",
+      "time": "21:15",
+      "event": "Atrium fall scene staged and Daria returns to donor role.",
+      "support": "Badge Swipes + Donor Arrival Log"
+    },
+    {
+      "id": "recon-6",
+      "time": "21:18",
+      "event": "Body discovered below Moonbridge.",
+      "support": "Incident Summary"
+    }
+  ]
+}
