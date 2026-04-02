@@ -39,7 +39,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("the modal focuses close or play correctly and restores focus on close", async () => {
+test("the modal focuses close correctly and shows native audio controls", async () => {
   const playMock = vi
     .spyOn(HTMLMediaElement.prototype, "play")
     .mockRejectedValueOnce(new Error("blocked"));
@@ -76,15 +76,19 @@ test("the modal focuses close or play correctly and restores focus on close", as
   expect(
     screen.getByRole("dialog", { name: /introduction for the hollow bishop/i }),
   ).toBeInTheDocument();
+  expect(screen.getByLabelText(/introduction audio/i)).toBeInTheDocument();
+  expect(screen.queryByRole("button", { name: /play introduction/i })).toBeNull();
 
   await waitFor(() => {
     expect(markIntroductionSeenActionMock).toHaveBeenCalledTimes(1);
-    expect(screen.getByRole("button", { name: /play introduction/i })).toHaveFocus();
+    expect(playMock).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByRole("link", { name: /close introduction/i }),
+    ).toHaveFocus();
   });
-  expect(playMock).toHaveBeenCalledTimes(1);
 
-  playMock.mockReset();
-  playMock.mockResolvedValue(undefined);
+  fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+  expect(screen.getByLabelText(/introduction audio/i)).toHaveFocus();
 
   fireEvent.click(screen.getByRole("link", { name: /close introduction/i }));
 
@@ -155,6 +159,8 @@ test("attempts audio playback on open and focuses close when autoplay succeeds",
   await waitFor(() => {
     expect(playMock).toHaveBeenCalledTimes(1);
     expect(markIntroductionSeenActionMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText(/introduction audio/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /close introduction/i })).toHaveFocus();
   });
+  expect(screen.queryByRole("button", { name: /play introduction/i })).toBeNull();
 });

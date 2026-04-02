@@ -109,6 +109,9 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
   expect(
     screen.getByRole("heading", { name: /attempt history/i }),
   ).toBeInTheDocument();
+  const outcomeSection = screen
+    .getByRole("heading", { name: /case solved/i })
+    .closest("section");
   const finalReportSection = screen
     .getByRole("heading", { name: /your final report/i })
     .closest("section");
@@ -119,6 +122,7 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
     .getByRole("heading", { name: /attempt history/i })
     .closest("section");
 
+  expect(outcomeSection).not.toBeNull();
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
   expect(attemptHistorySection).not.toBeNull();
@@ -156,6 +160,16 @@ test("renders a solved debrief dossier with final report, reconstruction, and at
       "Bookkeeper Mara Quinn",
     ),
   ).toBeInTheDocument();
+  expect(
+    within(outcomeSection as HTMLElement).getByText(
+      /quinn poisoned the sacramental wine/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(outcomeSection as HTMLElement).queryByText(
+      /ashfall accepted your filed theory/i,
+    ),
+  ).toBeNull();
   expect(
     within(screen.getByRole("heading", { name: /attempt history/i }).closest(
       "section",
@@ -256,10 +270,14 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
   const reconstructionSection = screen
     .getByRole("heading", { name: /ashfall reconstruction/i })
     .closest("section");
+  const outcomeSection = screen
+    .getByRole("heading", { name: /case closed unresolved/i })
+    .closest("section");
 
   expect(attemptHistorySection).not.toBeNull();
   expect(finalReportSection).not.toBeNull();
   expect(reconstructionSection).not.toBeNull();
+  expect(outcomeSection).not.toBeNull();
   expect(
     within(finalReportSection as HTMLElement).getByText(
       /who staged the false distress transmission\?/i,
@@ -279,6 +297,16 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
     ),
   ).toBeInTheDocument();
   expect(
+    within(outcomeSection as HTMLElement).getByText(
+      /ashfall closes red harbor without a prosecutable case/i,
+    ),
+  ).toBeInTheDocument();
+  expect(
+    within(outcomeSection as HTMLElement).queryByText(
+      /red harbor is closed without a prosecutable case/i,
+    ),
+  ).toBeNull();
+  expect(
     within(attemptHistorySection as HTMLElement).getAllByText("In Progress"),
   ).toHaveLength(2);
   expect(
@@ -289,7 +317,4 @@ test("renders a closed-unsolved debrief dossier with the player's final theory a
       /who staged the false distress transmission\?/i,
     ),
   ).toHaveLength(3);
-  expect(
-    screen.getByText(/red harbor is closed without a prosecutable case/i),
-  ).toBeInTheDocument();
 });

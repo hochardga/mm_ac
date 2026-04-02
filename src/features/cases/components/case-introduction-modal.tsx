@@ -2,13 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { markIntroductionSeenAction } from "@/app/(app)/cases/[caseSlug]/actions";
@@ -32,6 +26,7 @@ export type CaseIntroductionModalProps = {
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
+  "audio[controls]",
   "input:not([disabled]):not([type='hidden'])",
   "select:not([disabled])",
   "textarea:not([disabled])",
@@ -66,7 +61,6 @@ function pauseAudio(audio: HTMLAudioElement | null) {
 
 function attemptPlayAudio(
   audio: HTMLAudioElement | null,
-  onBlocked: () => void,
 ) {
   if (!audio) {
     return;
@@ -76,10 +70,10 @@ function attemptPlayAudio(
     const maybePlay = audio.play();
 
     if (maybePlay && typeof maybePlay.then === "function") {
-      maybePlay.catch(onBlocked);
+      maybePlay.catch(() => {});
     }
   } catch {
-    onBlocked();
+    // Ignore autoplay failures when the browser blocks playback.
   }
 }
 
@@ -96,14 +90,12 @@ export function CaseIntroductionModal({
   const openerRef = useRef<HTMLElement | null>(null);
   const closeLinkRef = useRef<HTMLAnchorElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
-  const playButtonRef = useRef<HTMLButtonElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const restoreFocusFrameRef = useRef<number | null>(null);
   const seenWriteQueuedRef = useRef(false);
   const autoplayAttemptedRef = useRef(false);
   const [portalNode, setPortalNode] = useState<HTMLDivElement | null>(null);
   const [isOpen, setIsOpen] = useState(open);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   const audioSrc = intro.audioPath
     ? buildCaseAssetUrl(caseSlug, intro.audioPath)
@@ -113,7 +105,6 @@ export function CaseIntroductionModal({
   useEffect(() => {
     if (open) {
       autoplayAttemptedRef.current = false;
-      setAutoplayBlocked(false);
       setIsOpen(true);
     }
   }, [open]);
@@ -151,21 +142,6 @@ export function CaseIntroductionModal({
     },
     [closeHref, closeModal],
   );
-
-  const handlePlayClick = useCallback(() => {
-    const audio = audioRef.current;
-
-    if (!audio) {
-      return;
-    }
-
-    setAutoplayBlocked(false);
-    audio.currentTime = 0;
-    attemptPlayAudio(audio, () => {
-      setAutoplayBlocked(true);
-      playButtonRef.current?.focus({ preventScroll: true });
-    });
-  }, []);
 
   useEffect(() => {
     const node = document.createElement("div");
@@ -233,9 +209,7 @@ export function CaseIntroductionModal({
     }
 
     const initialFocusTarget =
-      autoplayBlocked && hasAudio
-        ? playButtonRef.current
-        : closeLinkRef.current ?? closeButtonRef.current ?? dialog;
+      closeLinkRef.current ?? closeButtonRef.current ?? dialog;
 
     initialFocusTarget?.focus({ preventScroll: true });
 
@@ -294,10 +268,7 @@ export function CaseIntroductionModal({
     if (hasAudio && audioRef.current && !autoplayAttemptedRef.current) {
       autoplayAttemptedRef.current = true;
       audioRef.current.currentTime = 0;
-      attemptPlayAudio(audioRef.current, () => {
-        setAutoplayBlocked(true);
-        playButtonRef.current?.focus({ preventScroll: true });
-      });
+      attemptPlayAudio(audioRef.current);
     }
 
     return () => {
@@ -375,31 +346,31 @@ export function CaseIntroductionModal({
             <h2 className="text-2xl font-semibold">Introduction</h2>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            {hasAudio ? (
-              <button
-                className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-stone-50 transition hover:border-white/35 hover:bg-white/10"
-                onClick={handlePlayClick}
-                ref={playButtonRef}
-                type="button"
-              >
-                Play Introduction
-              </button>
-            ) : null}
             {closeControl}
           </div>
         </div>
 
         {hasAudio && audioSrc ? (
+          <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-6">
+            <p className="text-xs uppercase tracking-[0.2em] text-stone-400">
+              Narration
+            </p>
           <audio
-            aria-hidden="true"
-            className="sr-only"
-            preload="none"
+            aria-label="Introduction audio"
+            className="mt-4 w-full"
+            controls
+            tabIndex={0}
             ref={audioRef}
             src={audioSrc}
           />
+          </div>
         ) : null}
 
-        <div className="rounded-[1.5rem] border border-white/10 bg-black/20 p-6">
+        <div
+          className={`rounded-[1.5rem] border border-white/10 bg-black/20 p-6 ${
+            hasAudio ? "mt-4" : ""
+          }`}
+        >
           <MarkdownContent content={intro.transcript} />
         </div>
       </div>

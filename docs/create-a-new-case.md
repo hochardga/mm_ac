@@ -8,12 +8,13 @@ For a family-by-family reference on evidence formats, use [Supported Evidence Ty
 
 ## What You Are Creating
 
-Each case lives in its own folder under `content/cases/<slug>/` and has three core authored layers plus an optional opening introduction:
+Each case lives in its own folder under `content/cases/<slug>/` and has three core authored layers plus optional opening and closing narration:
 
 - `manifest.json`: player-safe metadata, evidence index, stages, and objectives
 - `protected.json`: canonical answers, grading limits, and debrief copy
 - `evidence/`: the actual artifact files referenced by the manifest
 - `introduction/`: optional opening narration transcript and audio, kept separate from evidence
+- `closing/`: optional closing narration bundles for solved and closed-unsolved debriefs, kept separate from evidence and debrief copy
 
 These layers have to stay aligned:
 
@@ -27,7 +28,7 @@ These layers have to stay aligned:
 1. Create a new folder at `content/cases/<slug>/`.
 2. Add `manifest.json` with top-level metadata, evidence entries, and at least one stage.
 3. Add `protected.json` with `maxGradedFailures`, canonical answers, and both debrief outcomes.
-4. Add the files referenced from `manifest.json` under `evidence/`. If the case has an opening introduction, add `introduction/transcript.md` and optional `introduction/audio.mp3`. When the introduction or the opening brief mentions the system, keep the reference brief and controlled.
+4. Add the files referenced from `manifest.json` under `evidence/`. If the case has an opening introduction, add `introduction/transcript.md` and optional `introduction/audio.mp3`. If the case also has a closing narration, add `closing/solved/transcript.md`, optional `closing/solved/audio.mp3` or `closing/solved/audio.m4a`, and the matching `closing/closed-unsolved/` bundle after you write the debrief copy. When the introduction or the opening brief mentions the system, keep the reference brief and controlled.
 5. Run `pnpm validate:cases`.
 6. Run `pnpm build`.
 
@@ -46,6 +47,13 @@ content/
       introduction/
         transcript.md
         audio.mp3
+      closing/
+        solved/
+          transcript.md
+          audio.mp3
+        closed-unsolved/
+          transcript.md
+          audio.mp3
       evidence/
         opening-brief.md
         witness-thread.json
@@ -78,6 +86,24 @@ Keep in mind:
 - do not add the introduction transcript or audio to the evidence index
 - do not create manifest entries, stage unlocks, or protected answers for the introduction
 - if `transcript.md` is missing, empty, or unreadable, the introduction is treated as absent
+
+## Optional Closing Folder
+
+Use `content/cases/<slug>/closing/` for a case-closing narration that should play on the debrief page after the case resolves.
+
+The folder is separate from the manifest, evidence index, and `protected.json`:
+
+- `closing/solved/transcript.md` is required for a solved closing bundle
+- `closing/closed-unsolved/transcript.md` is required for a closed-unsolved closing bundle
+- `audio.mp3` is optional, and the loader also accepts `audio.m4a` when that is the authored output
+- the debrief page swaps in the narrated closing panel when a valid bundle exists
+- if `transcript.md` is missing, empty, or unreadable, the closing narration is treated as absent and the page falls back to the current debrief paragraph
+
+Keep in mind:
+
+- do not add closing narration files to the evidence index
+- do not create manifest entries, stage unlocks, or protected answers for the closing narration
+- keep the solved and closed-unsolved bundles aligned with the debrief outcomes in `protected.json`
 
 ## Starter Templates
 

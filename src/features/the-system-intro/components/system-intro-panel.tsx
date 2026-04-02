@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 
 type SystemIntroPanelProps = {
@@ -8,7 +8,7 @@ type SystemIntroPanelProps = {
   audioSrc?: string;
 };
 
-function attemptPlayAudio(audio: HTMLAudioElement | null, onBlocked: () => void) {
+function attemptPlayAudio(audio: HTMLAudioElement | null) {
   if (!audio) {
     return;
   }
@@ -17,18 +17,16 @@ function attemptPlayAudio(audio: HTMLAudioElement | null, onBlocked: () => void)
     const maybePlay = audio.play();
 
     if (maybePlay && typeof maybePlay.then === "function") {
-      maybePlay.catch(onBlocked);
+      maybePlay.catch(() => {});
     }
   } catch {
-    onBlocked();
+    // Ignore autoplay failures when the browser blocks playback.
   }
 }
 
 export function SystemIntroPanel({ transcript, audioSrc }: SystemIntroPanelProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playButtonRef = useRef<HTMLButtonElement | null>(null);
   const autoplayAttemptedRef = useRef(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   useEffect(() => {
     if (!audioSrc || autoplayAttemptedRef.current) {
@@ -36,12 +34,7 @@ export function SystemIntroPanel({ transcript, audioSrc }: SystemIntroPanelProps
     }
 
     autoplayAttemptedRef.current = true;
-    setAutoplayBlocked(false);
-
-    attemptPlayAudio(audioRef.current, () => {
-      setAutoplayBlocked(true);
-      playButtonRef.current?.focus({ preventScroll: true });
-    });
+    attemptPlayAudio(audioRef.current);
   }, [audioSrc]);
 
   return (
@@ -64,34 +57,9 @@ export function SystemIntroPanel({ transcript, audioSrc }: SystemIntroPanelProps
             aria-label="System narration audio"
             className="mt-4 w-full"
             controls
+            tabIndex={0}
             src={audioSrc}
           />
-          {autoplayBlocked ? (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button
-                ref={playButtonRef}
-                type="button"
-                className="inline-flex rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black"
-                onClick={() => {
-                  setAutoplayBlocked(false);
-                  const audio = audioRef.current;
-                  if (!audio) {
-                    return;
-                  }
-                  audio.currentTime = 0;
-                  attemptPlayAudio(audio, () => {
-                    setAutoplayBlocked(true);
-                    playButtonRef.current?.focus({ preventScroll: true });
-                  });
-                }}
-              >
-                Play Audio
-              </button>
-              <p className="text-sm text-stone-300">
-                Autoplay was blocked by your browser.
-              </p>
-            </div>
-          ) : null}
         </div>
       ) : null}
 
@@ -118,4 +86,3 @@ export function SystemIntroPanel({ transcript, audioSrc }: SystemIntroPanelProps
     </section>
   );
 }
-
