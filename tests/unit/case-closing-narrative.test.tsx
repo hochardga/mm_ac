@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import { CaseClosingNarrative } from "@/features/cases/components/case-closing-narrative";
@@ -29,7 +29,7 @@ test("renders transcript-only closing narration when audio is absent", () => {
   ).toBeNull();
 });
 
-test("attempts autoplay and reveals a play button when blocked", async () => {
+test("renders native audio controls and attempts autoplay when audio exists", async () => {
   const playMock = vi
     .spyOn(HTMLMediaElement.prototype, "play")
     .mockRejectedValueOnce(new Error("blocked"))
@@ -50,10 +50,11 @@ test("attempts autoplay and reveals a play button when blocked", async () => {
     expect(playMock).toHaveBeenCalledTimes(1);
   });
 
+  expect(screen.getByLabelText(/closing narration audio/i)).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /play closing narration/i }),
-  ).toBeInTheDocument();
-
-  fireEvent.click(screen.getByRole("button", { name: /play closing narration/i }));
-  expect(HTMLMediaElement.prototype.play).toHaveBeenCalledTimes(2);
+    screen.getByLabelText(/closing narration audio/i),
+  ).toHaveAttribute("controls");
+  expect(
+    screen.queryByRole("button", { name: /play closing narration/i }),
+  ).toBeNull();
 });

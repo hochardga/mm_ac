@@ -772,8 +772,11 @@ test("larkspur exposes a replayable intro bundle without touching evidence", asy
     ),
   ).toBeInTheDocument();
   expect(
-    screen.getByRole("button", { name: /play introduction/i }),
+    screen.getByLabelText(/introduction audio/i),
   ).toBeInTheDocument();
+  expect(
+    screen.queryByRole("button", { name: /play introduction/i }),
+  ).toBeNull();
   expect(
     screen.getByRole("link", { name: /replay introduction/i, hidden: true }),
   ).toHaveAttribute(

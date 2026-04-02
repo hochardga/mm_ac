@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 import { buildCaseAssetUrl } from "@/features/cases/case-asset-url";
 import { MarkdownContent } from "@/features/cases/components/markdown-content";
@@ -18,7 +18,6 @@ type CaseClosingNarrativeProps = {
 
 function attemptPlayAudio(
   audio: HTMLAudioElement | null,
-  onBlocked: () => void,
 ) {
   if (!audio) {
     return;
@@ -28,10 +27,10 @@ function attemptPlayAudio(
     const maybePlay = audio.play();
 
     if (maybePlay && typeof maybePlay.then === "function") {
-      maybePlay.catch(onBlocked);
+      maybePlay.catch(() => {});
     }
   } catch {
-    onBlocked();
+    // Ignore autoplay failures when the browser blocks playback.
   }
 }
 
@@ -41,9 +40,7 @@ export function CaseClosingNarrative({
   closingNarrative,
 }: CaseClosingNarrativeProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playButtonRef = useRef<HTMLButtonElement | null>(null);
   const autoplayAttemptedRef = useRef(false);
-  const [autoplayBlocked, setAutoplayBlocked] = useState(false);
 
   const audioSrc = closingNarrative.audioPath
     ? buildCaseAssetUrl(caseSlug, closingNarrative.audioPath)
@@ -56,12 +53,7 @@ export function CaseClosingNarrative({
     }
 
     autoplayAttemptedRef.current = true;
-    setAutoplayBlocked(false);
-
-    attemptPlayAudio(audioRef.current, () => {
-      setAutoplayBlocked(true);
-      playButtonRef.current?.focus({ preventScroll: true });
-    });
+    attemptPlayAudio(audioRef.current);
   }, [hasAudio]);
 
   return (
@@ -81,34 +73,6 @@ export function CaseClosingNarrative({
             controls
             src={audioSrc}
           />
-          {autoplayBlocked ? (
-            <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button
-                ref={playButtonRef}
-                type="button"
-                className="inline-flex rounded-full bg-[#d96c3d] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-black"
-                onClick={() => {
-                  setAutoplayBlocked(false);
-                  const audio = audioRef.current;
-
-                  if (!audio) {
-                    return;
-                  }
-
-                  audio.currentTime = 0;
-                  attemptPlayAudio(audio, () => {
-                    setAutoplayBlocked(true);
-                    playButtonRef.current?.focus({ preventScroll: true });
-                  });
-                }}
-              >
-                Play Closing Narration
-              </button>
-              <p className="text-sm text-stone-300">
-                Autoplay was blocked by your browser.
-              </p>
-            </div>
-          ) : null}
         </div>
       ) : null}
 
