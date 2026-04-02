@@ -46,7 +46,7 @@ Implement `loadCaseClosing(slug, status)` so it:
 - maps `completed` to `closing/solved`
 - maps `closed_unsolved` to `closing/closed-unsolved`
 - requires `transcript.md`
-- treats `audio.mp3` as optional
+- treats `audio.mp3` (preferred) or `audio.m4a` (fallback) as optional
 - returns `null` when the bundle is missing or invalid
 
 Extend `getDebrief()` so it loads the closing bundle after terminal-case validation and returns it as a `closingNarrative` field alongside the existing title, summary, solution, and attempt history.
@@ -121,9 +121,9 @@ git commit -m "feat: render case closing narration"
 **Files:**
 - Modify: `docs/create-a-new-case.md`
 - Create: `content/cases/hollow-bishop/closing/solved/transcript.md`
-- Create: `content/cases/hollow-bishop/closing/solved/audio.mp3`
+- Create: `content/cases/hollow-bishop/closing/solved/audio.mp3` or `content/cases/hollow-bishop/closing/solved/audio.m4a`
 - Create: `content/cases/red-harbor/closing/closed-unsolved/transcript.md`
-- Create: `content/cases/red-harbor/closing/closed-unsolved/audio.mp3`
+- Create: `content/cases/red-harbor/closing/closed-unsolved/audio.mp3` or `content/cases/red-harbor/closing/closed-unsolved/audio.m4a`
 - Modify: `tests/unit/create-a-new-case.test.ts`
 
 - [ ] **Step 1: Write the failing docs and regression tests**
@@ -143,15 +143,15 @@ Expected: FAIL until the docs and case-local closing bundles exist.
 
 Add the new `closing/` folder guidance to `docs/create-a-new-case.md` so it explains:
 - the `closing/solved/` and `closing/closed-unsolved/` folder structure
-- that `transcript.md` is required and `audio.mp3` is optional
+- that `transcript.md` is required and `audio.mp3` (preferred) or `audio.m4a` (fallback) is optional
 - that closing narration is separate from `protected.json` and the evidence index
 - that cases without a closing bundle fall back to the current debrief paragraph
 
 Seed the first closing bundles on the existing debrief regression cases:
 - `content/cases/hollow-bishop/closing/solved/transcript.md`
-- `content/cases/hollow-bishop/closing/solved/audio.mp3`
+- `content/cases/hollow-bishop/closing/solved/audio.mp3` or `content/cases/hollow-bishop/closing/solved/audio.m4a`
 - `content/cases/red-harbor/closing/closed-unsolved/transcript.md`
-- `content/cases/red-harbor/closing/closed-unsolved/audio.mp3`
+- `content/cases/red-harbor/closing/closed-unsolved/audio.mp3` or `content/cases/red-harbor/closing/closed-unsolved/audio.m4a`
 
 If the final narrated MP3 assets are not yet available, keep the path contract in place and use transcript-only content for the corresponding bundle until the audio is ready.
 

@@ -57,6 +57,7 @@ export function SystemIntroPanel({ transcript, audioSrc }: SystemIntroPanelProps
             aria-label="System narration audio"
             className="mt-4 w-full"
             controls
+            tabIndex={0}
             src={audioSrc}
           />
         </div>

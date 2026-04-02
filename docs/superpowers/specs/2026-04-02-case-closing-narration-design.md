@@ -81,11 +81,11 @@ Cons:
 - Add an optional `closing/` folder under each case root.
 - The folder contains one subfolder per terminal outcome:
   - `closing/solved/transcript.md`
-  - `closing/solved/audio.mp3`
+  - `closing/solved/audio.mp3` (preferred) or `closing/solved/audio.m4a` (fallback)
   - `closing/closed-unsolved/transcript.md`
-  - `closing/closed-unsolved/audio.mp3`
+  - `closing/closed-unsolved/audio.mp3` (preferred) or `closing/closed-unsolved/audio.m4a` (fallback)
 - `transcript.md` is required for a closing bundle to count as present.
-- `audio.mp3` is optional.
+- `audio.mp3` (preferred) or `audio.m4a` (fallback) is optional.
 - If the transcript is missing, unreadable, or empty, the loader returns `null`.
 - If audio is present without a valid transcript, the bundle still does not count as present.
 - The loader maps `completed` to `solved` and `closed_unsolved` to `closed-unsolved`.
@@ -166,9 +166,9 @@ The tests should focus on content and behavior, not on brittle layout details.
 - `src/features/cases/load-case-closing.ts`: load the optional status-specific closing bundle and return a normalized object or `null`.
 - `src/features/cases/components/case-closing-narrative.tsx`: render the closing audio and transcript inline on the debrief page.
 - `content/cases/<slug>/closing/solved/transcript.md`: authored closing transcript for solved cases.
-- `content/cases/<slug>/closing/solved/audio.mp3`: optional solved closing audio.
+- `content/cases/<slug>/closing/solved/audio.mp3` (preferred) or `content/cases/<slug>/closing/solved/audio.m4a` (fallback): optional solved closing audio.
 - `content/cases/<slug>/closing/closed-unsolved/transcript.md`: authored closing transcript for closed-unsolved cases.
-- `content/cases/<slug>/closing/closed-unsolved/audio.mp3`: optional closed-unsolved closing audio.
+- `content/cases/<slug>/closing/closed-unsolved/audio.mp3` (preferred) or `content/cases/<slug>/closing/closed-unsolved/audio.m4a` (fallback): optional closed-unsolved closing audio.
 
 ### Modify
 
@@ -186,4 +186,3 @@ The tests should focus on content and behavior, not on brittle layout details.
 3. Author closing bundles for the current debrief regression cases.
 4. Update the case authoring docs with the new folder convention.
 5. Verify the page still falls back cleanly when a case has no closing bundle.
-

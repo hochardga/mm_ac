@@ -32,8 +32,7 @@ test("renders transcript-only closing narration when audio is absent", () => {
 test("renders native audio controls and attempts autoplay when audio exists", async () => {
   const playMock = vi
     .spyOn(HTMLMediaElement.prototype, "play")
-    .mockRejectedValueOnce(new Error("blocked"))
-    .mockResolvedValueOnce(undefined);
+    .mockResolvedValue(undefined);
 
   render(
     <CaseClosingNarrative
@@ -57,4 +56,40 @@ test("renders native audio controls and attempts autoplay when audio exists", as
   expect(
     screen.queryByRole("button", { name: /play closing narration/i }),
   ).toBeNull();
+});
+
+test("re-attempts autoplay when the audio source changes", async () => {
+  const playMock = vi
+    .spyOn(HTMLMediaElement.prototype, "play")
+    .mockResolvedValue(undefined);
+
+  const { rerender } = render(
+    <CaseClosingNarrative
+      caseSlug="hollow-bishop"
+      caseName="The Hollow Bishop"
+      closingNarrative={{
+        transcript: "Quinn poisoned the sacramental wine.",
+        audioPath: "closing/solved/audio.mp3",
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(playMock).toHaveBeenCalledTimes(1);
+  });
+
+  rerender(
+    <CaseClosingNarrative
+      caseSlug="hollow-bishop"
+      caseName="The Hollow Bishop"
+      closingNarrative={{
+        transcript: "Quinn poisoned the sacramental wine.",
+        audioPath: "closing/solved/audio.m4a",
+      }}
+    />,
+  );
+
+  await waitFor(() => {
+    expect(playMock).toHaveBeenCalledTimes(2);
+  });
 });

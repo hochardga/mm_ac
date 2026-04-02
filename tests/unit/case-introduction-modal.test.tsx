@@ -87,6 +87,9 @@ test("the modal focuses close correctly and shows native audio controls", async 
     ).toHaveFocus();
   });
 
+  fireEvent.keyDown(document, { key: "Tab", shiftKey: true });
+  expect(screen.getByLabelText(/introduction audio/i)).toHaveFocus();
+
   fireEvent.click(screen.getByRole("link", { name: /close introduction/i }));
 
   expect(routerReplaceMock).toHaveBeenCalledWith(

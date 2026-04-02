@@ -26,6 +26,7 @@ export type CaseIntroductionModalProps = {
 const FOCUSABLE_SELECTOR = [
   "a[href]",
   "button:not([disabled])",
+  "audio[controls]",
   "input:not([disabled]):not([type='hidden'])",
   "select:not([disabled])",
   "textarea:not([disabled])",
@@ -354,13 +355,14 @@ export function CaseIntroductionModal({
             <p className="text-xs uppercase tracking-[0.2em] text-stone-400">
               Narration
             </p>
-            <audio
-              aria-label="Introduction audio"
-              className="mt-4 w-full"
-              controls
-              ref={audioRef}
-              src={audioSrc}
-            />
+          <audio
+            aria-label="Introduction audio"
+            className="mt-4 w-full"
+            controls
+            tabIndex={0}
+            ref={audioRef}
+            src={audioSrc}
+          />
           </div>
         ) : null}
 

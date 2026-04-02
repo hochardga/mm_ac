@@ -40,7 +40,7 @@ export function CaseClosingNarrative({
   closingNarrative,
 }: CaseClosingNarrativeProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const autoplayAttemptedRef = useRef(false);
+  const autoplayAttemptedAudioSrcRef = useRef<string | null>(null);
 
   const audioSrc = closingNarrative.audioPath
     ? buildCaseAssetUrl(caseSlug, closingNarrative.audioPath)
@@ -48,13 +48,18 @@ export function CaseClosingNarrative({
   const hasAudio = Boolean(audioSrc);
 
   useEffect(() => {
-    if (!hasAudio || autoplayAttemptedRef.current) {
+    if (!audioSrc) {
+      autoplayAttemptedAudioSrcRef.current = null;
       return;
     }
 
-    autoplayAttemptedRef.current = true;
+    if (autoplayAttemptedAudioSrcRef.current === audioSrc) {
+      return;
+    }
+
+    autoplayAttemptedAudioSrcRef.current = audioSrc;
     attemptPlayAudio(audioRef.current);
-  }, [hasAudio]);
+  }, [audioSrc]);
 
   return (
     <section
@@ -71,6 +76,7 @@ export function CaseClosingNarrative({
             aria-label="Closing narration audio"
             className="mt-4 w-full"
             controls
+            tabIndex={0}
             src={audioSrc}
           />
         </div>
