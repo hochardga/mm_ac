@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { AudioEvidenceView } from "@/features/cases/components/audio-evidence-view";
 
 test("audio viewer shows source metadata, player, and transcript", () => {
-  render(
+  const { container } = render(
     <AudioEvidenceView
       caseSlug="media-family-valid"
       evidence={{
@@ -25,6 +25,10 @@ test("audio viewer shows source metadata, player, and transcript", () => {
     screen.getByText(/source:\s*harbor dispatch archive/i),
   ).toBeInTheDocument();
   expect(screen.getByText(/duration:\s*1m 5s/i)).toBeInTheDocument();
+  expect(screen.getByText(/voicemail transcript/i)).toBeInTheDocument();
   expect(screen.getByLabelText(/audio playback/i)).toBeInTheDocument();
   expect(screen.getByText(/check pier locker seven/i)).toBeInTheDocument();
+  expect(
+    container.querySelector("[data-audio-variant='voicemail']"),
+  ).toBeInTheDocument();
 });

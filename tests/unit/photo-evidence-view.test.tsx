@@ -22,11 +22,15 @@ function renderPhotoEvidenceView() {
 }
 
 test("shows Source and Date without a nested preview control", () => {
-  renderPhotoEvidenceView();
+  const { container } = renderPhotoEvidenceView();
 
   expect(screen.getByText(/source:\s*parish evidence locker/i)).toBeInTheDocument();
   expect(screen.getByText(/date:\s*unknown/i)).toBeInTheDocument();
+  expect(screen.getByText(/scene still/i)).toBeInTheDocument();
   expect(
     screen.queryByRole("button", { name: /open larger preview/i }),
   ).not.toBeInTheDocument();
+  expect(
+    container.querySelector("[data-photo-variant='scene_photo']"),
+  ).toBeInTheDocument();
 });

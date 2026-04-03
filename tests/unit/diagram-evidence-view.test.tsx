@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { DiagramEvidenceView } from "@/features/cases/components/diagram-evidence-view";
 
 test("diagram viewer renders labels from the structured geometry model", () => {
-  render(
+  const { container } = render(
     <DiagramEvidenceView
       evidence={{
         id: "harbor-map",
@@ -40,4 +40,7 @@ test("diagram viewer renders labels from the structured geometry model", () => {
   expect(screen.getByText(/power loss reported here/i)).toBeInTheDocument();
   expect(screen.getByText(/legend/i)).toBeInTheDocument();
   expect(screen.getAllByText(/camera/i).length).toBeGreaterThan(0);
+  expect(
+    container.querySelector("[data-diagram-variant='map']"),
+  ).toBeInTheDocument();
 });
