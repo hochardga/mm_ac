@@ -44,6 +44,9 @@ test("webpage viewer renders structured blocks without raw html injection", () =
   expect(screen.getByText(/harbor service directory/i)).toBeInTheDocument();
   expect(screen.getByText(/pier locker rentals/i)).toBeInTheDocument();
   expect(container.querySelector("script")).toBeNull();
+  expect(
+    container.querySelector("[data-webpage-variant='directory_listing']"),
+  ).toBeInTheDocument();
 });
 
 test("webpage viewer tolerates duplicate list items and repeated card titles", () => {
